@@ -21,9 +21,13 @@
     input{ width:100%; padding:10px; border-radius:8px; border:1px solid var(--line);
            background:#0f0f13; color:var(--text); font-size:15px; }
     .row{ display:flex; gap:10px; } .row>div{ flex:1; }
-    button{ background:#23232b; color:var(--text); border:1px solid var(--line); border-radius:8px;
-            padding:10px 14px; font-size:15px; cursor:pointer; width:100%; }
-    button.on{ background:var(--accent); border-color:var(--accent); }
+    /* -webkit-appearance:none → iOS Safari'nin native buton görünümünü kapatır,
+       böylece .on kırmızı arka planı GERÇEKTEN görünür. */
+    button{ -webkit-appearance:none; appearance:none;
+            background:#23232b; color:var(--text); border:1px solid var(--line); border-radius:8px;
+            padding:10px 14px; font-size:15px; font-family:inherit; cursor:pointer; width:100%;
+            transition:background .15s, border-color .15s; }
+    button.on{ background:var(--accent); border-color:var(--accent); color:#fff; }
     .go{ background:var(--accent); border-color:var(--accent); font-weight:600; margin-top:14px; }
     #out{ line-height:1.8; }
     .status{ font-size:13px; padding:8px 12px; border-radius:8px; margin:6px 0; background:#1f1f26; color:var(--muted); }

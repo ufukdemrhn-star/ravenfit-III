@@ -4,7 +4,7 @@
 //  Yeni sürüm yayınlarken CACHE adındaki "v1"i artır (v2, v3...).
 // ════════════════════════════════════════════════════════════
 
-const CACHE = 'ravenfit3-skeleton-v1';
+const CACHE = 'ravenfit3-skeleton-v2';
 const ASSETS = [
   './',
   './index.html',
