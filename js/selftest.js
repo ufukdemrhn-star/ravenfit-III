@@ -9,7 +9,7 @@ import {
 import {
   recGoalDetailed, calcGoalGates, checkRedsRisk, ffmiBand, trainingAgeFrom
 } from './goals.js';
-import { SUPPS, calcSuppScores } from './supplements.js';
+import { SUPPS, calcSuppScores, SUPP_QS } from './supplements.js';
 import { determineBodyProfile, getDietTipByProfile } from './profile.js';
 import { _roundTripTest } from './storage.js';
 import { filterExercises } from './exercises.js';
@@ -135,6 +135,13 @@ export function runSelfTest() {
   eq(sm.dB, -3, 'İlerleme: yağ farkı -3');
   eq(goalNote('cut', -3).length > 5, true, 'İlerleme: cut yorumu döndü');
   eq(summarizeProgress([]), null, 'İlerleme: boş dizi null');
+
+
+  // GRUP 17 — Supplement anketi
+  eq(SUPP_QS.length, 10, 'Supplement anketi 10 soru');
+  eq(SUPP_QS.every(q => q.key && q.opts && q.opts.length >= 2), true, 'Anket: her soru >=2 seçenek');
+  const badSleep = Object.fromEntries(calcSuppScores({ sleep: 'bad' }, { age: 25, gender: 'male' }, null).map(x => [x.id, x.score]));
+  eq(badSleep.zma >= 30, true, 'Anket: kötü uyku -> zma >=30');
 
   console.log(`%c🔬 Öz-test: ${passed} geçti, ${failed} kaldı`,
     failed === 0 ? 'color:#4ade80;font-weight:bold' : 'color:#f87171;font-weight:bold');

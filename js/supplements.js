@@ -413,3 +413,70 @@ export function calcSuppScores(a, user, profileName){
     return Object.assign({},SUPPS[id],{id:id,score:scores[id],reasons:reasons[id]});
   });
 }
+
+// ── Supplement anketi soruları (RavenFit2'den; protein etiketleri sabitlendi) ──
+export const SUPP_QS = [
+  { key: 'goal', title: 'Birincil hedefin nedir?', opts: [
+    { v: 'bulk', l: '💪 Kas & Kütle Kazanımı' },
+    { v: 'cut', l: '🔥 Yağ Yakımı & Definasyon' },
+    { v: 'recomp', l: '⚖️ Rekompozisyon (Dengeli Form)' },
+    { v: 'health', l: '❤️ Genel Sağlık & Wellness' },
+    { v: 'perf', l: '🏆 Performans & Dayanıklılık' },
+  ] },
+  { key: 'sport', title: 'Antrenman türün nedir?', opts: [
+    { v: 'bb', l: '🏋️ Vücut Geliştirme / Powerlifting' },
+    { v: 'cardio', l: '🏃 Kardiyo / Koşu / Bisiklet' },
+    { v: 'hybrid', l: '⚡ Hibrit (Ağırlık + Kardiyo)' },
+    { v: 'sport', l: '⚽ Takım / Kombat Sporu' },
+    { v: 'none', l: '🚶 Aktif ama antrenman yok' },
+  ] },
+  { key: 'freq', title: 'Haftada kaç gün antrenman yapıyorsun?', opts: [
+    { v: 'low', l: '1–2 gün' },
+    { v: 'mid', l: '3–4 gün' },
+    { v: 'high', l: '5–6 gün' },
+    { v: 'elite', l: 'Her gün / 2 antrenman/gün' },
+  ] },
+  { key: 'diet', title: 'Beslenme düzenin nasıl?', opts: [
+    { v: 'clean', l: '🥦 Temiz / Bol protein, az işlenmiş' },
+    { v: 'normal', l: '🍖 Normal / Karma beslenme' },
+    { v: 'messy', l: '🍕 Düzensiz / Hazır yemek ağırlıklı' },
+    { v: 'veje', l: '🥬 Vejetaryen' },
+    { v: 'vegan', l: '🌱 Vegan' },
+  ] },
+  { key: 'protein_intake', title: 'Günlük protein alımın nasıl?', opts: [
+    { v: 'low', l: '😬 Düşük — < 100 g' },
+    { v: 'mid', l: '😐 Orta — 100–150 g' },
+    { v: 'ok', l: '✅ Yeterli — > 150 g' },
+    { v: 'unknown', l: '🤷 Bilmiyorum / Takip etmiyorum' },
+  ] },
+  { key: 'sleep', title: 'Uyku kalitenin nasıl?', opts: [
+    { v: 'good', l: '😴 İyi — Düzenli 7-9 saat' },
+    { v: 'mid', l: '😐 Orta — Sık sık 5-7 saat' },
+    { v: 'bad', l: '😵 Kötü — Genellikle <5 saat veya bölünmüş' },
+    { v: 'shift', l: '🌙 Vardiyalı / Düzensiz uyku saatleri' },
+  ] },
+  { key: 'stress', title: 'Günlük stres seviyeni nasıl tanımlarsın?', opts: [
+    { v: 'low', l: '😌 Düşük — Genellikle rahat' },
+    { v: 'mid', l: '😐 Orta — Ara sıra yoğun dönemler' },
+    { v: 'high', l: '😤 Yüksek — Sürekli baskı altındayım' },
+    { v: 'burnout', l: '🔥 Çok yüksek — Tükenmişlik' },
+  ] },
+  { key: 'sun', title: 'Güneş maruziyetin nasıl?', opts: [
+    { v: 'good', l: '☀️ İyi — Düzenli dışarıda' },
+    { v: 'low', l: '🏢 Az — Çoğunlukla iç mekanda' },
+    { v: 'none', l: '🌑 Çok az — Neredeyse hiç güneş yok' },
+    { v: 'covered', l: '🧣 Kapalı giyiniyorum / Kuzey iklim' },
+  ] },
+  { key: 'budget', title: 'Supplement için aylık bütçen nedir?', opts: [
+    { v: 'min', l: '💰 Minimal — Sadece 1 temel ürün' },
+    { v: 'low', l: '💰💰 Düşük — 2-3 ürün' },
+    { v: 'mid', l: '💰💰💰 Orta — 3-5 ürün' },
+    { v: 'high', l: '💎 Yüksek — Kapsamlı stack' },
+  ] },
+  { key: 'current_usage', title: 'Halihazırda supplement kullanıyor musun?', opts: [
+    { v: 'none', l: '🚫 Hiç kullanmıyorum' },
+    { v: 'basic', l: '💊 1-2 temel supplement' },
+    { v: 'moderate', l: '💊💊 3-5 supplement' },
+    { v: 'advanced', l: '🧪 Kapsamlı stack' },
+  ] },
+];

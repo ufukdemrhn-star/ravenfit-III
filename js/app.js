@@ -8,7 +8,7 @@ import {
   calcGoalCalories, calcMacros, calcWaterTarget
 } from './calc.js';
 import { recGoalDetailed, gateWarning, checkRedsRisk } from './goals.js';
-import { calcSuppScores } from './supplements.js';
+import { calcSuppScores, SUPP_QS } from './supplements.js';
 import { determineBodyProfile, getDietTipByProfile } from './profile.js';
 import { loadExercises, filterExercises, uniqueEquipment, CAT_TR, CATEGORIES } from './exercises.js';
 import { PROGRAMS } from './programs.js';
@@ -17,7 +17,7 @@ import { showScreen } from './ui.js';
 import { saveUser, loadUser, clearUser, saveJSON, loadJSON } from './storage.js';
 import { runSelfTest } from './selftest.js';
 
-const APP_VERSION = '0.0.12';
+const APP_VERSION = '0.0.13';
 const GOAL_LABELS = { cut: 'Cut (yağ ver)', recomp: 'Recomp', maintain: 'Koru', bulk: 'Bulk (kütle al)' };
 const EV = { high: '🟢 Yüksek kanıt', mid: '🟡 Orta kanıt', low: '🔴 Sınırlı kanıt' };
 
@@ -163,7 +163,50 @@ function renderVucudum() {
   const body = activeVsub === 'olculer' ? renderOlculer() : activeVsub === 'ilerleme' ? renderIlerleme() : renderAnaliz();
   return bar + body;
 }
+function renderSuppSurvey() {
+  const answered = SUPP_QS.filter(q => suppDraft[q.key]).length;
+  let h = `<button data-action="cancelSuppSurvey">← İptal</button>` +
+    `<h3 style="margin:12px 0 4px">Supplement Anketi</h3>` +
+    `<div class="muted" style="font-size:12px;margin-bottom:8px">${answered}/${SUPP_QS.length} yanıtlandı</div>`;
+  SUPP_QS.forEach(q => {
+    h += `<div class="qblock"><div class="qtitle">${q.title}</div><div class="pills qopts">` +
+      q.opts.map(o => `<button data-action="suppAns" data-arg="${q.key}:${o.v}" class="${suppDraft[q.key] === o.v ? 'on' : ''}">${o.l}</button>`).join('') +
+      `</div></div>`;
+  });
+  return h + `<button class="go" style="width:100%;margin-top:8px" data-action="submitSuppSurvey">Sonuçları Gör →</button>`;
+}
+function suppSection() {
+  if (!suppAnswers) {
+    return grp('SUPPLEMENT', `<span class="muted">Sana özel supplement önerisi için kısa bir anket var (10 soru).</span>`) +
+      `<button class="go" style="width:100%" data-action="startSuppSurvey">Ankete Başla</button>`;
+  }
+  const max = BUDGET_MAX[suppAnswers.budget] || 6;
+  const list = calcSuppScores(suppAnswers, { age: U.age, gender: U.gender }, R.profileName)
+    .filter(s => s.score > 0).sort((a, b) => b.score - a.score).slice(0, max);
+  let h = `<div class="ph">SANA ÖNERİLEN SUPPLEMENTLER (${list.length})</div>`;
+  list.forEach(s => {
+    const open = openSupp === s.id;
+    h += `<div class="suppcard"><div class="supphead" data-action="suppToggle" data-arg="${s.id}">` +
+      `<span>${s.emoji} <b>${esc(s.name)}</b></span><span class="ev">${EV[s.evidence] || ''} ${open ? '▲' : '▼'}</span></div>`;
+    if (open) {
+      h += `<div class="suppbody">` +
+        `<div><b>Doz:</b> ${esc(s.dose)}</div>` +
+        `<div><b>Zamanlama:</b> ${esc(s.timing)}</div>` +
+        `<div><b>Amaç:</b> ${esc(s.purpose)}</div>` +
+        `<div><b>Etki:</b> ${esc(s.effect)}</div>` +
+        (s.sideEffects ? `<div><b>Yan etki:</b> ${esc(s.sideEffects)}</div>` : '') +
+        (s.interactions ? `<div><b>Etkileşim:</b> ${esc(s.interactions)}</div>` : '') +
+        (s.note ? `<div class="muted">${esc(s.note)}</div>` : '') +
+        (s.reasons && s.reasons.length ? `<div class="reasons">${s.reasons.map(r => '• ' + esc(r)).join('<br>')}</div>` : '') +
+        `</div>`;
+    }
+    h += `</div>`;
+  });
+  h += `<div class="legal">⚕️ Bu bilgiler yalnızca eğitim amaçlıdır, tıbbi tavsiye değildir. Bir supplemente başlamadan önce doktoruna/eczacına danış. Hamilelik, kronik hastalık veya ilaç kullanımı varsa mutlaka hekime sor.</div>`;
+  return h + `<button data-action="startSuppSurvey" style="width:100%">Anketi Yenile</button>`;
+}
 function renderBeslenme() {
+  if (suppSurvey) return renderSuppSurvey();
   let h = grp(`ENERJİ — hedef: ${GOAL_LABELS[U.goal]}`,
         `TDEE (BMR × ${U.actM}): <b>${R.tdee} kcal</b><br>Günlük hedef: <b>${R.goalCals} kcal</b>`) +
       grp('MAKRO',
@@ -173,12 +216,7 @@ function renderBeslenme() {
       grp('ÖNERİ', `Önerilen: <b>${GOAL_LABELS[R.recPrimary]}</b>` +
         (R.recAlt ? ` <span class="muted">· alternatif: ${GOAL_LABELS[R.recAlt]}</span>` : '') +
         `<br><span class="muted">${R.recReason}</span>`);
-  let supp = `<div class="grp"><div class="h">SUPPLEMENT</div>`;
-  if (R.supps.length) R.supps.forEach((s, i) => {
-    supp += `${['🥇', '🥈', '🥉', '•'][i] || '•'} ${s.emoji} <b>${s.name}</b> <span class="ev">${EV[s.evidence] || ''}</span><br>`;
-  });
-  else supp += `<span class="muted">—</span>`;
-  supp += `</div>`; h += supp;
+  h += suppSection();
   if (R.gw) h += `<div class="warn">${R.gw}</div>`;
   if (R.reds) h += `<div class="warn reds">⚠️ <strong>RED-S riski:</strong> Yağ oranın çok düşükken cut yapmak hormonal sağlığı, kemik yoğunluğunu ve performansı olumsuz etkileyebilir. <strong>Maintain</strong> veya <strong>bulk</strong> önerilir.</div>`;
   return h;
@@ -198,6 +236,12 @@ let customPrograms = loadJSON(PROG_KEY) || [];
 const MEAS_KEY = 'ravenfit_measurements_v1';
 let measurements = loadJSON(MEAS_KEY) || [];
 let measureForm = false;
+const SUPP_KEY = 'ravenfit_supp_v1';
+let suppAnswers = loadJSON(SUPP_KEY) || null;
+let suppSurvey = false;
+let suppDraft = {};
+let openSupp = null;
+const BUDGET_MAX = { min: 3, low: 5, mid: 8, high: 99 };
 const allPrograms = () => customPrograms.concat(PROGRAMS);
 // dinlenme sayacı
 let restRemaining = 0, restInterval = null;
@@ -444,6 +488,12 @@ const actions = {
     measureForm = false; renderTab();
   },
   deleteMeasure(el, arg) { if (confirm('Bu ölçümü sil?')) { measurements = measurements.filter(m => String(m.date) !== arg); saveJSON(MEAS_KEY, measurements); renderTab(); } },
+  // supplement anketi
+  startSuppSurvey() { suppSurvey = true; suppDraft = suppAnswers ? { ...suppAnswers } : {}; openSupp = null; renderTab(); window.scrollTo(0, 0); },
+  cancelSuppSurvey() { suppSurvey = false; renderTab(); },
+  suppAns(el, arg) { const [k, v] = arg.split(':'); suppDraft[k] = v; renderTab(); },
+  submitSuppSurvey() { suppAnswers = { ...suppDraft }; saveJSON(SUPP_KEY, suppAnswers); suppSurvey = false; openSupp = null; renderTab(); window.scrollTo(0, 0); },
+  suppToggle(el, id) { openSupp = openSupp === id ? null : id; renderTab(); },
 };
 
 document.addEventListener('click', (e) => {
