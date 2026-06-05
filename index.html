@@ -4,36 +4,46 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#E63946">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="icon.png">
   <link rel="manifest" href="manifest.json">
-  <title>RavenFit3 — İskelet</title>
+  <title>RavenFit3</title>
   <style>
     :root{ --bg:#0d0d0f; --card:#17171c; --line:#2a2a31; --accent:#E63946; --text:#f1f1f3; --muted:#8a8a93; }
     *{ box-sizing:border-box; }
     body{ margin:0 auto; max-width:480px; padding:20px; font-family:system-ui,-apple-system,sans-serif;
           background:var(--bg); color:var(--text); }
-    h1{ font-size:20px; margin:0 0 2px; }
+    h1{ font-size:24px; margin:8px 0 2px; } h2{ font-size:18px; margin:0 0 12px; }
     .tag{ color:var(--muted); font-size:13px; margin:0 0 6px; }
     .muted{ color:var(--muted); }
+    .logo{ width:88px; height:88px; border-radius:22px; object-fit:cover; }
+    .center{ text-align:center; padding-top:24px; }
     .card{ background:var(--card); border-radius:14px; padding:16px; margin:14px 0; }
+    .prog{ font-size:12px; color:var(--muted); text-align:center; margin-bottom:8px; letter-spacing:.05em; }
     .lbl{ font-size:13px; color:var(--muted); margin:12px 0 6px; }
     label{ display:block; font-size:13px; color:var(--muted); margin:8px 0 4px; }
-    input{ width:100%; padding:10px; border-radius:8px; border:1px solid var(--line);
+    input{ width:100%; padding:11px; border-radius:8px; border:1px solid var(--line);
            background:#0f0f13; color:var(--text); font-size:15px; }
     .row{ display:flex; gap:10px; } .row>div{ flex:1; }
     .pills{ display:flex; flex-wrap:wrap; gap:8px; }
     button{ -webkit-appearance:none; appearance:none;
             background:#23232b; color:var(--text); border:1px solid var(--line); border-radius:8px;
-            padding:10px 12px; font-size:14px; font-family:inherit; cursor:pointer;
+            padding:11px 12px; font-size:14px; font-family:inherit; cursor:pointer;
             transition:background .15s, border-color .15s; }
     .pills button{ flex:1 1 auto; }
     button.on{ background:var(--accent); border-color:var(--accent); color:#fff; }
-    .go{ width:100%; font-size:15px; font-weight:600; margin-top:14px; }
+    .go{ background:var(--accent); border-color:var(--accent); font-weight:600; }
+    .nav{ display:flex; gap:10px; margin-top:16px; }
+    .nav button{ flex:1; } .nav .go{ flex:2; }
+    /* SPA: sadece aktif ekran görünür */
+    .screen{ display:none; }
+    .screen.active{ display:block; animation:fade .2s ease; }
+    @keyframes fade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
     #out .grp{ padding:10px 0; border-bottom:1px solid var(--line); line-height:1.9; }
     #out .grp:last-child{ border-bottom:none; }
     #out .h{ font-size:11px; letter-spacing:.08em; color:var(--accent); margin-bottom:4px; }
     #out .ev{ font-size:11px; color:var(--muted); }
-    #out .warn{ background:#2a1e0f; color:#fbbf24; border:1px solid #5a4516; border-radius:8px;
-                padding:10px; margin-top:10px; font-size:13px; line-height:1.6; }
+    #out .warn{ background:#2a1e0f; color:#fbbf24; border:1px solid #5a4516; border-radius:8px; padding:10px; margin-top:10px; font-size:13px; line-height:1.6; }
     #out .warn.reds{ background:#2a0f12; color:#fca5a5; border-color:#5a1620; }
     .status{ font-size:13px; padding:8px 12px; border-radius:8px; margin:6px 0; background:#1f1f26; color:var(--muted); }
     .status.ok{ background:#0f2a1e; color:#4ade80; }
@@ -41,66 +51,116 @@
   </style>
 </head>
 <body>
-  <h1>RavenFit3 🛠️ İskelet</h1>
-  <p class="tag">Modüller + delegasyon + enerji/makro + öneri/uyarı + supplement + PWA</p>
 
-  <div class="card">
-    <div id="selftest" class="status">Öz-test çalışıyor…</div>
-    <div id="pwa" class="status">Service worker kontrol ediliyor…</div>
+  <!-- ══ ADIM 0: HOŞ GELDİN ══ -->
+  <div id="scr-welcome" class="screen active">
+    <div class="center">
+      <img src="logo.png" alt="RavenFit" class="logo" onerror="this.style.display='none'">
+      <h1>RavenFit3</h1>
+      <p class="tag">Kişisel fitness analiz & antrenman</p>
+    </div>
+    <div class="card">
+      <div id="selftest" class="status">Öz-test çalışıyor…</div>
+      <div id="pwa" class="status">Service worker kontrol ediliyor…</div>
+    </div>
+    <button class="go" style="width:100%" data-action="wizNext">Başla →</button>
   </div>
 
-  <div class="card">
-    <div class="lbl">Cinsiyet</div>
-    <div class="pills">
-      <button data-action="setGender" data-arg="male">Erkek</button>
-      <button data-action="setGender" data-arg="female">Kadın</button>
+  <!-- ══ ADIM 1: TEMEL ══ -->
+  <div id="scr-basic" class="screen">
+    <div class="prog">ADIM 1 / 4</div>
+    <h2>Temel Bilgiler</h2>
+    <div class="card">
+      <div class="lbl">Cinsiyet</div>
+      <div class="pills">
+        <button data-action="setGender" data-arg="male">Erkek</button>
+        <button data-action="setGender" data-arg="female">Kadın</button>
+      </div>
+      <div class="row">
+        <div><label>Yaş</label><input id="in-age" type="number" value="25"></div>
+        <div><label>Boy (cm)</label><input id="in-height" type="number" value="180"></div>
+      </div>
+      <label>Kilo (kg)</label><input id="in-weight" type="number" value="80">
     </div>
-
-    <div class="row">
-      <div><label>Boy (cm)</label><input id="in-height" type="number" value="180"></div>
-      <div><label>Kilo (kg)</label><input id="in-weight" type="number" value="80"></div>
+    <div class="nav">
+      <button data-action="wizBack">← Geri</button>
+      <button class="go" data-action="wizNext">İleri →</button>
     </div>
-    <div class="row">
-      <div><label>Boyun (cm)</label><input id="in-neck" type="number" value="40"></div>
-      <div><label>Bel (cm)</label><input id="in-waist" type="number" value="85"></div>
-    </div>
-    <div class="row">
-      <div><label>Kalça (cm — kadın)</label><input id="in-hip" type="number" value="95"></div>
-      <div><label>Omuz (cm — opsiyonel)</label><input id="in-shoulder" type="number" placeholder="—"></div>
-    </div>
-    <div class="row">
-      <div><label>Yaş</label><input id="in-age" type="number" value="25"></div>
-    </div>
-
-    <div class="lbl">Aktivite düzeyi</div>
-    <div class="pills">
-      <button data-action="setAct" data-arg="1.2">Sedanter</button>
-      <button data-action="setAct" data-arg="1.375">Az</button>
-      <button data-action="setAct" data-arg="1.55">Orta</button>
-      <button data-action="setAct" data-arg="1.725">Çok</button>
-      <button data-action="setAct" data-arg="1.9">Aşırı</button>
-    </div>
-
-    <div class="lbl">Antrenman geçmişi</div>
-    <div class="pills">
-      <button data-action="setTrain" data-arg="beginner">Yeni</button>
-      <button data-action="setTrain" data-arg="intermediate">Orta</button>
-      <button data-action="setTrain" data-arg="advanced">İleri</button>
-    </div>
-
-    <div class="lbl">Hedef</div>
-    <div class="pills">
-      <button data-action="setGoal" data-arg="cut">Cut</button>
-      <button data-action="setGoal" data-arg="recomp">Recomp</button>
-      <button data-action="setGoal" data-arg="maintain">Koru</button>
-      <button data-action="setGoal" data-arg="bulk">Bulk</button>
-    </div>
-
-    <button class="go" data-action="calculate">Hesapla</button>
   </div>
 
-  <div class="card">
-    <div id="out" class="muted">Sonuçlar burada görünecek. Seçimleri yap, "Hesapla"ya bas.</div>
+  <!-- ══ ADIM 2: ÖLÇÜLER ══ -->
+  <div id="scr-measure" class="screen">
+    <div class="prog">ADIM 2 / 4</div>
+    <h2>Ölçüler</h2>
+    <div class="card">
+      <div class="row">
+        <div><label>Boyun (cm)</label><input id="in-neck" type="number" value="40"></div>
+        <div><label>Bel (cm)</label><input id="in-waist" type="number" value="85"></div>
+      </div>
+      <div class="row">
+        <div><label>Kalça (cm — kadın)</label><input id="in-hip" type="number" value="95"></div>
+        <div><label>Omuz (cm — ops.)</label><input id="in-shoulder" type="number" placeholder="—"></div>
+      </div>
+    </div>
+    <div class="nav">
+      <button data-action="wizBack">← Geri</button>
+      <button class="go" data-action="wizNext">İleri →</button>
+    </div>
+  </div>
+
+  <!-- ══ ADIM 3: AKTİVİTE ══ -->
+  <div id="scr-activity" class="screen">
+    <div class="prog">ADIM 3 / 4</div>
+    <h2>Aktivite Düzeyi</h2>
+    <div class="card">
+      <div class="lbl">Günlük hareket + egzersiz yoğunluğun</div>
+      <div class="pills">
+        <button data-action="setAct" data-arg="1.2">Sedanter</button>
+        <button data-action="setAct" data-arg="1.375">Az</button>
+        <button data-action="setAct" data-arg="1.55">Orta</button>
+        <button data-action="setAct" data-arg="1.725">Çok</button>
+        <button data-action="setAct" data-arg="1.9">Aşırı</button>
+      </div>
+    </div>
+    <div class="nav">
+      <button data-action="wizBack">← Geri</button>
+      <button class="go" data-action="wizNext">İleri →</button>
+    </div>
+  </div>
+
+  <!-- ══ ADIM 4: DENEYİM & HEDEF ══ -->
+  <div id="scr-goal" class="screen">
+    <div class="prog">ADIM 4 / 4</div>
+    <h2>Deneyim & Hedef</h2>
+    <div class="card">
+      <div class="lbl">Antrenman geçmişin</div>
+      <div class="pills">
+        <button data-action="setTrain" data-arg="beginner">Yeni</button>
+        <button data-action="setTrain" data-arg="intermediate">Orta</button>
+        <button data-action="setTrain" data-arg="advanced">İleri</button>
+      </div>
+      <div class="lbl">Hedefin</div>
+      <div class="pills">
+        <button data-action="setGoal" data-arg="cut">Cut</button>
+        <button data-action="setGoal" data-arg="recomp">Recomp</button>
+        <button data-action="setGoal" data-arg="maintain">Koru</button>
+        <button data-action="setGoal" data-arg="bulk">Bulk</button>
+      </div>
+    </div>
+    <div class="nav">
+      <button data-action="wizBack">← Geri</button>
+      <button class="go" data-action="wizNext">Sonuçları Gör →</button>
+    </div>
+  </div>
+
+  <!-- ══ SONUÇLAR ══ -->
+  <div id="scr-results" class="screen">
+    <h2>Sonuçların</h2>
+    <div class="card"><div id="out" class="muted">…</div></div>
+    <div class="nav">
+      <button data-action="wizBack">← Geri</button>
+      <button class="go" data-action="wizRestart">Baştan ↺</button>
+    </div>
   </div>
 
   <script type="module" src="js/app.js"></script>
