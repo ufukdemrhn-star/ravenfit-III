@@ -8,6 +8,7 @@ import {
   calcBF, calcFFMI, calcBMR, calcIdealRange, bfBand,
   calcGoalCalories, calcMacros, calcWaterTarget
 } from './calc.js';
+import { recGoalDetailed, gateWarning, checkRedsRisk } from './goals.js';
 import { runSelfTest } from './selftest.js';
 
 const GOAL_LABELS = { cut: 'Cut (yağ ver)', recomp: 'Recomp', maintain: 'Koru', bulk: 'Bulk (kütle al)' };
@@ -23,31 +24,33 @@ const actions = {
   setGender(el, arg) { U.gender = arg; highlight('setGender', arg); },
   setAct(el, arg)    { U.actM = parseFloat(arg); highlight('setAct', arg); },
   setGoal(el, arg)   { U.goal = arg; highlight('setGoal', arg); },
+  setTrain(el, arg)  { U.trainingAge = arg; highlight('setTrain', arg); },
 
   calculate() {
     U.height = +v('in-height'); U.weight = +v('in-weight');
     U.neck = +v('in-neck'); U.waist = +v('in-waist'); U.hip = +v('in-hip');
     const male = U.gender === 'male';
 
-    // vücut kompozisyonu
+    // vücut
     R.bf = calcBF(U);
     const f = calcFFMI(U, R.bf);
     R.ffm = f.ffm;
     R.bmr = calcBMR(f.ffm);
     const ideal = calcIdealRange(U.height);
 
-    // enerji
+    // enerji + makro + su
     const tdee = Math.round(R.bmr * U.actM);
     const goalCals = calcGoalCalories(tdee, U.goal, R.bf, male);
-
-    // makro
     const mac = calcMacros(goalCals, U.goal, 'hybrid', f.ffm, U.weight, R.bf, male, null);
-
-    // su (antrenman sıklığı aktiviteden türetilir)
     const freq = U.actM >= 1.725 ? 'high' : U.actM >= 1.55 ? 'mid' : 'low';
     const water = calcWaterTarget(U.weight, freq, 0);
 
-    document.getElementById('out').innerHTML =
+    // öneri + uyarılar
+    const rec = recGoalDetailed(R.bf, f.ffmi, male, U.trainingAge);
+    const gw = rec.gates[U.goal] === 'risky' ? gateWarning(U.goal, R.bf, male) : null;
+    const reds = checkRedsRisk(U.goal, R.bf, male);
+
+    let html =
       `<div class="grp"><div class="h">VÜCUT</div>` +
         `Yağ oranı: <b>%${R.bf}</b> <span class="muted">(${bfBand(R.bf, male)} bant)</span><br>` +
         `FFMI: <b>${f.ffmi}</b> &nbsp;·&nbsp; Yağsız kütle: <b>${f.ffm} kg</b><br>` +
@@ -63,11 +66,21 @@ const actions = {
       `</div>` +
       `<div class="grp"><div class="h">SU</div>` +
         `Günlük: <b>${water.cups} bardak</b> &nbsp;(~${water.lt} L)` +
+      `</div>` +
+      `<div class="grp"><div class="h">ÖNERİ</div>` +
+        `Sana önerilen: <b>${GOAL_LABELS[rec.primary]}</b>` +
+        (rec.alternative ? ` <span class="muted">· alternatif: ${GOAL_LABELS[rec.alternative]}</span>` : ``) +
+        `<br><span class="muted">${rec.reason}</span>` +
       `</div>`;
+
+    if (gw)   html += `<div class="warn">${gw}</div>`;
+    if (reds) html += `<div class="warn reds">⚠️ <strong>RED-S riski:</strong> Yağ oranın çok düşükken cut yapmak hormonal sağlığı, kemik yoğunluğunu ve performansı olumsuz etkileyebilir. <strong>Maintain</strong> veya <strong>bulk</strong> önerilir.</div>`;
+
+    document.getElementById('out').innerHTML = html;
   },
 };
 
-// ── TEK DİNLEYİCİ — tüm data-action'ları yönetir ──
+// ── TEK DİNLEYİCİ ──
 document.addEventListener('click', (e) => {
   const t = e.target.closest('[data-action]');
   if (!t) return;
@@ -87,6 +100,7 @@ stEl.className = 'status ' + (st.failed === 0 ? 'ok' : 'bad');
 highlight('setGender', U.gender);
 highlight('setAct', U.actM);
 highlight('setGoal', U.goal);
+highlight('setTrain', U.trainingAge);
 
 // ── SERVICE WORKER ──
 if ('serviceWorker' in navigator) {

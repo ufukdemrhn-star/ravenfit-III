@@ -7,7 +7,6 @@
   <link rel="manifest" href="manifest.json">
   <title>RavenFit3 — İskelet</title>
   <style>
-    /* Minimal stil — senin 6 temalı gerçek tasarımın sonraki fazda style.css'e taşınacak. */
     :root{ --bg:#0d0d0f; --card:#17171c; --line:#2a2a31; --accent:#E63946; --text:#f1f1f3; --muted:#8a8a93; }
     *{ box-sizing:border-box; }
     body{ margin:0 auto; max-width:480px; padding:20px; font-family:system-ui,-apple-system,sans-serif;
@@ -16,16 +15,15 @@
     .tag{ color:var(--muted); font-size:13px; margin:0 0 6px; }
     .muted{ color:var(--muted); }
     .card{ background:var(--card); border-radius:14px; padding:16px; margin:14px 0; }
-    .lbl{ font-size:13px; color:var(--muted); margin:10px 0 6px; }
+    .lbl{ font-size:13px; color:var(--muted); margin:12px 0 6px; }
     label{ display:block; font-size:13px; color:var(--muted); margin:8px 0 4px; }
     input{ width:100%; padding:10px; border-radius:8px; border:1px solid var(--line);
            background:#0f0f13; color:var(--text); font-size:15px; }
     .row{ display:flex; gap:10px; } .row>div{ flex:1; }
     .pills{ display:flex; flex-wrap:wrap; gap:8px; }
-    /* -webkit-appearance:none → iOS Safari'nin native buton görünümünü kapatır */
     button{ -webkit-appearance:none; appearance:none;
             background:#23232b; color:var(--text); border:1px solid var(--line); border-radius:8px;
-            padding:10px 14px; font-size:14px; font-family:inherit; cursor:pointer;
+            padding:10px 12px; font-size:14px; font-family:inherit; cursor:pointer;
             transition:background .15s, border-color .15s; }
     .pills button{ flex:1 1 auto; }
     button.on{ background:var(--accent); border-color:var(--accent); color:#fff; }
@@ -33,6 +31,10 @@
     #out .grp{ padding:10px 0; border-bottom:1px solid var(--line); line-height:1.8; }
     #out .grp:last-child{ border-bottom:none; }
     #out .h{ font-size:11px; letter-spacing:.08em; color:var(--accent); margin-bottom:4px; }
+    #out .warn{ background:#2a1e0f; color:#fbbf24; border:1px solid #5a4516; border-radius:8px;
+                padding:10px; margin-top:10px; font-size:13px; line-height:1.6; }
+    #out .warn.reds{ background:#2a0f12; color:#fca5a5; border-color:#5a1620; }
+    #out .warn strong{ color:inherit; }
     .status{ font-size:13px; padding:8px 12px; border-radius:8px; margin:6px 0; background:#1f1f26; color:var(--muted); }
     .status.ok{ background:#0f2a1e; color:#4ade80; }
     .status.bad{ background:#2a0f12; color:#f87171; }
@@ -40,7 +42,7 @@
 </head>
 <body>
   <h1>RavenFit3 🛠️ İskelet</h1>
-  <p class="tag">ES modüller + delegasyon + enerji/makro motoru + öz-test + PWA</p>
+  <p class="tag">Modüller + delegasyon + enerji/makro motoru + öneri & uyarılar + PWA</p>
 
   <div class="card">
     <div id="selftest" class="status">Öz-test çalışıyor…</div>
@@ -74,6 +76,13 @@
       <button data-action="setAct" data-arg="1.9">Aşırı</button>
     </div>
 
+    <div class="lbl">Antrenman geçmişi</div>
+    <div class="pills">
+      <button data-action="setTrain" data-arg="beginner">Yeni</button>
+      <button data-action="setTrain" data-arg="intermediate">Orta</button>
+      <button data-action="setTrain" data-arg="advanced">İleri</button>
+    </div>
+
     <div class="lbl">Hedef</div>
     <div class="pills">
       <button data-action="setGoal" data-arg="cut">Cut</button>
@@ -86,7 +95,7 @@
   </div>
 
   <div class="card">
-    <div id="out" class="muted">Sonuçlar burada görünecek. Aktivite + hedef seç, "Hesapla"ya bas.</div>
+    <div id="out" class="muted">Sonuçlar burada görünecek. Seçimleri yap, "Hesapla"ya bas.</div>
   </div>
 
   <script type="module" src="js/app.js"></script>

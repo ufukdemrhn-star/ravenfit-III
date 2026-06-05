@@ -9,6 +9,7 @@ export const U = {
   hip: 95,       // cm
   weight: 80,    // kg
   actM: 1.55,    // aktivite çarpanı (orta aktif)
-  goal: 'maintain', // cut | recomp | maintain | bulk
+  goal: 'maintain',        // cut | recomp | maintain | bulk
+  trainingAge: 'intermediate', // beginner | intermediate | advanced
 };
 export const R = {}; // hesap sonuçları (bf, ffm, bmr...)
