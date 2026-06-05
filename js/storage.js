@@ -15,9 +15,43 @@ const backend = (typeof localStorage !== 'undefined' && localStorage) ? localSto
   removeItem: (k) => { delete mem[k]; },
 };
 
+// Senkronlanacak tüm anahtarlar (bulut senkronu için)
+export const KEYS = {
+  user: 'ravenfit_user_v1',
+  programs: 'ravenfit_programs_v1',
+  measurements: 'ravenfit_measurements_v1',
+  supp: 'ravenfit_supp_v1',
+};
+
+// Kayıt sonrası tetiklenecek bulut-senkron geri çağrısı
+let syncHandler = null;
+export function setSyncHandler(cb) { syncHandler = cb; }
+function fireSync() { if (syncHandler) { try { syncHandler(); } catch (e) {} } }
+
+// Tüm anahtarları ham JSON string olarak topla (buluta yazmak için)
+export function exportAll() {
+  const o = {};
+  for (const [k, key] of Object.entries(KEYS)) {
+    const r = backend.getItem(key);
+    if (r != null) o[k] = r;
+  }
+  return o;
+}
+// Buluttan gelen veriyi localStorage'a yaz (syncHandler TETİKLEMEZ — echo önler)
+export function importAll(o) {
+  for (const [k, key] of Object.entries(KEYS)) {
+    if (o && o[k] != null) backend.setItem(key, o[k]);
+    else backend.removeItem(key);
+  }
+}
+// Tüm yerel veriyi sil (çıkışta)
+export function clearAll() {
+  for (const key of Object.values(KEYS)) backend.removeItem(key);
+}
+
 // Kullanıcı verisini kaydet
 export function saveUser(obj) {
-  try { backend.setItem(KEY, JSON.stringify(obj)); return true; }
+  try { backend.setItem(KEY, JSON.stringify(obj)); fireSync(); return true; }
   catch (e) { console.warn('saveUser hata:', e); return false; }
 }
 
@@ -40,7 +74,7 @@ export function hasUser() {
 
 // ── Genel amaçlı JSON kayıt (programlar, ölçümler vb. için) ──
 export function saveJSON(key, obj) {
-  try { backend.setItem(key, JSON.stringify(obj)); return true; }
+  try { backend.setItem(key, JSON.stringify(obj)); fireSync(); return true; }
   catch (e) { return false; }
 }
 export function loadJSON(key) {
@@ -48,7 +82,7 @@ export function loadJSON(key) {
   catch (e) { return null; }
 }
 export function removeJSON(key) {
-  try { backend.removeItem(key); return true; } catch (e) { return false; }
+  try { backend.removeItem(key); fireSync(); return true; } catch (e) { return false; }
 }
 
 // Test yardımcısı — gerçek veriyi KİRLETMEDEN round-trip doğrular

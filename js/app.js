@@ -14,10 +14,10 @@ import { loadExercises, filterExercises, uniqueEquipment, CAT_TR, CATEGORIES } f
 import { PROGRAMS } from './programs.js';
 import { summarizeProgress, goalNote } from './progress.js';
 import { showScreen } from './ui.js';
-import { saveUser, loadUser, clearUser, saveJSON, loadJSON } from './storage.js';
+import { saveUser, loadUser, clearUser, saveJSON, loadJSON, setSyncHandler, exportAll, importAll, clearAll } from './storage.js';
 import { runSelfTest } from './selftest.js';
 
-const APP_VERSION = '0.0.13';
+const APP_VERSION = '0.0.14';
 const GOAL_LABELS = { cut: 'Cut (yağ ver)', recomp: 'Recomp', maintain: 'Koru', bulk: 'Bulk (kütle al)' };
 const EV = { high: '🟢 Yüksek kanıt', mid: '🟡 Orta kanıt', low: '🔴 Sınırlı kanıt' };
 
@@ -411,8 +411,8 @@ function renderProfil() {
       `Yaş: <b>${U.age}</b> &nbsp;·&nbsp; Boy: <b>${U.height} cm</b> &nbsp;·&nbsp; Kilo: <b>${U.weight} kg</b><br>` +
       `Aktivite: <b>×${U.actM}</b> &nbsp;·&nbsp; Deneyim: <b>${U.trainingAge}</b> &nbsp;·&nbsp; Hedef: <b>${GOAL_LABELS[U.goal]}</b>`) +
     `<button class="go" style="width:100%;margin-top:4px" data-action="editInfo">Bilgileri Düzenle</button>` +
-    `<button style="width:100%;margin-top:8px" data-action="resetAll">Sıfırla</button>` +
-    `<div class="ver">Raven Fit · v${APP_VERSION} · veriler bu cihazda kayıtlı</div>`;
+    `<button style="width:100%;margin-top:8px" data-action="logOut">Çıkış Yap</button>` +
+    `<div class="ver">Raven Fit · v${APP_VERSION}${accountLine()}</div>`;
 }
 function renderTab() {
   const map = { vucudum: renderVucudum, beslenme: renderBeslenme, antrenman: renderAntrenman, profil: renderProfil };
@@ -494,6 +494,11 @@ const actions = {
   suppAns(el, arg) { const [k, v] = arg.split(':'); suppDraft[k] = v; renderTab(); },
   submitSuppSurvey() { suppAnswers = { ...suppDraft }; saveJSON(SUPP_KEY, suppAnswers); suppSurvey = false; openSupp = null; renderTab(); window.scrollTo(0, 0); },
   suppToggle(el, id) { openSupp = openSupp === id ? null : id; renderTab(); },
+  // hesap / auth
+  authLogin() { doAuth('login'); },
+  authSignup() { doAuth('signup'); },
+  authGuest() { doAuth('guest'); },
+  logOut() { didLogout = true; if (FB) FB.logOut(); },
 };
 
 document.addEventListener('click', (e) => {
@@ -511,22 +516,88 @@ document.addEventListener('change', (e) => {
   if (t && actions[t.dataset.actionChange]) actions[t.dataset.actionChange](t, t.value);
 });
 
-// ── AÇILIŞ ──
+// ── AÇILIŞ + AUTH ─────────────────────────────────────────────
+let FB = null, currentUid = null, didLogout = false, syncTimer = null;
+
 const st = runSelfTest();
 const stEl = document.getElementById('selftest');
-stEl.textContent = st.failed === 0 ? `✅ Öz-test geçti (${st.passed}/${st.passed})` : `❌ ${st.failed} test kaldı`;
-stEl.className = 'status ' + (st.failed === 0 ? 'ok' : 'bad');
-document.getElementById('ver-welcome').textContent = `Raven Fit · v${APP_VERSION}`;
+if (stEl) { stEl.textContent = st.failed === 0 ? `✅ Öz-test geçti (${st.passed}/${st.passed})` : `❌ ${st.failed} test kaldı`; stEl.className = 'status ' + (st.failed === 0 ? 'ok' : 'bad'); }
+const VER_TXT = `Raven Fit · v${APP_VERSION}`;
+['ver-welcome', 'ver-auth'].forEach(id => { const e = document.getElementById(id); if (e) e.textContent = VER_TXT; });
 
-const saved = loadUser();
-if (saved) Object.assign(U, saved);
-fillInputs();
-applyHighlights();
-if (saved) enterDashboard();
-else showScreen('scr-welcome');
+function accountLine() {
+  if (FB && FB.auth && FB.auth.currentUser) {
+    const u = FB.auth.currentUser;
+    return u.isAnonymous ? ' · misafir (bulut)' : ' · ' + u.email;
+  }
+  return ' · yerel mod';
+}
+function reloadFromStorage() {
+  const saved = loadUser();
+  if (saved) Object.assign(U, saved);
+  customPrograms = loadJSON(PROG_KEY) || [];
+  measurements = loadJSON(MEAS_KEY) || [];
+  suppAnswers = loadJSON(SUPP_KEY) || null;
+  return !!saved;
+}
+function resetMemory() {
+  Object.assign(U, { gender: 'male', age: 25, height: 180, neck: 40, shoulder: 0, waist: 85, hip: 95, weight: 80, actM: 1.55, goal: 'maintain', trainingAge: 'intermediate' });
+  customPrograms = []; measurements = []; suppAnswers = null;
+  step = 0; activeTab = 'vucudum'; activeVsub = 'analiz'; antrenSub = 'havuz';
+  selectedProgram = null; activeWorkout = null; builder = null; exSelectMode = false;
+  suppSurvey = false; exDetail = null; openSupp = null;
+}
+function initAppUI(hasData) { fillInputs(); applyHighlights(); if (hasData) enterDashboard(); else showScreen('scr-welcome'); }
+function localOnlyStart() { initAppUI(reloadFromStorage()); }
+
+function scheduleSync() {
+  if (!FB || !currentUid) return;
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(() => { FB.pushUserData(currentUid, exportAll()).catch(() => {}); }, 800);
+}
+function authMsg(text, ok) { const m = document.getElementById('au-msg'); if (!m) return; m.style.display = 'block'; m.textContent = text; m.className = 'status ' + (ok ? 'ok' : 'bad'); }
+function authErr(e) {
+  const x = (e && e.code) || '';
+  if (x.includes('invalid-email')) return 'Geçersiz e-posta.';
+  if (x.includes('weak-password')) return 'Şifre en az 6 karakter olmalı.';
+  if (x.includes('email-already-in-use')) return 'Bu e-posta zaten kayıtlı — Giriş Yap.';
+  if (x.includes('invalid-credential') || x.includes('wrong-password') || x.includes('user-not-found')) return 'E-posta veya şifre hatalı.';
+  if (x.includes('operation-not-allowed')) return 'Bu giriş yöntemi Firebase\'de açık değil.';
+  if (x.includes('network')) return 'Ağ hatası. İnterneti kontrol et.';
+  return 'Hata: ' + (x || 'bilinmeyen');
+}
+async function doAuth(mode) {
+  if (!FB) { authMsg('Bağlantı yok (yerel mod).', false); return; }
+  const email = (document.getElementById('au-email').value || '').trim();
+  const pass = document.getElementById('au-pass').value || '';
+  try {
+    authMsg('İşleniyor…', true);
+    if (mode === 'guest') await FB.signInGuest();
+    else if (mode === 'signup') await FB.signUp(email, pass);
+    else await FB.signIn(email, pass);
+  } catch (e) { authMsg(authErr(e), false); }
+}
+
+async function boot() {
+  setSyncHandler(scheduleSync);
+  try { FB = await import('./firebase.js'); } catch (e) { FB = null; }
+  if (!FB) { localOnlyStart(); return; }   // Firebase yüklenemedi → yerel mod
+  FB.onAuth(async (user) => {
+    if (!user) {
+      currentUid = null;
+      if (didLogout) { clearAll(); resetMemory(); didLogout = false; }
+      showScreen('scr-auth');
+      return;
+    }
+    currentUid = user.uid;
+    try { const cloud = await FB.pullUserData(user.uid); if (cloud) importAll(cloud); } catch (e) {}
+    initAppUI(reloadFromStorage());
+  });
+}
+boot();
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js')
-    .then(() => { const el = document.getElementById('pwa'); el.textContent = '✅ Service worker kayıtlı — offline & kurulabilir'; el.className = 'status ok'; })
-    .catch(() => { const el = document.getElementById('pwa'); el.textContent = '⚠️ Service worker kaydı başarısız (HTTPS/Pages gerekir)'; el.className = 'status bad'; });
+    .then(() => { const el = document.getElementById('pwa'); if (el) { el.textContent = '✅ Service worker kayıtlı'; el.className = 'status ok'; } })
+    .catch(() => { const el = document.getElementById('pwa'); if (el) { el.textContent = '⚠️ Service worker kaydı başarısız'; el.className = 'status bad'; } });
 }

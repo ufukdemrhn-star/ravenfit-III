@@ -109,8 +109,39 @@
 </head>
 <body>
 
+  <!-- ══ YÜKLENİYOR (başlangıç) ══ -->
+  <div id="scr-loading" class="screen active">
+    <div class="center">
+      <img src="icon.png" alt="Raven Fit" class="welcome-icon" onerror="this.style.display='none'">
+      <h1>Raven Fit</h1>
+      <p class="tag">Yükleniyor…</p>
+    </div>
+  </div>
+
+  <!-- ══ GİRİŞ / KAYIT ══ -->
+  <div id="scr-auth" class="screen">
+    <div class="center">
+      <img src="icon.png" alt="Raven Fit" class="welcome-icon" onerror="this.style.display='none'">
+      <h1>Raven Fit</h1>
+      <p class="tag">Giriş yap veya hesap oluştur</p>
+    </div>
+    <div class="card">
+      <label>E-posta</label>
+      <input id="au-email" type="email" autocomplete="email" placeholder="ornek@mail.com">
+      <label>Şifre</label>
+      <input id="au-pass" type="password" autocomplete="current-password" placeholder="en az 6 karakter">
+      <div id="au-msg" class="status" style="display:none"></div>
+      <div class="nav">
+        <button data-action="authLogin">Giriş Yap</button>
+        <button class="go" data-action="authSignup">Kayıt Ol</button>
+      </div>
+      <button style="width:100%;margin-top:8px" data-action="authGuest">Misafir olarak devam et</button>
+    </div>
+    <div class="ver" id="ver-auth"></div>
+  </div>
+
   <!-- ══ HOŞ GELDİN ══ -->
-  <div id="scr-welcome" class="screen active">
+  <div id="scr-welcome" class="screen">
     <div class="center">
       <img src="icon.png" alt="Raven Fit" class="welcome-icon" onerror="this.style.display='none'">
       <h1>Raven Fit</h1>
