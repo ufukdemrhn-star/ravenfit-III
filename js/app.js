@@ -12,11 +12,12 @@ import { calcSuppScores } from './supplements.js';
 import { determineBodyProfile, getDietTipByProfile } from './profile.js';
 import { loadExercises, filterExercises, uniqueEquipment, CAT_TR, CATEGORIES } from './exercises.js';
 import { PROGRAMS } from './programs.js';
+import { summarizeProgress, goalNote } from './progress.js';
 import { showScreen } from './ui.js';
 import { saveUser, loadUser, clearUser, saveJSON, loadJSON } from './storage.js';
 import { runSelfTest } from './selftest.js';
 
-const APP_VERSION = '0.0.11';
+const APP_VERSION = '0.0.12';
 const GOAL_LABELS = { cut: 'Cut (yağ ver)', recomp: 'Recomp', maintain: 'Koru', bulk: 'Bulk (kütle al)' };
 const EV = { high: '🟢 Yüksek kanıt', mid: '🟡 Orta kanıt', low: '🔴 Sınırlı kanıt' };
 
@@ -109,8 +110,51 @@ function renderOlculer() {
     `Boyun: <b>${U.neck}</b> &nbsp; Bel: <b>${U.waist}</b> &nbsp; Kalça: <b>${U.hip}</b>` +
     (U.shoulder ? ` &nbsp; Omuz: <b>${U.shoulder}</b>` : ''));
 }
+function miniChart(values) {
+  if (values.length < 2) return '<div class="muted" style="font-size:12px">Grafik için en az 2 ölçüm gerekir.</div>';
+  const w = 320, h = 120, pad = 8;
+  const min = Math.min(...values), max = Math.max(...values), range = (max - min) || 1;
+  const pts = values.map((v, i) => [
+    pad + (i / (values.length - 1)) * (w - 2 * pad),
+    pad + (1 - (v - min) / range) * (h - 2 * pad),
+  ]);
+  const path = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
+  const dots = pts.map(p => `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3" fill="var(--accent)"/>`).join('');
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" style="display:block">` +
+    `<path d="${path}" fill="none" stroke="var(--accent)" stroke-width="2"/>${dots}</svg>`;
+}
+function renderMeasureForm() {
+  const female = U.gender === 'female';
+  return grp('YENİ ÖLÇÜM',
+    `<label>Kilo (kg)</label><input id="m-weight" type="number" value="${U.weight}">` +
+    `<div class="row"><div><label>Bel (cm)</label><input id="m-waist" type="number" value="${U.waist}"></div>` +
+    `<div><label>Boyun (cm)</label><input id="m-neck" type="number" value="${U.neck}"></div></div>` +
+    (female ? `<label>Kalça (cm)</label><input id="m-hip" type="number" value="${U.hip}">` : '')) +
+    `<div class="nav"><button data-action="cancelMeasure">İptal</button><button class="go" data-action="saveMeasure">Kaydet</button></div>`;
+}
 function renderIlerleme() {
-  return grp('İLERLEME', `<span class="muted">Haftalık ölçüm kaydı ve değişim grafiği sonraki fazlarda eklenecek.</span>`);
+  if (measureForm) return renderMeasureForm();
+  if (!measurements.length) {
+    return grp('İLERLEME', `<span class="muted">Henüz ölçüm kaydın yok. Düzenli ölçüm ekleyerek kilo ve yağ oranı değişimini takip et.</span>`) +
+      `<button class="go" style="width:100%" data-action="openMeasure">İlk Ölçümü Ekle</button>`;
+  }
+  const s = summarizeProgress(measurements);
+  const arrow = (d) => d > 0.05 ? `<span style="color:#fca5a5">▲ ${d.toFixed(1)}</span>` : d < -0.05 ? `<span style="color:#4ade80">▼ ${Math.abs(d).toFixed(1)}</span>` : '<span class="muted">–</span>';
+  const weights = measurements.map(m => m.weight);
+  let h = grp(`ÖZET (${s.count} ölçüm)`,
+    `İlk → Son kilo: <b>${s.first.weight}</b> → <b>${s.last.weight} kg</b> &nbsp; ${arrow(s.dW)}<br>` +
+    `İlk → Son yağ: <b>%${s.first.bf}</b> → <b>%${s.last.bf}</b> &nbsp; ${arrow(s.dB)}<br>` +
+    `<span class="muted">${goalNote(U.goal, s.dW)}</span>`);
+  h += grp('KİLO DEĞİŞİMİ', miniChart(weights) +
+    `<div class="muted" style="font-size:11px;margin-top:4px">en düşük ${Math.min(...weights)} – en yüksek ${Math.max(...weights)} kg</div>`);
+  let rows = '';
+  [...measurements].reverse().forEach(m => {
+    rows += `<div class="wkrow"><div><div class="exname">${new Date(m.date).toLocaleDateString('tr-TR')}</div>` +
+      `<div class="exmeta">${m.weight} kg &nbsp;·&nbsp; %${m.bf} yağ</div></div>` +
+      `<button data-action="deleteMeasure" data-arg="${m.date}">Sil</button></div>`;
+  });
+  h += grp('KAYITLAR', rows) + `<button class="go" style="width:100%" data-action="openMeasure">+ Ölçüm Ekle</button>`;
+  return h;
 }
 function renderVucudum() {
   const subs = [['analiz', 'Analiz'], ['olculer', 'Ölçüler'], ['ilerleme', 'İlerleme']];
@@ -151,6 +195,9 @@ let builder = null;            // { name, items:[{ex,sets,reps}] }
 let exSelectMode = false;      // havuzdan egzersiz seçme modu
 const PROG_KEY = 'ravenfit_programs_v1';
 let customPrograms = loadJSON(PROG_KEY) || [];
+const MEAS_KEY = 'ravenfit_measurements_v1';
+let measurements = loadJSON(MEAS_KEY) || [];
+let measureForm = false;
 const allPrograms = () => customPrograms.concat(PROGRAMS);
 // dinlenme sayacı
 let restRemaining = 0, restInterval = null;
@@ -380,6 +427,23 @@ const actions = {
     builder = null; exSelectMode = false; renderTab(); alert('Program kaydedildi 💪');
   },
   deleteProgram(el, id) { if (confirm('Bu programı sil?')) { customPrograms = customPrograms.filter(p => p.id !== id); saveJSON(PROG_KEY, customPrograms); renderTab(); } },
+  // ilerleme / ölçüm
+  openMeasure() { measureForm = true; renderTab(); window.scrollTo(0, 0); },
+  cancelMeasure() { measureForm = false; renderTab(); },
+  saveMeasure() {
+    const w = +document.getElementById('m-weight').value;
+    if (!w || w < 20 || w > 400) { alert('Geçerli bir kilo gir.'); return; }
+    const waist = +document.getElementById('m-waist').value || U.waist;
+    const neck = +document.getElementById('m-neck').value || U.neck;
+    const hipEl = document.getElementById('m-hip');
+    const hip = hipEl ? (+hipEl.value || U.hip) : U.hip;
+    const bf = calcBF({ gender: U.gender, height: U.height, neck, waist, hip });
+    U.weight = w; U.waist = waist; U.neck = neck; U.hip = hip; saveUser(U); compute();
+    measurements.push({ date: Date.now(), weight: w, bf, waist, neck, hip });
+    saveJSON(MEAS_KEY, measurements);
+    measureForm = false; renderTab();
+  },
+  deleteMeasure(el, arg) { if (confirm('Bu ölçümü sil?')) { measurements = measurements.filter(m => String(m.date) !== arg); saveJSON(MEAS_KEY, measurements); renderTab(); } },
 };
 
 document.addEventListener('click', (e) => {

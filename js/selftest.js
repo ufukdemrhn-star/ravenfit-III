@@ -15,6 +15,7 @@ import { _roundTripTest } from './storage.js';
 import { filterExercises } from './exercises.js';
 import { PROGRAMS } from './programs.js';
 import { saveJSON, loadJSON, removeJSON } from './storage.js';
+import { summarizeProgress, goalNote } from './progress.js';
 
 export function runSelfTest() {
   let passed = 0, failed = 0;
@@ -125,6 +126,15 @@ export function runSelfTest() {
   const gj = loadJSON(JK);
   removeJSON(JK);
   eq(gj && gj[0] && gj[0].a, 7, 'Storage JSON: kaydet/oku round-trip');
+
+
+  // GRUP 16 — İlerleme özeti
+  const sm = summarizeProgress([{ weight: 80, bf: 18 }, { weight: 78.5, bf: 16.5 }, { weight: 77, bf: 15 }]);
+  eq(sm.count, 3, 'İlerleme: ölçüm sayısı 3');
+  eq(sm.dW, -3, 'İlerleme: kilo farkı -3');
+  eq(sm.dB, -3, 'İlerleme: yağ farkı -3');
+  eq(goalNote('cut', -3).length > 5, true, 'İlerleme: cut yorumu döndü');
+  eq(summarizeProgress([]), null, 'İlerleme: boş dizi null');
 
   console.log(`%c🔬 Öz-test: ${passed} geçti, ${failed} kaldı`,
     failed === 0 ? 'color:#4ade80;font-weight:bold' : 'color:#f87171;font-weight:bold');
