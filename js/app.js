@@ -1,7 +1,6 @@
 // ════════════════════════════════════════════════════════════
 //  app.js — GİRİŞ NOKTASI
-//  Modülleri birleştirir, OLAY DELEGASYONUNU + WIZARD'ı kurar,
-//  öz-testi çalıştırır, service worker'ı kaydeder.
+//  Wizard + sekme sistemli dashboard. Hesap motorları aynen kullanılır.
 // ════════════════════════════════════════════════════════════
 import { U, R } from './state.js';
 import {
@@ -14,6 +13,7 @@ import { determineBodyProfile, getDietTipByProfile } from './profile.js';
 import { showScreen } from './ui.js';
 import { runSelfTest } from './selftest.js';
 
+const APP_VERSION = '0.0.7';
 const GOAL_LABELS = { cut: 'Cut (yağ ver)', recomp: 'Recomp', maintain: 'Koru', bulk: 'Bulk (kütle al)' };
 const EV = { high: '🟢 Yüksek kanıt', mid: '🟡 Orta kanıt', low: '🔴 Sınırlı kanıt' };
 
@@ -23,99 +23,142 @@ function highlight(action, arg) {
     b.classList.toggle('on', b.dataset.arg === String(arg)));
 }
 
-// ── WIZARD (onboarding) ──────────────────────────────────────
-const STEPS = ['scr-welcome', 'scr-basic', 'scr-measure', 'scr-activity', 'scr-goal', 'scr-results'];
+// ── WIZARD ───────────────────────────────────────────────────
+const STEPS = ['scr-welcome', 'scr-basic', 'scr-measure', 'scr-activity', 'scr-goal'];
 let step = 0;
 function goStep(i) {
-  step = Math.max(0, Math.min(STEPS.length - 1, i));
-  if (STEPS[step] === 'scr-results') calculate();
+  if (i >= STEPS.length) { enterDashboard(); return; }
+  step = Math.max(0, i);
   showScreen(STEPS[step]);
 }
+function enterDashboard() {
+  compute();
+  activeTab = 'vucudum'; activeVsub = 'analiz';
+  showScreen('scr-dashboard');
+  renderDashboard();
+}
 
-// ── HESAPLAMA + SONUÇ ÇİZİMİ ─────────────────────────────────
-function calculate() {
+// ── HESAP → R'ye yaz ─────────────────────────────────────────
+function compute() {
   U.height = +v('in-height'); U.weight = +v('in-weight'); U.age = +v('in-age');
   U.neck = +v('in-neck'); U.waist = +v('in-waist'); U.hip = +v('in-hip');
   U.shoulder = +v('in-shoulder') || 0;
   const male = U.gender === 'male';
-
-  // vücut
+  R.male = male;
   R.bf = calcBF(U);
   const f = calcFFMI(U, R.bf);
   R.ffm = f.ffm; R.ffmi = f.ffmi;
   R.bmr = calcBMR(f.ffm);
   R.bmi = U.weight / Math.pow(U.height / 100, 2);
-  const ideal = calcIdealRange(U.height);
+  const ideal = calcIdealRange(U.height); R.idealLo = ideal.lo; R.idealHi = ideal.hi;
   const profile = determineBodyProfile(R.bf, f.ffmi, R.bmi, U);
-
-  // enerji + makro + su
-  const tdee = Math.round(R.bmr * U.actM);
-  const goalCals = calcGoalCalories(tdee, U.goal, R.bf, male);
-  const mac = calcMacros(goalCals, U.goal, 'hybrid', f.ffm, U.weight, R.bf, male, null);
+  R.profileName = profile.n; R.profileTip = getDietTipByProfile(profile.n);
+  R.band = bfBand(R.bf, male);
+  R.tdee = Math.round(R.bmr * U.actM);
+  R.goalCals = calcGoalCalories(R.tdee, U.goal, R.bf, male);
+  R.mac = calcMacros(R.goalCals, U.goal, 'hybrid', f.ffm, U.weight, R.bf, male, null);
   const freq = U.actM >= 1.725 ? 'high' : U.actM >= 1.55 ? 'mid' : 'low';
-  const water = calcWaterTarget(U.weight, freq, 0);
-
-  // öneri + uyarılar
+  R.water = calcWaterTarget(U.weight, freq, 0);
   const rec = recGoalDetailed(R.bf, f.ffmi, male, U.trainingAge);
-  const gw = rec.gates[U.goal] === 'risky' ? gateWarning(U.goal, R.bf, male) : null;
-  const reds = checkRedsRisk(U.goal, R.bf, male);
-
-  // supplement (mevcut seçimlerden türetilir; tam anket sonraki fazda)
+  R.recPrimary = rec.primary; R.recAlt = rec.alternative; R.recReason = rec.reason;
+  R.gw = rec.gates[U.goal] === 'risky' ? gateWarning(U.goal, R.bf, male) : null;
+  R.reds = checkRedsRisk(U.goal, R.bf, male);
   const suppGoal = U.goal === 'maintain' ? 'health' : U.goal;
   const suppFreq = U.actM >= 1.9 ? 'elite' : U.actM >= 1.725 ? 'high' : 'mid';
-  const supps = calcSuppScores({ goal: suppGoal, freq: suppFreq }, { age: U.age, gender: U.gender }, profile.n)
+  R.supps = calcSuppScores({ goal: suppGoal, freq: suppFreq }, { age: U.age, gender: U.gender }, profile.n)
     .filter(s => s.score > 0).sort((a, b) => b.score - a.score).slice(0, 4);
+}
 
-  let html =
-    `<div class="grp"><div class="h">VÜCUT</div>` +
-      `Yağ oranı: <b>%${R.bf}</b> <span class="muted">(${bfBand(R.bf, male)} bant)</span><br>` +
-      `FFMI: <b>${f.ffmi}</b> &nbsp;·&nbsp; Yağsız kütle: <b>${f.ffm} kg</b><br>` +
-      `BMR: <b>${R.bmr} kcal</b> &nbsp;·&nbsp; İdeal kilo: <b>${ideal.lo}–${ideal.hi} kg</b>` +
-    `</div>` +
-    `<div class="grp"><div class="h">PROFİL</div>` +
-      `Vücut profilin: <b>${profile.n}</b><br><span class="muted">${getDietTipByProfile(profile.n)}</span>` +
-    `</div>` +
-    `<div class="grp"><div class="h">ENERJİ — hedef: ${GOAL_LABELS[U.goal]}</div>` +
-      `TDEE (BMR × ${U.actM}): <b>${tdee} kcal</b><br>Günlük hedef kalori: <b>${goalCals} kcal</b>` +
-    `</div>` +
-    `<div class="grp"><div class="h">MAKRO</div>` +
-      `Protein: <b>${mac.pg} g</b> <span class="muted">(${mac.proteinSource === 'lm' ? 'yağsız kütle bazlı' : 'vücut ağırlığı bazlı'})</span><br>` +
-      `Yağ: <b>${mac.fg} g</b> &nbsp;·&nbsp; Karbonhidrat: <b>${mac.cg} g</b>` +
-    `</div>` +
-    `<div class="grp"><div class="h">SU</div>Günlük: <b>${water.cups} bardak</b> &nbsp;(~${water.lt} L)</div>` +
-    `<div class="grp"><div class="h">ÖNERİ</div>` +
-      `Sana önerilen: <b>${GOAL_LABELS[rec.primary]}</b>` +
-      (rec.alternative ? ` <span class="muted">· alternatif: ${GOAL_LABELS[rec.alternative]}</span>` : ``) +
-      `<br><span class="muted">${rec.reason}</span>` +
-    `</div>`;
+// ── SEKMELER ─────────────────────────────────────────────────
+let activeTab = 'vucudum', activeVsub = 'analiz';
+const grp = (title, body) => `<div class="grp"><div class="h">${title}</div>${body}</div>`;
 
-  html += `<div class="grp"><div class="h">SUPPLEMENT ÖNERİSİ <span class="muted" style="text-transform:none;letter-spacing:0">(temel)</span></div>`;
-  if (supps.length) {
-    supps.forEach((s, i) => {
-      const rank = ['🥇', '🥈', '🥉', '•'][i] || '•';
-      html += `${rank} ${s.emoji} <b>${s.name}</b> <span class="ev">${EV[s.evidence] || ''}</span><br>`;
-    });
-  } else html += `<span class="muted">Bu seçimlerle belirgin öneri yok.</span>`;
-  html += `</div>`;
-
-  if (gw)   html += `<div class="warn">${gw}</div>`;
-  if (reds) html += `<div class="warn reds">⚠️ <strong>RED-S riski:</strong> Yağ oranın çok düşükken cut yapmak hormonal sağlığı, kemik yoğunluğunu ve performansı olumsuz etkileyebilir. <strong>Maintain</strong> veya <strong>bulk</strong> önerilir.</div>`;
-
-  document.getElementById('out').innerHTML = html;
+function renderAnaliz() {
+  return grp('VÜCUT',
+      `Yağ oranı: <b>%${R.bf}</b> <span class="muted">(${R.band} bant)</span><br>` +
+      `FFMI: <b>${R.ffmi}</b> &nbsp;·&nbsp; Yağsız kütle: <b>${R.ffm} kg</b><br>` +
+      `BMR: <b>${R.bmr} kcal</b> &nbsp;·&nbsp; İdeal kilo: <b>${R.idealLo}–${R.idealHi} kg</b>`) +
+    grp('PROFİL', `Vücut profilin: <b>${R.profileName}</b><br><span class="muted">${R.profileTip}</span>`);
+}
+function renderOlculer() {
+  return grp('GÜNCEL ÖLÇÜLER',
+    `Cinsiyet: <b>${R.male ? 'Erkek' : 'Kadın'}</b> &nbsp;·&nbsp; Yaş: <b>${U.age}</b><br>` +
+    `Boy: <b>${U.height} cm</b> &nbsp;·&nbsp; Kilo: <b>${U.weight} kg</b> &nbsp;·&nbsp; BMI: <b>${R.bmi.toFixed(1)}</b><br>` +
+    `Boyun: <b>${U.neck}</b> &nbsp; Bel: <b>${U.waist}</b> &nbsp; Kalça: <b>${U.hip}</b>` +
+    (U.shoulder ? ` &nbsp; Omuz: <b>${U.shoulder}</b>` : ''));
+}
+function renderIlerleme() {
+  return grp('İLERLEME',
+    `<span class="muted">Haftalık ölçüm kaydı ve değişim grafiği sonraki fazlarda eklenecek. ` +
+    `Şu an baz ölçülerin alındı; zamanla yağ/kilo/ölçü değişimini buradan takip edeceksin.</span>`);
+}
+function renderVucudum() {
+  const subs = [['analiz', 'Analiz'], ['olculer', 'Ölçüler'], ['ilerleme', 'İlerleme']];
+  const bar = '<div class="subtabs">' + subs.map(([k, l]) =>
+    `<button data-action="vsub" data-arg="${k}" class="${activeVsub === k ? 'on' : ''}">${l}</button>`).join('') + '</div>';
+  const body = activeVsub === 'olculer' ? renderOlculer()
+             : activeVsub === 'ilerleme' ? renderIlerleme()
+             : renderAnaliz();
+  return bar + body;
+}
+function renderBeslenme() {
+  let h = grp(`ENERJİ — hedef: ${GOAL_LABELS[U.goal]}`,
+        `TDEE (BMR × ${U.actM}): <b>${R.tdee} kcal</b><br>Günlük hedef: <b>${R.goalCals} kcal</b>`) +
+      grp('MAKRO',
+        `Protein: <b>${R.mac.pg} g</b> <span class="muted">(${R.mac.proteinSource === 'lm' ? 'yağsız kütle bazlı' : 'vücut ağırlığı bazlı'})</span><br>` +
+        `Yağ: <b>${R.mac.fg} g</b> &nbsp;·&nbsp; Karbonhidrat: <b>${R.mac.cg} g</b>`) +
+      grp('SU', `Günlük: <b>${R.water.cups} bardak</b> &nbsp;(~${R.water.lt} L)`) +
+      grp('ÖNERİ',
+        `Önerilen: <b>${GOAL_LABELS[R.recPrimary]}</b>` +
+        (R.recAlt ? ` <span class="muted">· alternatif: ${GOAL_LABELS[R.recAlt]}</span>` : '') +
+        `<br><span class="muted">${R.recReason}</span>`);
+  let supp = `<div class="grp"><div class="h">SUPPLEMENT</div>`;
+  if (R.supps.length) R.supps.forEach((s, i) => {
+    supp += `${['🥇', '🥈', '🥉', '•'][i] || '•'} ${s.emoji} <b>${s.name}</b> <span class="ev">${EV[s.evidence] || ''}</span><br>`;
+  });
+  else supp += `<span class="muted">—</span>`;
+  supp += `</div>`;
+  h += supp;
+  if (R.gw) h += `<div class="warn">${R.gw}</div>`;
+  if (R.reds) h += `<div class="warn reds">⚠️ <strong>RED-S riski:</strong> Yağ oranın çok düşükken cut yapmak hormonal sağlığı, kemik yoğunluğunu ve performansı olumsuz etkileyebilir. <strong>Maintain</strong> veya <strong>bulk</strong> önerilir.</div>`;
+  return h;
+}
+function renderAntrenman() {
+  return grp('ANTRENMAN',
+    `<span class="muted">Egzersiz havuzu (344 egzersiz), fitness filtre sistemi, egzersiz detayları, ` +
+    `programlar ve antrenman motoru sonraki fazlarda gelecek. Branşlar zamanla genişleyecek.</span>`);
+}
+function renderProfil() {
+  return grp('HESABIM',
+      `Cinsiyet: <b>${R.male ? 'Erkek' : 'Kadın'}</b><br>` +
+      `Yaş: <b>${U.age}</b> &nbsp;·&nbsp; Boy: <b>${U.height} cm</b> &nbsp;·&nbsp; Kilo: <b>${U.weight} kg</b><br>` +
+      `Aktivite: <b>×${U.actM}</b> &nbsp;·&nbsp; Deneyim: <b>${U.trainingAge}</b> &nbsp;·&nbsp; Hedef: <b>${GOAL_LABELS[U.goal]}</b>`) +
+    `<button class="go" style="width:100%;margin-top:4px" data-action="editInfo">Bilgileri Düzenle</button>` +
+    `<div class="ver">Raven Fit · v${APP_VERSION}</div>`;
+}
+function renderTab() {
+  const map = { vucudum: renderVucudum, beslenme: renderBeslenme, antrenman: renderAntrenman, profil: renderProfil };
+  document.getElementById('tab-content').innerHTML = (map[activeTab] || renderVucudum)();
+}
+function renderDashboard() {
+  document.querySelectorAll('.bottomnav button').forEach(b =>
+    b.classList.toggle('on', b.dataset.arg === activeTab));
+  renderTab();
 }
 
 // ── EYLEM KAYDI ──────────────────────────────────────────────
 const actions = {
-  setGender(el, arg) { U.gender = arg; highlight('setGender', arg); },
-  setAct(el, arg)    { U.actM = parseFloat(arg); highlight('setAct', arg); },
-  setGoal(el, arg)   { U.goal = arg; highlight('setGoal', arg); },
-  setTrain(el, arg)  { U.trainingAge = arg; highlight('setTrain', arg); },
-  wizNext()    { goStep(step + 1); },
-  wizBack()    { goStep(step - 1); },
-  wizRestart() { goStep(0); },
+  setGender(el, a) { U.gender = a; highlight('setGender', a); },
+  setAct(el, a)    { U.actM = parseFloat(a); highlight('setAct', a); },
+  setGoal(el, a)   { U.goal = a; highlight('setGoal', a); },
+  setTrain(el, a)  { U.trainingAge = a; highlight('setTrain', a); },
+  wizNext() { goStep(step + 1); },
+  wizBack() { goStep(step - 1); },
+  tab(el, a)  { activeTab = a; renderDashboard(); },
+  vsub(el, a) { activeVsub = a; renderTab(); },
+  editInfo()  { step = 1; showScreen('scr-basic'); },
 };
 
-// ── TEK DİNLEYİCİ ──
 document.addEventListener('click', (e) => {
   const t = e.target.closest('[data-action]');
   if (!t) return;
@@ -128,6 +171,7 @@ const st = runSelfTest();
 const stEl = document.getElementById('selftest');
 stEl.textContent = st.failed === 0 ? `✅ Öz-test geçti (${st.passed}/${st.passed})` : `❌ ${st.failed} test kaldı`;
 stEl.className = 'status ' + (st.failed === 0 ? 'ok' : 'bad');
+document.getElementById('ver-welcome').textContent = `Raven Fit · v${APP_VERSION}`;
 
 highlight('setGender', U.gender);
 highlight('setAct', U.actM);

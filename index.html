@@ -7,17 +7,21 @@
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="apple-touch-icon" href="icon.png">
   <link rel="manifest" href="manifest.json">
-  <title>RavenFit3</title>
+  <title>Raven Fit</title>
   <style>
     :root{ --bg:#0d0d0f; --card:#17171c; --line:#2a2a31; --accent:#E63946; --text:#f1f1f3; --muted:#8a8a93; }
     *{ box-sizing:border-box; }
     body{ margin:0 auto; max-width:480px; padding:20px; font-family:system-ui,-apple-system,sans-serif;
           background:var(--bg); color:var(--text); }
-    h1{ font-size:24px; margin:8px 0 2px; } h2{ font-size:18px; margin:0 0 12px; }
+    h1{ font-size:28px; margin:14px 0 2px; letter-spacing:-.5px; } h2{ font-size:18px; margin:0 0 12px; }
     .tag{ color:var(--muted); font-size:13px; margin:0 0 6px; }
     .muted{ color:var(--muted); }
-    .logo{ width:88px; height:88px; border-radius:22px; object-fit:cover; }
-    .center{ text-align:center; padding-top:24px; }
+    .center{ text-align:center; padding-top:18px; }
+    /* Açılış ikonu — büyük + animasyonlu */
+    .welcome-icon{ width:124px; height:124px; border-radius:30px; object-fit:cover;
+      animation:floaty 3.2s ease-in-out infinite; box-shadow:0 14px 40px rgba(230,57,70,.28); }
+    @keyframes floaty{ 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(-12px) } }
+    .ver{ font-size:11px; color:var(--muted); text-align:center; margin-top:16px; letter-spacing:.05em; }
     .card{ background:var(--card); border-radius:14px; padding:16px; margin:14px 0; }
     .prog{ font-size:12px; color:var(--muted); text-align:center; margin-bottom:8px; letter-spacing:.05em; }
     .lbl{ font-size:13px; color:var(--muted); margin:12px 0 6px; }
@@ -35,28 +39,38 @@
     .go{ background:var(--accent); border-color:var(--accent); font-weight:600; }
     .nav{ display:flex; gap:10px; margin-top:16px; }
     .nav button{ flex:1; } .nav .go{ flex:2; }
-    /* SPA: sadece aktif ekran görünür */
     .screen{ display:none; }
     .screen.active{ display:block; animation:fade .2s ease; }
     @keyframes fade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
-    #out .grp{ padding:10px 0; border-bottom:1px solid var(--line); line-height:1.9; }
-    #out .grp:last-child{ border-bottom:none; }
-    #out .h{ font-size:11px; letter-spacing:.08em; color:var(--accent); margin-bottom:4px; }
-    #out .ev{ font-size:11px; color:var(--muted); }
-    #out .warn{ background:#2a1e0f; color:#fbbf24; border:1px solid #5a4516; border-radius:8px; padding:10px; margin-top:10px; font-size:13px; line-height:1.6; }
-    #out .warn.reds{ background:#2a0f12; color:#fca5a5; border-color:#5a1620; }
     .status{ font-size:13px; padding:8px 12px; border-radius:8px; margin:6px 0; background:#1f1f26; color:var(--muted); }
-    .status.ok{ background:#0f2a1e; color:#4ade80; }
-    .status.bad{ background:#2a0f12; color:#f87171; }
+    .status.ok{ background:#0f2a1e; color:#4ade80; } .status.bad{ background:#2a0f12; color:#f87171; }
+    /* Dashboard */
+    .dash-head{ display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+    .dash-head img{ width:34px; height:34px; border-radius:9px; }
+    .dash-head .t{ font-size:18px; font-weight:700; }
+    #tab-content{ padding-bottom:78px; }
+    .subtabs{ display:flex; gap:8px; margin:4px 0 12px; }
+    .subtabs button{ flex:1; font-size:13px; padding:8px; }
+    .grp{ background:var(--card); border-radius:12px; padding:14px; margin:10px 0; line-height:1.9; }
+    .grp .h{ font-size:11px; letter-spacing:.08em; color:var(--accent); margin-bottom:6px; }
+    .ev{ font-size:11px; color:var(--muted); }
+    .warn{ background:#2a1e0f; color:#fbbf24; border:1px solid #5a4516; border-radius:10px; padding:12px; margin:10px 0; font-size:13px; line-height:1.6; }
+    .warn.reds{ background:#2a0f12; color:#fca5a5; border-color:#5a1620; }
+    .bottomnav{ position:fixed; left:50%; transform:translateX(-50%); bottom:0; width:100%; max-width:480px;
+      display:flex; background:#121216; border-top:1px solid var(--line); }
+    .bottomnav button{ flex:1; border:none; border-radius:0; background:none; color:var(--muted);
+      display:flex; flex-direction:column; align-items:center; gap:2px; padding:9px 0; }
+    .bottomnav button .ic{ font-size:20px; } .bottomnav button .lb{ font-size:11px; }
+    .bottomnav button.on{ color:var(--accent); }
   </style>
 </head>
 <body>
 
-  <!-- ══ ADIM 0: HOŞ GELDİN ══ -->
+  <!-- ══ HOŞ GELDİN ══ -->
   <div id="scr-welcome" class="screen active">
     <div class="center">
-      <img src="logo.png" alt="RavenFit" class="logo" onerror="this.style.display='none'">
-      <h1>RavenFit3</h1>
+      <img src="icon.png" alt="Raven Fit" class="welcome-icon" onerror="this.style.display='none'">
+      <h1>Raven Fit</h1>
       <p class="tag">Kişisel fitness analiz & antrenman</p>
     </div>
     <div class="card">
@@ -64,6 +78,7 @@
       <div id="pwa" class="status">Service worker kontrol ediliyor…</div>
     </div>
     <button class="go" style="width:100%" data-action="wizNext">Başla →</button>
+    <div class="ver" id="ver-welcome"></div>
   </div>
 
   <!-- ══ ADIM 1: TEMEL ══ -->
@@ -153,14 +168,19 @@
     </div>
   </div>
 
-  <!-- ══ SONUÇLAR ══ -->
-  <div id="scr-results" class="screen">
-    <h2>Sonuçların</h2>
-    <div class="card"><div id="out" class="muted">…</div></div>
-    <div class="nav">
-      <button data-action="wizBack">← Geri</button>
-      <button class="go" data-action="wizRestart">Baştan ↺</button>
+  <!-- ══ DASHBOARD ══ -->
+  <div id="scr-dashboard" class="screen">
+    <div class="dash-head">
+      <img src="icon.png" alt="" onerror="this.style.display='none'">
+      <span class="t">Raven Fit</span>
     </div>
+    <div id="tab-content"></div>
+    <nav class="bottomnav">
+      <button data-action="tab" data-arg="vucudum"><span class="ic">🏋️</span><span class="lb">Vücudum</span></button>
+      <button data-action="tab" data-arg="beslenme"><span class="ic">🍽️</span><span class="lb">Beslenme</span></button>
+      <button data-action="tab" data-arg="antrenman"><span class="ic">💪</span><span class="lb">Antrenman</span></button>
+      <button data-action="tab" data-arg="profil"><span class="ic">👤</span><span class="lb">Profil</span></button>
+    </nav>
   </div>
 
   <script type="module" src="js/app.js"></script>
