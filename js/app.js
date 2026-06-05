@@ -10,6 +10,7 @@ import {
 } from './calc.js';
 import { recGoalDetailed, gateWarning, checkRedsRisk } from './goals.js';
 import { calcSuppScores } from './supplements.js';
+import { determineBodyProfile, getDietTipByProfile } from './profile.js';
 import { runSelfTest } from './selftest.js';
 
 const GOAL_LABELS = { cut: 'Cut (yağ ver)', recomp: 'Recomp', maintain: 'Koru', bulk: 'Bulk (kütle al)' };
@@ -30,6 +31,7 @@ const actions = {
   calculate() {
     U.height = +v('in-height'); U.weight = +v('in-weight'); U.age = +v('in-age');
     U.neck = +v('in-neck'); U.waist = +v('in-waist'); U.hip = +v('in-hip');
+    U.shoulder = +v('in-shoulder') || 0;
     const male = U.gender === 'male';
 
     // vücut
@@ -38,6 +40,9 @@ const actions = {
     R.ffm = f.ffm;
     R.bmr = calcBMR(f.ffm);
     const ideal = calcIdealRange(U.height);
+    R.bmi = U.weight / Math.pow(U.height / 100, 2);
+    R.ffmi = f.ffmi;
+    const profile = determineBodyProfile(R.bf, f.ffmi, R.bmi, U);
 
     // enerji + makro + su
     const tdee = Math.round(R.bmr * U.actM);
@@ -54,7 +59,7 @@ const actions = {
     // supplement önerisi (mevcut seçimlerden türetilir; tam anket A2'de)
     const suppGoal = U.goal === 'maintain' ? 'health' : U.goal;
     const suppFreq = U.actM >= 1.9 ? 'elite' : U.actM >= 1.725 ? 'high' : 'mid';
-    const supps = calcSuppScores({ goal: suppGoal, freq: suppFreq }, { age: U.age, gender: U.gender }, null)
+    const supps = calcSuppScores({ goal: suppGoal, freq: suppFreq }, { age: U.age, gender: U.gender }, profile.n)
       .filter(s => s.score > 0).sort((a, b) => b.score - a.score).slice(0, 4);
 
     let html =
@@ -62,6 +67,9 @@ const actions = {
         `Yağ oranı: <b>%${R.bf}</b> <span class="muted">(${bfBand(R.bf, male)} bant)</span><br>` +
         `FFMI: <b>${f.ffmi}</b> &nbsp;·&nbsp; Yağsız kütle: <b>${f.ffm} kg</b><br>` +
         `BMR: <b>${R.bmr} kcal</b> &nbsp;·&nbsp; İdeal kilo: <b>${ideal.lo}–${ideal.hi} kg</b>` +
+      `</div>` +
+      `<div class="grp"><div class="h">PROFİL</div>` +
+        `Vücut profilin: <b>${profile.n}</b><br><span class="muted">${getDietTipByProfile(profile.n)}</span>` +
       `</div>` +
       `<div class="grp"><div class="h">ENERJİ — hedef: ${GOAL_LABELS[U.goal]}</div>` +
         `TDEE (BMR × ${U.actM}): <b>${tdee} kcal</b><br>` +

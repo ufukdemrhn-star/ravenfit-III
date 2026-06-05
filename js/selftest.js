@@ -10,6 +10,7 @@ import {
   recGoalDetailed, calcGoalGates, checkRedsRisk, ffmiBand, trainingAgeFrom
 } from './goals.js';
 import { SUPPS, calcSuppScores } from './supplements.js';
+import { determineBodyProfile, getDietTipByProfile } from './profile.js';
 
 export function runSelfTest() {
   let passed = 0, failed = 0;
@@ -79,6 +80,16 @@ export function runSelfTest() {
   eq(sv.vitD, 105, 'Supp vegan: vitD = 105');
   eq(sv.omega3, 80, 'Supp vegan: omega3 = 80');
   eq(sortTop({ goal: 'health', diet: 'vegan', sun: 'none' }, { age: 40, gender: 'female' }), 'vitD', 'Supp vegan: #1 = vitD');
+
+
+  // GRUP 11 — Vücut profili & diyet ipucu
+  const prof = (bf, ffmi, bmi, user) => determineBodyProfile(bf, ffmi, bmi, user).n;
+  eq(prof(32, 22, 31, { gender: 'male', waist: 110, hip: 105, shoulder: 0 }), 'Obese (Obez)', 'Profil: erkek obez');
+  eq(prof(12, 22, 24, { gender: 'male', waist: 82, hip: 95, shoulder: 0 }), 'Muscular (Kaslı)', 'Profil: erkek kaslı');
+  eq(prof(20, 17, 23, { gender: 'male', waist: 90, hip: 95, shoulder: 0 }), 'Skinny-fat', 'Profil: erkek skinny-fat');
+  eq(prof(10, 16, 19, { gender: 'male', waist: 74, hip: 90, shoulder: 0 }), 'Skinny (Zayıf)', 'Profil: erkek zayıf');
+  eq(prof(38, 16, 31, { gender: 'female', waist: 95, hip: 110, shoulder: 0 }), 'Obese (Obez)', 'Profil: kadın obez');
+  eq(getDietTipByProfile('Skinny (Zayıf)').length > 20, true, 'Diyet ipucu döndü (zayıf)');
 
   console.log(`%c🔬 Öz-test: ${passed} geçti, ${failed} kaldı`,
     failed === 0 ? 'color:#4ade80;font-weight:bold' : 'color:#f87171;font-weight:bold');
