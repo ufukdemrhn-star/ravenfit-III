@@ -11,6 +11,7 @@ import {
 } from './goals.js';
 import { SUPPS, calcSuppScores } from './supplements.js';
 import { determineBodyProfile, getDietTipByProfile } from './profile.js';
+import { _roundTripTest } from './storage.js';
 
 export function runSelfTest() {
   let passed = 0, failed = 0;
@@ -90,6 +91,12 @@ export function runSelfTest() {
   eq(prof(10, 16, 19, { gender: 'male', waist: 74, hip: 90, shoulder: 0 }), 'Skinny (Zayıf)', 'Profil: erkek zayıf');
   eq(prof(38, 16, 31, { gender: 'female', waist: 95, hip: 110, shoulder: 0 }), 'Obese (Obez)', 'Profil: kadın obez');
   eq(getDietTipByProfile('Skinny (Zayıf)').length > 20, true, 'Diyet ipucu döndü (zayıf)');
+
+
+  // GRUP 12 — Kalıcılık (storage) round-trip (gerçek veriyi kirletmez)
+  const rt = _roundTripTest({ gender: 'female', weight: 62, goal: 'cut', actM: 1.55 });
+  eq(rt && rt.weight, 62, 'Storage: kilo round-trip korunur');
+  eq(rt && rt.goal, 'cut', 'Storage: hedef round-trip korunur');
 
   console.log(`%c🔬 Öz-test: ${passed} geçti, ${failed} kaldı`,
     failed === 0 ? 'color:#4ade80;font-weight:bold' : 'color:#f87171;font-weight:bold');

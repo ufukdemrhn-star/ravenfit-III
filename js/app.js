@@ -1,6 +1,6 @@
 // ════════════════════════════════════════════════════════════
 //  app.js — GİRİŞ NOKTASI
-//  Wizard + sekme sistemli dashboard. Hesap motorları aynen kullanılır.
+//  Wizard + sekmeli dashboard + KALICILIK (storage.js).
 // ════════════════════════════════════════════════════════════
 import { U, R } from './state.js';
 import {
@@ -11,9 +11,10 @@ import { recGoalDetailed, gateWarning, checkRedsRisk } from './goals.js';
 import { calcSuppScores } from './supplements.js';
 import { determineBodyProfile, getDietTipByProfile } from './profile.js';
 import { showScreen } from './ui.js';
+import { saveUser, loadUser, clearUser } from './storage.js';
 import { runSelfTest } from './selftest.js';
 
-const APP_VERSION = '0.0.7';
+const APP_VERSION = '0.0.8';
 const GOAL_LABELS = { cut: 'Cut (yağ ver)', recomp: 'Recomp', maintain: 'Koru', bulk: 'Bulk (kütle al)' };
 const EV = { high: '🟢 Yüksek kanıt', mid: '🟡 Orta kanıt', low: '🔴 Sınırlı kanıt' };
 
@@ -22,14 +23,41 @@ function highlight(action, arg) {
   document.querySelectorAll(`[data-action="${action}"]`).forEach(b =>
     b.classList.toggle('on', b.dataset.arg === String(arg)));
 }
+function applyHighlights() {
+  highlight('setGender', U.gender);
+  highlight('setAct', U.actM);
+  highlight('setGoal', U.goal);
+  highlight('setTrain', U.trainingAge);
+}
+
+// ── GİRDİ ↔ DURUM ────────────────────────────────────────────
+function readInputs() {          // DOM → U
+  U.age = +v('in-age'); U.height = +v('in-height'); U.weight = +v('in-weight');
+  U.neck = +v('in-neck'); U.waist = +v('in-waist'); U.hip = +v('in-hip');
+  U.shoulder = +v('in-shoulder') || 0;
+}
+function fillInputs() {           // U → DOM (kayıtlı/önceki değerleri formda göster)
+  document.getElementById('in-age').value = U.age;
+  document.getElementById('in-height').value = U.height;
+  document.getElementById('in-weight').value = U.weight;
+  document.getElementById('in-neck').value = U.neck;
+  document.getElementById('in-waist').value = U.waist;
+  document.getElementById('in-hip').value = U.hip;
+  document.getElementById('in-shoulder').value = U.shoulder || '';
+}
 
 // ── WIZARD ───────────────────────────────────────────────────
 const STEPS = ['scr-welcome', 'scr-basic', 'scr-measure', 'scr-activity', 'scr-goal'];
 let step = 0;
 function goStep(i) {
-  if (i >= STEPS.length) { enterDashboard(); return; }
+  if (i >= STEPS.length) { finishWizard(); return; }
   step = Math.max(0, i);
   showScreen(STEPS[step]);
+}
+function finishWizard() {
+  readInputs();
+  saveUser(U);          // ← kalıcı kayıt
+  enterDashboard();
 }
 function enterDashboard() {
   compute();
@@ -38,11 +66,8 @@ function enterDashboard() {
   renderDashboard();
 }
 
-// ── HESAP → R'ye yaz ─────────────────────────────────────────
+// ── HESAP (U → R, DOM'a dokunmaz) ────────────────────────────
 function compute() {
-  U.height = +v('in-height'); U.weight = +v('in-weight'); U.age = +v('in-age');
-  U.neck = +v('in-neck'); U.waist = +v('in-waist'); U.hip = +v('in-hip');
-  U.shoulder = +v('in-shoulder') || 0;
   const male = U.gender === 'male';
   R.male = male;
   R.bf = calcBF(U);
@@ -90,7 +115,7 @@ function renderOlculer() {
 function renderIlerleme() {
   return grp('İLERLEME',
     `<span class="muted">Haftalık ölçüm kaydı ve değişim grafiği sonraki fazlarda eklenecek. ` +
-    `Şu an baz ölçülerin alındı; zamanla yağ/kilo/ölçü değişimini buradan takip edeceksin.</span>`);
+    `Şu an baz ölçülerin kayıtlı; zamanla yağ/kilo/ölçü değişimini buradan takip edeceksin.</span>`);
 }
 function renderVucudum() {
   const subs = [['analiz', 'Analiz'], ['olculer', 'Ölçüler'], ['ilerleme', 'İlerleme']];
@@ -134,7 +159,8 @@ function renderProfil() {
       `Yaş: <b>${U.age}</b> &nbsp;·&nbsp; Boy: <b>${U.height} cm</b> &nbsp;·&nbsp; Kilo: <b>${U.weight} kg</b><br>` +
       `Aktivite: <b>×${U.actM}</b> &nbsp;·&nbsp; Deneyim: <b>${U.trainingAge}</b> &nbsp;·&nbsp; Hedef: <b>${GOAL_LABELS[U.goal]}</b>`) +
     `<button class="go" style="width:100%;margin-top:4px" data-action="editInfo">Bilgileri Düzenle</button>` +
-    `<div class="ver">Raven Fit · v${APP_VERSION}</div>`;
+    `<button style="width:100%;margin-top:8px" data-action="resetAll">Sıfırla</button>` +
+    `<div class="ver">Raven Fit · v${APP_VERSION} · veriler bu cihazda kayıtlı</div>`;
 }
 function renderTab() {
   const map = { vucudum: renderVucudum, beslenme: renderBeslenme, antrenman: renderAntrenman, profil: renderProfil };
@@ -156,7 +182,8 @@ const actions = {
   wizBack() { goStep(step - 1); },
   tab(el, a)  { activeTab = a; renderDashboard(); },
   vsub(el, a) { activeVsub = a; renderTab(); },
-  editInfo()  { step = 1; showScreen('scr-basic'); },
+  editInfo()  { fillInputs(); applyHighlights(); step = 1; showScreen('scr-basic'); },
+  resetAll()  { if (confirm('Tüm bilgilerin silinecek ve baştan başlayacaksın. Emin misin?')) { clearUser(); location.reload(); } },
 };
 
 document.addEventListener('click', (e) => {
@@ -173,11 +200,13 @@ stEl.textContent = st.failed === 0 ? `✅ Öz-test geçti (${st.passed}/${st.pas
 stEl.className = 'status ' + (st.failed === 0 ? 'ok' : 'bad');
 document.getElementById('ver-welcome').textContent = `Raven Fit · v${APP_VERSION}`;
 
-highlight('setGender', U.gender);
-highlight('setAct', U.actM);
-highlight('setGoal', U.goal);
-highlight('setTrain', U.trainingAge);
-showScreen(STEPS[0]);
+// Kayıtlı veri varsa wizard'ı ATLA, direkt dashboard'a düş
+const saved = loadUser();
+if (saved) Object.assign(U, saved);
+fillInputs();
+applyHighlights();
+if (saved) enterDashboard();
+else showScreen('scr-welcome');
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js')
