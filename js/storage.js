@@ -38,6 +38,19 @@ export function hasUser() {
   return loadUser() !== null;
 }
 
+// ── Genel amaçlı JSON kayıt (programlar, ölçümler vb. için) ──
+export function saveJSON(key, obj) {
+  try { backend.setItem(key, JSON.stringify(obj)); return true; }
+  catch (e) { return false; }
+}
+export function loadJSON(key) {
+  try { const r = backend.getItem(key); return r ? JSON.parse(r) : null; }
+  catch (e) { return null; }
+}
+export function removeJSON(key) {
+  try { backend.removeItem(key); return true; } catch (e) { return false; }
+}
+
 // Test yardımcısı — gerçek veriyi KİRLETMEDEN round-trip doğrular
 export function _roundTripTest(obj) {
   const TKEY = '__rf_roundtrip_test__';

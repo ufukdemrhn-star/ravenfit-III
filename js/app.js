@@ -13,10 +13,10 @@ import { determineBodyProfile, getDietTipByProfile } from './profile.js';
 import { loadExercises, filterExercises, uniqueEquipment, CAT_TR, CATEGORIES } from './exercises.js';
 import { PROGRAMS } from './programs.js';
 import { showScreen } from './ui.js';
-import { saveUser, loadUser, clearUser } from './storage.js';
+import { saveUser, loadUser, clearUser, saveJSON, loadJSON } from './storage.js';
 import { runSelfTest } from './selftest.js';
 
-const APP_VERSION = '0.0.10';
+const APP_VERSION = '0.0.11';
 const GOAL_LABELS = { cut: 'Cut (yağ ver)', recomp: 'Recomp', maintain: 'Koru', bulk: 'Bulk (kütle al)' };
 const EV = { high: '🟢 Yüksek kanıt', mid: '🟡 Orta kanıt', low: '🔴 Sınırlı kanıt' };
 
@@ -147,15 +147,45 @@ let exDetail = null;
 let antrenSub = 'havuz';      // havuz | programlar
 let selectedProgram = null;
 let activeWorkout = null;      // { program, dayIdx, done:{exIdx:setSayısı} }
+let builder = null;            // { name, items:[{ex,sets,reps}] }
+let exSelectMode = false;      // havuzdan egzersiz seçme modu
+const PROG_KEY = 'ravenfit_programs_v1';
+let customPrograms = loadJSON(PROG_KEY) || [];
+const allPrograms = () => customPrograms.concat(PROGRAMS);
+// dinlenme sayacı
+let restRemaining = 0, restInterval = null;
+const mmss = (s) => Math.floor(Math.max(0, s) / 60) + ':' + String(Math.max(0, s) % 60).padStart(2, '0');
+function updateRestDisplay() { const el = document.getElementById('rest-timer'); if (el) el.textContent = mmss(restRemaining); }
+function startRest(sec) {
+  clearInterval(restInterval); restRemaining = sec; updateRestDisplay();
+  restInterval = setInterval(() => {
+    restRemaining--;
+    if (restRemaining <= 0) { clearInterval(restInterval); restInterval = null; restRemaining = 0; restAlarm(); }
+    updateRestDisplay();
+  }, 1000);
+}
+function stopRest() { clearInterval(restInterval); restInterval = null; restRemaining = 0; updateRestDisplay(); }
+function restAlarm() {
+  try { if (navigator.vibrate) navigator.vibrate([200, 100, 200]); } catch (e) {}
+  try {
+    const ac = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.connect(g); g.connect(ac.destination); o.frequency.value = 880;
+    g.gain.setValueAtTime(0.2, ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.5);
+    o.start(); o.stop(ac.currentTime + 0.5);
+  } catch (e) {}
+}
 const diffDots = (d) => '●'.repeat(d) + '○'.repeat(Math.max(0, 3 - d));
 const prettyMuscle = (m) => m.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
-function exListHTML() {
+function exListHTML(selectMode) {
   const list = filterExercises(exData, exFilters);
   if (!list.length) return `<div class="muted" style="padding:14px 2px">Eşleşen egzersiz yok.</div>`;
   let h = `<div class="excount">${list.length} egzersiz</div>`;
+  const act = selectMode ? 'exPick' : 'exOpen';
   list.forEach(e => {
-    h += `<div class="excard" data-action="exOpen" data-arg="${e.id}">` +
+    h += `<div class="excard" data-action="${act}" data-arg="${e.id}">` +
       `<div class="exname">${esc(e.name_tr)}</div>` +
       `<div class="exmeta">${CAT_TR[e.category] || e.category} · ${(e.equipment || []).join(', ')} · ${diffDots(e.difficulty)}</div>` +
       `</div>`;
@@ -171,7 +201,35 @@ function renderExercisePool() {
   const sel = `<select data-action-change="exEquip" class="exsel"><option value="">Tüm ekipman</option>` +
     equips.map(q => `<option value="${q}" ${exFilters.equip === q ? 'selected' : ''}>${q}</option>`).join('') + `</select>`;
   const search = `<input data-action-input="exSearch" class="exsearch" type="text" placeholder="Egzersiz ara…" value="${esc(exFilters.q)}">`;
-  return `<div class="exbar">${pills}<div class="exrow">${sel}${search}</div></div><div id="ex-list">${exListHTML()}</div>`;
+  return `<div class="exbar">${pills}<div class="exrow">${sel}${search}</div></div><div id="ex-list">${exListHTML(false)}</div>`;
+}
+function renderExerciseSelect() {
+  const pills = '<div class="pills exf">' +
+    `<button data-action="exCat" data-arg="" class="${exFilters.cat === '' ? 'on' : ''}">Hepsi</button>` +
+    CATEGORIES.map(c => `<button data-action="exCat" data-arg="${c}" class="${exFilters.cat === c ? 'on' : ''}">${CAT_TR[c]}</button>`).join('') + '</div>';
+  const equips = uniqueEquipment(exData);
+  const sel = `<select data-action-change="exEquip" class="exsel"><option value="">Tüm ekipman</option>` +
+    equips.map(q => `<option value="${q}" ${exFilters.equip === q ? 'selected' : ''}>${q}</option>`).join('') + `</select>`;
+  const search = `<input data-action-input="exSearch" class="exsearch" type="text" placeholder="Egzersiz ara…" value="${esc(exFilters.q)}">`;
+  const n = builder ? builder.items.length : 0;
+  return `<button class="go" style="width:100%" data-action="doneSelecting">✓ Bitti (<span id="sel-count">${n}</span> egzersiz)</button>` +
+    `<div class="muted" style="font-size:12px;margin:8px 2px">Eklemek için egzersize dokun</div>` +
+    `<div class="exbar">${pills}<div class="exrow">${sel}${search}</div></div><div id="ex-list">${exListHTML(true)}</div>`;
+}
+function renderBuilder() {
+  const rows = builder.items.length
+    ? builder.items.map((it, i) =>
+        `<div class="wkrow"><div><div class="exname">${esc(exName(it.ex))}</div>` +
+        `<div class="exmeta">Set: <button class="mini" data-action="bSetMinus" data-arg="${i}">−</button> <b>${it.sets}</b> <button class="mini" data-action="bSetPlus" data-arg="${i}">+</button>` +
+        ` &nbsp; Tekrar: <input class="repsin" data-action-input="bReps" data-arg="${i}" value="${esc(it.reps)}"></div></div>` +
+        `<button data-action="bRemove" data-arg="${i}">Sil</button></div>`).join('')
+    : `<div class="muted" style="padding:10px 2px">Henüz egzersiz yok. "Egzersiz Ekle" ile havuzdan seç.</div>`;
+  return `<button data-action="cancelBuilder">← İptal</button>` +
+    `<h3 style="margin:12px 0 8px">Yeni Program</h3>` +
+    `<input class="exsearch" style="width:100%;margin-bottom:10px" data-action-input="builderName" placeholder="Program adı" value="${esc(builder.name)}">` +
+    rows +
+    `<button style="width:100%;margin-top:10px" data-action="addExercise">+ Egzersiz Ekle</button>` +
+    `<button class="go" style="width:100%;margin-top:8px" data-action="saveProgram">Programı Kaydet</button>`;
 }
 function renderExerciseDetail(e) {
   const muscles = Object.entries(e.muscles || {}).sort((a, b) => b[1] - a[1]);
@@ -191,11 +249,20 @@ function antrenBar() {
   return '<div class="subtabs">' + subs.map(([k, l]) =>
     `<button data-action="antrenTab" data-arg="${k}" class="${antrenSub === k ? 'on' : ''}">${l}</button>`).join('') + '</div>';
 }
+function progCard(p, isCustom) {
+  return `<div class="wkrow">` +
+    `<div data-action="openProgram" data-arg="${p.id}" style="flex:1;cursor:pointer">` +
+    `<div class="exname">${esc(p.name)}</div>` +
+    `<div class="exmeta">${p.level} · ${p.days.length} gün · ${esc(p.desc)}</div></div>` +
+    (isCustom ? `<button data-action="deleteProgram" data-arg="${p.id}">Sil</button>` : '') + `</div>`;
+}
 function renderProgramList() {
-  return PROGRAMS.map(p =>
-    `<div class="excard" data-action="openProgram" data-arg="${p.id}">` +
-    `<div class="exname">${p.name}</div>` +
-    `<div class="exmeta">${p.level} · ${p.days.length} gün · ${p.desc}</div></div>`).join('');
+  let h = `<button class="go" style="width:100%;margin-bottom:12px" data-action="newProgram">+ Yeni Program Oluştur</button>`;
+  if (customPrograms.length) {
+    h += `<div class="ph">PROGRAMLARIM</div>` + customPrograms.map(p => progCard(p, true)).join('');
+  }
+  h += `<div class="ph muted">HAZIR PROGRAMLAR</div>` + PROGRAMS.map(p => progCard(p, false)).join('');
+  return h;
 }
 function renderProgramDetail(p) {
   let h = `<button data-action="backToPrograms">← Programlar</button>` +
@@ -223,6 +290,8 @@ function renderActiveWorkout() {
   });
   return `<div class="wkhead"><div><b>${program.name}</b><div class="muted" style="font-size:13px">${d.name}</div></div>` +
     `<button data-action="cancelWorkout">Vazgeç</button></div>` +
+    `<div class="restbar">⏱️ Dinlenme <span id="rest-timer">${mmss(restRemaining)}</span>` +
+      `<span class="restbtns"><button data-action="rest" data-arg="60">60</button><button data-action="rest" data-arg="90">90</button><button data-action="rest" data-arg="120">120</button><button data-action="restStop">⨯</button></span></div>` +
     `<div class="excount">${doneSets} / ${totalSets} set tamamlandı</div>` + rows +
     `<button class="go" style="width:100%;margin-top:12px" data-action="finishWorkout">Antrenmanı Bitir ✓</button>`;
 }
@@ -237,6 +306,7 @@ function renderAntrenman() {
   }
   if (exDetail) return renderExerciseDetail(exDetail);
   if (antrenSub === 'programlar') {
+    if (builder !== null) return exSelectMode ? renderExerciseSelect() : renderBuilder();
     if (activeWorkout) return renderActiveWorkout();
     if (selectedProgram) return antrenBar() + renderProgramDetail(selectedProgram);
     return antrenBar() + renderProgramList();
@@ -275,19 +345,41 @@ const actions = {
   editInfo() { fillInputs(); applyHighlights(); step = 1; showScreen('scr-basic'); },
   resetAll() { if (confirm('Tüm bilgilerin silinecek ve baştan başlayacaksın. Emin misin?')) { clearUser(); location.reload(); } },
   // egzersiz
-  exCat(el, a) { exFilters.cat = a; highlight('exCat', a); document.getElementById('ex-list').innerHTML = exListHTML(); },
-  exEquip(el, val) { exFilters.equip = val; document.getElementById('ex-list').innerHTML = exListHTML(); },
-  exSearch(el, val) { exFilters.q = val; document.getElementById('ex-list').innerHTML = exListHTML(); },
+  exCat(el, a) { exFilters.cat = a; highlight('exCat', a); document.getElementById('ex-list').innerHTML = exListHTML(exSelectMode); },
+  exEquip(el, val) { exFilters.equip = val; document.getElementById('ex-list').innerHTML = exListHTML(exSelectMode); },
+  exSearch(el, val) { exFilters.q = val; document.getElementById('ex-list').innerHTML = exListHTML(exSelectMode); },
   exOpen(el, id) { exDetail = exData.find(e => e.id === id) || null; renderTab(); window.scrollTo(0, 0); },
   exBack() { exDetail = null; renderTab(); },
   // programlar
   antrenTab(el, a) { antrenSub = a; selectedProgram = null; exDetail = null; renderTab(); },
-  openProgram(el, id) { selectedProgram = PROGRAMS.find(p => p.id === id) || null; renderTab(); window.scrollTo(0, 0); },
+  openProgram(el, id) { selectedProgram = allPrograms().find(p => p.id === id) || null; renderTab(); window.scrollTo(0, 0); },
   backToPrograms() { selectedProgram = null; renderTab(); },
-  startWorkout(el, arg) { const [pid, di] = arg.split(':'); const p = PROGRAMS.find(x => x.id === pid); if (p) { activeWorkout = { program: p, dayIdx: +di, done: {} }; renderTab(); window.scrollTo(0, 0); } },
-  workoutSet(el, i) { if (!activeWorkout) return; const k = +i; activeWorkout.done[k] = (activeWorkout.done[k] || 0) + 1; renderTab(); },
-  finishWorkout() { activeWorkout = null; renderTab(); alert('Tebrikler! Antrenman tamamlandı 💪'); },
-  cancelWorkout() { if (confirm('Antrenmanı bitirmeden çıkmak istiyor musun?')) { activeWorkout = null; renderTab(); } },
+  startWorkout(el, arg) { const [pid, di] = arg.split(':'); const p = allPrograms().find(x => x.id === pid); if (p) { activeWorkout = { program: p, dayIdx: +di, done: {} }; stopRest(); renderTab(); window.scrollTo(0, 0); } },
+  workoutSet(el, i) { if (!activeWorkout) return; const k = +i; activeWorkout.done[k] = (activeWorkout.done[k] || 0) + 1; startRest(90); renderTab(); },
+  finishWorkout() { stopRest(); activeWorkout = null; renderTab(); alert('Tebrikler! Antrenman tamamlandı 💪'); },
+  cancelWorkout() { if (confirm('Antrenmanı bitirmeden çıkmak istiyor musun?')) { stopRest(); activeWorkout = null; renderTab(); } },
+  // dinlenme sayacı
+  rest(el, a) { startRest(+a); },
+  restStop() { stopRest(); },
+  // program oluşturucu
+  newProgram() { builder = { name: '', items: [] }; exSelectMode = false; renderTab(); window.scrollTo(0, 0); },
+  cancelBuilder() { builder = null; exSelectMode = false; renderTab(); },
+  builderName(el, val) { if (builder) builder.name = val; },
+  addExercise() { exSelectMode = true; renderTab(); window.scrollTo(0, 0); },
+  doneSelecting() { exSelectMode = false; renderTab(); window.scrollTo(0, 0); },
+  exPick(el, id) { if (!builder) return; builder.items.push({ ex: id, sets: 3, reps: '10' }); document.getElementById('ex-list').innerHTML = exListHTML(true); const cc = document.getElementById('sel-count'); if (cc) cc.textContent = builder.items.length; },
+  bSetPlus(el, i) { builder.items[+i].sets++; renderTab(); },
+  bSetMinus(el, i) { const it = builder.items[+i]; if (it.sets > 1) it.sets--; renderTab(); },
+  bReps(el, val) { const i = +el.dataset.arg; if (builder && builder.items[i]) builder.items[i].reps = val; },
+  bRemove(el, i) { builder.items.splice(+i, 1); renderTab(); },
+  saveProgram() {
+    if (!builder.name.trim()) { alert('Programa bir ad ver.'); return; }
+    if (!builder.items.length) { alert('En az bir egzersiz ekle.'); return; }
+    const p = { id: 'custom-' + Date.now(), name: builder.name.trim(), desc: 'Özel program', level: 'Özel', custom: true, days: [{ name: 'Antrenman', items: builder.items }] };
+    customPrograms.push(p); saveJSON(PROG_KEY, customPrograms);
+    builder = null; exSelectMode = false; renderTab(); alert('Program kaydedildi 💪');
+  },
+  deleteProgram(el, id) { if (confirm('Bu programı sil?')) { customPrograms = customPrograms.filter(p => p.id !== id); saveJSON(PROG_KEY, customPrograms); renderTab(); } },
 };
 
 document.addEventListener('click', (e) => {

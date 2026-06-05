@@ -14,6 +14,7 @@ import { determineBodyProfile, getDietTipByProfile } from './profile.js';
 import { _roundTripTest } from './storage.js';
 import { filterExercises } from './exercises.js';
 import { PROGRAMS } from './programs.js';
+import { saveJSON, loadJSON, removeJSON } from './storage.js';
 
 export function runSelfTest() {
   let passed = 0, failed = 0;
@@ -116,6 +117,14 @@ export function runSelfTest() {
   // GRUP 14 — Programlar bütünlüğü
   eq(PROGRAMS.length >= 3, true, 'Programlar: en az 3 program');
   eq(PROGRAMS.every(p => p.days.length >= 1 && p.days.every(d => d.items.length >= 1 && d.items.every(it => it.ex && it.sets))), true, 'Programlar: her gün/egzersiz dolu');
+
+
+  // GRUP 15 — Genel JSON kayıt (programlar için) round-trip
+  const JK = '__rf_json_test__';
+  saveJSON(JK, [{ a: 7 }]);
+  const gj = loadJSON(JK);
+  removeJSON(JK);
+  eq(gj && gj[0] && gj[0].a, 7, 'Storage JSON: kaydet/oku round-trip');
 
   console.log(`%c🔬 Öz-test: ${passed} geçti, ${failed} kaldı`,
     failed === 0 ? 'color:#4ade80;font-weight:bold' : 'color:#f87171;font-weight:bold');
