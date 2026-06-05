@@ -12,6 +12,8 @@ import {
 import { SUPPS, calcSuppScores } from './supplements.js';
 import { determineBodyProfile, getDietTipByProfile } from './profile.js';
 import { _roundTripTest } from './storage.js';
+import { filterExercises } from './exercises.js';
+import { PROGRAMS } from './programs.js';
 
 export function runSelfTest() {
   let passed = 0, failed = 0;
@@ -97,6 +99,23 @@ export function runSelfTest() {
   const rt = _roundTripTest({ gender: 'female', weight: 62, goal: 'cut', actM: 1.55 });
   eq(rt && rt.weight, 62, 'Storage: kilo round-trip korunur');
   eq(rt && rt.goal, 'cut', 'Storage: hedef round-trip korunur');
+
+
+  // GRUP 13 — Egzersiz filtreleme (mock veri)
+  const exMock = [
+    { id: 'a', name_tr: 'Barbell Curl', name_en: 'Curl', category: 'arms', equipment: ['barbell'] },
+    { id: 'b', name_tr: 'Squat', name_en: 'Squat', category: 'legs', equipment: ['barbell'] },
+    { id: 'c', name_tr: 'Sinav', name_en: 'Push Up', category: 'chest', equipment: ['bodyweight'] },
+  ];
+  eq(filterExercises(exMock, { cat: 'legs' }).length, 1, 'Egzersiz filtre: kategori legs');
+  eq(filterExercises(exMock, { equip: 'bodyweight' }).length, 1, 'Egzersiz filtre: ekipman bodyweight');
+  eq(filterExercises(exMock, { q: 'push' }).length, 1, 'Egzersiz filtre: arama (EN)');
+  eq(filterExercises(exMock, {}).length, 3, 'Egzersiz filtre: bos -> hepsi');
+
+
+  // GRUP 14 — Programlar bütünlüğü
+  eq(PROGRAMS.length >= 3, true, 'Programlar: en az 3 program');
+  eq(PROGRAMS.every(p => p.days.length >= 1 && p.days.every(d => d.items.length >= 1 && d.items.every(it => it.ex && it.sets))), true, 'Programlar: her gün/egzersiz dolu');
 
   console.log(`%c🔬 Öz-test: ${passed} geçti, ${failed} kaldı`,
     failed === 0 ? 'color:#4ade80;font-weight:bold' : 'color:#f87171;font-weight:bold');
