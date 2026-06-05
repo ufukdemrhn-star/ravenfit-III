@@ -4,7 +4,7 @@
 //  Yeni sürüm yayınlarken CACHE adındaki "v1"i artır (v2, v3...).
 // ════════════════════════════════════════════════════════════
 
-const CACHE = 'ravenfit3-skeleton-v4';
+const CACHE = 'ravenfit3-skeleton-v5';
 const ASSETS = [
   './',
   './index.html',
@@ -13,6 +13,7 @@ const ASSETS = [
   './js/state.js',
   './js/calc.js',
   './js/goals.js',
+  './js/supplements.js',
   './js/selftest.js',
 ];
 

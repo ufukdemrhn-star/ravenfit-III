@@ -9,9 +9,11 @@ import {
   calcGoalCalories, calcMacros, calcWaterTarget
 } from './calc.js';
 import { recGoalDetailed, gateWarning, checkRedsRisk } from './goals.js';
+import { calcSuppScores } from './supplements.js';
 import { runSelfTest } from './selftest.js';
 
 const GOAL_LABELS = { cut: 'Cut (yağ ver)', recomp: 'Recomp', maintain: 'Koru', bulk: 'Bulk (kütle al)' };
+const EV = { high: '🟢 Yüksek kanıt', mid: '🟡 Orta kanıt', low: '🔴 Sınırlı kanıt' };
 
 const v = (id) => document.getElementById(id).value;
 function highlight(action, arg) {
@@ -19,7 +21,6 @@ function highlight(action, arg) {
     b.classList.toggle('on', b.dataset.arg === String(arg)));
 }
 
-// ── EYLEM KAYDI (HTML'de onclick yok; data-action var) ──
 const actions = {
   setGender(el, arg) { U.gender = arg; highlight('setGender', arg); },
   setAct(el, arg)    { U.actM = parseFloat(arg); highlight('setAct', arg); },
@@ -27,7 +28,7 @@ const actions = {
   setTrain(el, arg)  { U.trainingAge = arg; highlight('setTrain', arg); },
 
   calculate() {
-    U.height = +v('in-height'); U.weight = +v('in-weight');
+    U.height = +v('in-height'); U.weight = +v('in-weight'); U.age = +v('in-age');
     U.neck = +v('in-neck'); U.waist = +v('in-waist'); U.hip = +v('in-hip');
     const male = U.gender === 'male';
 
@@ -50,6 +51,12 @@ const actions = {
     const gw = rec.gates[U.goal] === 'risky' ? gateWarning(U.goal, R.bf, male) : null;
     const reds = checkRedsRisk(U.goal, R.bf, male);
 
+    // supplement önerisi (mevcut seçimlerden türetilir; tam anket A2'de)
+    const suppGoal = U.goal === 'maintain' ? 'health' : U.goal;
+    const suppFreq = U.actM >= 1.9 ? 'elite' : U.actM >= 1.725 ? 'high' : 'mid';
+    const supps = calcSuppScores({ goal: suppGoal, freq: suppFreq }, { age: U.age, gender: U.gender }, null)
+      .filter(s => s.score > 0).sort((a, b) => b.score - a.score).slice(0, 4);
+
     let html =
       `<div class="grp"><div class="h">VÜCUT</div>` +
         `Yağ oranı: <b>%${R.bf}</b> <span class="muted">(${bfBand(R.bf, male)} bant)</span><br>` +
@@ -64,14 +71,24 @@ const actions = {
         `Protein: <b>${mac.pg} g</b> <span class="muted">(${mac.proteinSource === 'lm' ? 'yağsız kütle bazlı' : 'vücut ağırlığı bazlı'})</span><br>` +
         `Yağ: <b>${mac.fg} g</b> &nbsp;·&nbsp; Karbonhidrat: <b>${mac.cg} g</b>` +
       `</div>` +
-      `<div class="grp"><div class="h">SU</div>` +
-        `Günlük: <b>${water.cups} bardak</b> &nbsp;(~${water.lt} L)` +
-      `</div>` +
+      `<div class="grp"><div class="h">SU</div>Günlük: <b>${water.cups} bardak</b> &nbsp;(~${water.lt} L)</div>` +
       `<div class="grp"><div class="h">ÖNERİ</div>` +
         `Sana önerilen: <b>${GOAL_LABELS[rec.primary]}</b>` +
         (rec.alternative ? ` <span class="muted">· alternatif: ${GOAL_LABELS[rec.alternative]}</span>` : ``) +
         `<br><span class="muted">${rec.reason}</span>` +
       `</div>`;
+
+    // supplement bölümü
+    html += `<div class="grp"><div class="h">SUPPLEMENT ÖNERİSİ <span class="muted" style="text-transform:none;letter-spacing:0">(temel — tam anket A2'de)</span></div>`;
+    if (supps.length) {
+      supps.forEach((s, i) => {
+        const rank = ['🥇', '🥈', '🥉', '•'][i] || '•';
+        html += `${rank} ${s.emoji} <b>${s.name}</b> <span class="ev">${EV[s.evidence] || ''}</span><br>`;
+      });
+    } else {
+      html += `<span class="muted">Bu seçimlerle belirgin öneri yok.</span>`;
+    }
+    html += `</div>`;
 
     if (gw)   html += `<div class="warn">${gw}</div>`;
     if (reds) html += `<div class="warn reds">⚠️ <strong>RED-S riski:</strong> Yağ oranın çok düşükken cut yapmak hormonal sağlığı, kemik yoğunluğunu ve performansı olumsuz etkileyebilir. <strong>Maintain</strong> veya <strong>bulk</strong> önerilir.</div>`;
@@ -80,7 +97,6 @@ const actions = {
   },
 };
 
-// ── TEK DİNLEYİCİ ──
 document.addEventListener('click', (e) => {
   const t = e.target.closest('[data-action]');
   if (!t) return;
@@ -88,21 +104,18 @@ document.addEventListener('click', (e) => {
   if (fn) fn(t, t.dataset.arg);
 });
 
-// ── AÇILIŞ: öz-test ──
+// açılış: öz-test
 const st = runSelfTest();
 const stEl = document.getElementById('selftest');
-stEl.textContent = st.failed === 0
-  ? `✅ Öz-test geçti (${st.passed}/${st.passed})`
-  : `❌ ${st.failed} test kaldı — matematiğe bak!`;
+stEl.textContent = st.failed === 0 ? `✅ Öz-test geçti (${st.passed}/${st.passed})` : `❌ ${st.failed} test kaldı — matematiğe bak!`;
 stEl.className = 'status ' + (st.failed === 0 ? 'ok' : 'bad');
 
-// başlangıç seçili durumları
 highlight('setGender', U.gender);
 highlight('setAct', U.actM);
 highlight('setGoal', U.goal);
 highlight('setTrain', U.trainingAge);
 
-// ── SERVICE WORKER ──
+// service worker
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js')
     .then(() => { const el = document.getElementById('pwa'); el.textContent = '✅ Service worker kayıtlı — offline & kurulabilir'; el.className = 'status ok'; })

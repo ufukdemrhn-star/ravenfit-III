@@ -28,13 +28,13 @@
     .pills button{ flex:1 1 auto; }
     button.on{ background:var(--accent); border-color:var(--accent); color:#fff; }
     .go{ width:100%; font-size:15px; font-weight:600; margin-top:14px; }
-    #out .grp{ padding:10px 0; border-bottom:1px solid var(--line); line-height:1.8; }
+    #out .grp{ padding:10px 0; border-bottom:1px solid var(--line); line-height:1.9; }
     #out .grp:last-child{ border-bottom:none; }
     #out .h{ font-size:11px; letter-spacing:.08em; color:var(--accent); margin-bottom:4px; }
+    #out .ev{ font-size:11px; color:var(--muted); }
     #out .warn{ background:#2a1e0f; color:#fbbf24; border:1px solid #5a4516; border-radius:8px;
                 padding:10px; margin-top:10px; font-size:13px; line-height:1.6; }
     #out .warn.reds{ background:#2a0f12; color:#fca5a5; border-color:#5a1620; }
-    #out .warn strong{ color:inherit; }
     .status{ font-size:13px; padding:8px 12px; border-radius:8px; margin:6px 0; background:#1f1f26; color:var(--muted); }
     .status.ok{ background:#0f2a1e; color:#4ade80; }
     .status.bad{ background:#2a0f12; color:#f87171; }
@@ -42,7 +42,7 @@
 </head>
 <body>
   <h1>RavenFit3 🛠️ İskelet</h1>
-  <p class="tag">Modüller + delegasyon + enerji/makro motoru + öneri & uyarılar + PWA</p>
+  <p class="tag">Modüller + delegasyon + enerji/makro + öneri/uyarı + supplement + PWA</p>
 
   <div class="card">
     <div id="selftest" class="status">Öz-test çalışıyor…</div>
@@ -64,8 +64,10 @@
       <div><label>Boyun (cm)</label><input id="in-neck" type="number" value="40"></div>
       <div><label>Bel (cm)</label><input id="in-waist" type="number" value="85"></div>
     </div>
-    <label>Kalça (cm — kadın için)</label>
-    <input id="in-hip" type="number" value="95">
+    <div class="row">
+      <div><label>Kalça (cm — kadın)</label><input id="in-hip" type="number" value="95"></div>
+      <div><label>Yaş</label><input id="in-age" type="number" value="25"></div>
+    </div>
 
     <div class="lbl">Aktivite düzeyi</div>
     <div class="pills">

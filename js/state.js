@@ -3,13 +3,14 @@
 // ════════════════════════════════════════════════════════════
 export const U = {
   gender: 'male',
+  age: 25,       // supplement/profil hesapları için
   height: 180,   // cm
   neck: 40,      // cm
   waist: 85,     // cm
   hip: 95,       // cm
   weight: 80,    // kg
   actM: 1.55,    // aktivite çarpanı (orta aktif)
-  goal: 'maintain',        // cut | recomp | maintain | bulk
-  trainingAge: 'intermediate', // beginner | intermediate | advanced
+  goal: 'maintain',             // cut | recomp | maintain | bulk
+  trainingAge: 'intermediate',  // beginner | intermediate | advanced
 };
 export const R = {}; // hesap sonuçları (bf, ffm, bmr...)
