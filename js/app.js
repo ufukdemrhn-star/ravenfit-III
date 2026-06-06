@@ -10,14 +10,14 @@ import {
 import { recGoalDetailed, gateWarning, checkRedsRisk } from './goals.js';
 import { calcSuppScores, SUPP_QS } from './supplements.js';
 import { determineBodyProfile, getDietTipByProfile } from './profile.js';
-import { loadExercises, filterExercises, uniqueEquipment, CAT_TR, CATEGORIES } from './exercises.js';
+import { loadExercises, filterExercises, uniqueEquipment, uniqueCategories, CAT_TR, BRANCHES } from './exercises.js';
 import { PROGRAMS } from './programs.js';
 import { summarizeProgress, goalNote } from './progress.js';
 import { showScreen } from './ui.js';
 import { saveUser, loadUser, clearUser, saveJSON, loadJSON, setSyncHandler, exportAll, importAll, clearAll } from './storage.js';
 import { runSelfTest } from './selftest.js';
 
-const APP_VERSION = '0.0.14';
+const APP_VERSION = '0.0.15';
 const GOAL_LABELS = { cut: 'Cut (yağ ver)', recomp: 'Recomp', maintain: 'Koru', bulk: 'Bulk (kütle al)' };
 const EV = { high: '🟢 Yüksek kanıt', mid: '🟡 Orta kanıt', low: '🔴 Sınırlı kanıt' };
 
@@ -224,6 +224,8 @@ function renderBeslenme() {
 
 // ── EGZERSİZ HAVUZU ──────────────────────────────────────────
 let exData = null, exLoading = false;
+let currentBranch = 'fitness';
+const exCache = {};
 let exFilters = { cat: '', equip: '', q: '' };
 let exDetail = null;
 let antrenSub = 'havuz';      // havuz | programlar
@@ -284,20 +286,24 @@ function exListHTML(selectMode) {
   return h;
 }
 function renderExercisePool() {
+  const brPills = '<div class="pills exf">' + BRANCHES.map(b =>
+    `<button data-action="exBranch" data-arg="${b.key}" class="${currentBranch === b.key ? 'on' : ''}">${b.label}</button>`).join('') + '</div>';
+  const cats = uniqueCategories(exData);
   const pills = '<div class="pills exf">' +
     `<button data-action="exCat" data-arg="" class="${exFilters.cat === '' ? 'on' : ''}">Hepsi</button>` +
-    CATEGORIES.map(c => `<button data-action="exCat" data-arg="${c}" class="${exFilters.cat === c ? 'on' : ''}">${CAT_TR[c]}</button>`).join('') +
+    cats.map(c => `<button data-action="exCat" data-arg="${c}" class="${exFilters.cat === c ? 'on' : ''}">${CAT_TR[c] || c}</button>`).join('') +
     '</div>';
   const equips = uniqueEquipment(exData);
   const sel = `<select data-action-change="exEquip" class="exsel"><option value="">Tüm ekipman</option>` +
     equips.map(q => `<option value="${q}" ${exFilters.equip === q ? 'selected' : ''}>${q}</option>`).join('') + `</select>`;
   const search = `<input data-action-input="exSearch" class="exsearch" type="text" placeholder="Egzersiz ara…" value="${esc(exFilters.q)}">`;
-  return `<div class="exbar">${pills}<div class="exrow">${sel}${search}</div></div><div id="ex-list">${exListHTML(false)}</div>`;
+  return brPills + `<div class="exbar">${pills}<div class="exrow">${sel}${search}</div></div><div id="ex-list">${exListHTML(false)}</div>`;
 }
 function renderExerciseSelect() {
+  const cats = uniqueCategories(exData);
   const pills = '<div class="pills exf">' +
     `<button data-action="exCat" data-arg="" class="${exFilters.cat === '' ? 'on' : ''}">Hepsi</button>` +
-    CATEGORIES.map(c => `<button data-action="exCat" data-arg="${c}" class="${exFilters.cat === c ? 'on' : ''}">${CAT_TR[c]}</button>`).join('') + '</div>';
+    cats.map(c => `<button data-action="exCat" data-arg="${c}" class="${exFilters.cat === c ? 'on' : ''}">${CAT_TR[c] || c}</button>`).join('') + '</div>';
   const equips = uniqueEquipment(exData);
   const sel = `<select data-action-change="exEquip" class="exsel"><option value="">Tüm ekipman</option>` +
     equips.map(q => `<option value="${q}" ${exFilters.equip === q ? 'selected' : ''}>${q}</option>`).join('') + `</select>`;
@@ -326,15 +332,27 @@ function renderExerciseDetail(e) {
   const muscles = Object.entries(e.muscles || {}).sort((a, b) => b[1] - a[1]);
   const mus = muscles.map(([m, w]) =>
     `<div class="mrow"><span class="mname">${prettyMuscle(m)}</span><div class="mbar"><div class="mfill" style="width:${Math.min(100, w * 10)}%"></div></div></div>`).join('') || '<span class="muted">—</span>';
-  const li = (arr) => (arr && arr.length) ? '<ul class="exul">' + arr.map(x => `<li>${esc(x)}</li>`).join('') + '</ul>' : '<span class="muted">—</span>';
+  const li = (arr) => Array.isArray(arr)
+    ? (arr.length ? '<ul class="exul">' + arr.map(x => `<li>${esc(x)}</li>`).join('') + '</ul>' : '<span class="muted">—</span>')
+    : (arr ? `<div>${esc(arr)}</div>` : '<span class="muted">—</span>');
+  const badges = [CAT_TR[e.category] || e.category, (e.equipment || []).join(', ') || '—', 'Zorluk ' + diffDots(e.difficulty)];
+  if (e.is_compound !== undefined) badges.push(e.is_compound ? 'Bileşik' : 'İzolasyon');
+  if (e.force_type) badges.push(esc(e.force_type));
+  if (e.stroke) badges.push('Stil: ' + esc(e.stroke));
+  if (e.distance_m) badges.push(e.distance_m + ' m');
+  if (e.condition_target) badges.push('Hedef: ' + esc(e.condition_target));
+  if (e.duration_sec) badges.push(e.duration_sec + ' sn');
+  if (e.pain_safe !== undefined) badges.push(e.pain_safe ? '✅ Ağrıya güvenli' : '⚠️ Dikkatli yap');
   return `<button data-action="exBack">← Havuza dön</button>` +
     `<h3 style="margin:12px 0 0">${esc(e.name_tr)}</h3>` +
     `<div class="muted" style="font-size:13px">${esc(e.name_en || '')}</div>` +
-    `<div class="exbadges">${CAT_TR[e.category] || e.category} · ${(e.equipment || []).join(', ')} · Zorluk ${diffDots(e.difficulty)} · ${e.is_compound ? 'Bileşik' : 'İzolasyon'} · ${esc(e.force_type)}</div>` +
+    `<div class="exbadges">${badges.join(' · ')}</div>` +
     grp('HEDEF KASLAR', mus) + grp('TALİMATLAR', li(e.instructions_tr)) +
-    grp('İPUÇLARI', li(e.tips_tr)) + grp('SIK HATALAR', li(e.common_mistakes_tr));
+    grp('İPUÇLARI', li(e.tips_tr)) +
+    (e.caution_tr ? grp('⚠️ UYARI', li(e.caution_tr)) : '') +
+    grp('SIK HATALAR', li(e.common_mistakes_tr));
 }
-const exName = (id) => { const e = exData && exData.find(x => x.id === id); return e ? e.name_tr : id; };
+const exName = (id) => { for (const arr of Object.values(exCache)) { const e = arr && arr.find(x => x.id === id); if (e) return e.name_tr; } const e = exData && exData.find(x => x.id === id); return e ? e.name_tr : id; };
 function antrenBar() {
   const subs = [['havuz', 'Havuz'], ['programlar', 'Programlar']];
   return '<div class="subtabs">' + subs.map(([k, l]) =>
@@ -390,7 +408,7 @@ function renderAntrenman() {
   if (exData === null) {
     if (!exLoading) {
       exLoading = true;
-      loadExercises().then(d => { exData = d; exLoading = false; if (activeTab === 'antrenman') renderTab(); })
+      loadExercises(currentBranch).then(d => { exCache[currentBranch] = d; exData = d; exLoading = false; if (activeTab === 'antrenman') renderTab(); })
         .catch(() => { exLoading = false; if (activeTab === 'antrenman') document.getElementById('tab-content').innerHTML = grp('ANTRENMAN', '<span class="muted">Egzersizler yüklenemedi. (https/Pages üzerinde çalışır, file:// ile değil.)</span>'); });
     }
     return grp('ANTRENMAN', '<span class="muted">Egzersizler yükleniyor…</span>');
@@ -439,7 +457,8 @@ const actions = {
   exCat(el, a) { exFilters.cat = a; highlight('exCat', a); document.getElementById('ex-list').innerHTML = exListHTML(exSelectMode); },
   exEquip(el, val) { exFilters.equip = val; document.getElementById('ex-list').innerHTML = exListHTML(exSelectMode); },
   exSearch(el, val) { exFilters.q = val; document.getElementById('ex-list').innerHTML = exListHTML(exSelectMode); },
-  exOpen(el, id) { exDetail = exData.find(e => e.id === id) || null; renderTab(); window.scrollTo(0, 0); },
+  exOpen(el, id) { let f = null; for (const arr of Object.values(exCache)) { const e = arr && arr.find(x => x.id === id); if (e) { f = e; break; } } exDetail = f || (exData && exData.find(e => e.id === id)) || null; renderTab(); window.scrollTo(0, 0); },
+  exBranch(el, b) { if (b === currentBranch) return; currentBranch = b; exFilters = { cat: '', equip: '', q: '' }; exDetail = null; exData = exCache[b] || null; renderTab(); },
   exBack() { exDetail = null; renderTab(); },
   // programlar
   antrenTab(el, a) { antrenSub = a; selectedProgram = null; exDetail = null; renderTab(); },
@@ -528,7 +547,7 @@ const VER_TXT = `Raven Fit · v${APP_VERSION}`;
 function accountLine() {
   if (FB && FB.auth && FB.auth.currentUser) {
     const u = FB.auth.currentUser;
-    return u.isAnonymous ? ' · misafir (bulut)' : ' · ' + u.email;
+    return u.isAnonymous ? ' · misafir (bulut)' : ' · ' + (u.email || '').split('@')[0];
   }
   return ' · yerel mod';
 }
@@ -560,20 +579,22 @@ function authErr(e) {
   const x = (e && e.code) || '';
   if (x.includes('invalid-email')) return 'Geçersiz e-posta.';
   if (x.includes('weak-password')) return 'Şifre en az 6 karakter olmalı.';
-  if (x.includes('email-already-in-use')) return 'Bu e-posta zaten kayıtlı — Giriş Yap.';
-  if (x.includes('invalid-credential') || x.includes('wrong-password') || x.includes('user-not-found')) return 'E-posta veya şifre hatalı.';
+  if (x.includes('email-already-in-use')) return 'Bu kullanıcı adı zaten alınmış — Giriş Yap.';
+  if (x.includes('invalid-credential') || x.includes('wrong-password') || x.includes('user-not-found')) return 'Kullanıcı adı veya şifre hatalı.';
   if (x.includes('operation-not-allowed')) return 'Bu giriş yöntemi Firebase\'de açık değil.';
   if (x.includes('network')) return 'Ağ hatası. İnterneti kontrol et.';
   return 'Hata: ' + (x || 'bilinmeyen');
 }
 async function doAuth(mode) {
   if (!FB) { authMsg('Bağlantı yok (yerel mod).', false); return; }
-  const email = (document.getElementById('au-email').value || '').trim();
+  if (mode === 'guest') { try { authMsg('İşleniyor…', true); await FB.signInGuest(); } catch (e) { authMsg(authErr(e), false); } return; }
+  const uname = (document.getElementById('au-user').value || '').trim().toLowerCase();
   const pass = document.getElementById('au-pass').value || '';
+  if (!/^[a-z0-9._-]{3,20}$/.test(uname)) { authMsg('Kullanıcı adı 3-20 karakter; harf, rakam, . _ - olabilir.', false); return; }
+  const email = uname + '@ravenfit3.app';   // dahili sahte e-posta
   try {
     authMsg('İşleniyor…', true);
-    if (mode === 'guest') await FB.signInGuest();
-    else if (mode === 'signup') await FB.signUp(email, pass);
+    if (mode === 'signup') await FB.signUp(email, pass);
     else await FB.signIn(email, pass);
   } catch (e) { authMsg(authErr(e), false); }
 }

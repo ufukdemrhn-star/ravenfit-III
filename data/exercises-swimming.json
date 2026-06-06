@@ -1,0 +1,434 @@
+{
+  "_README": {
+    "title": "RavenFit — Yüzme Egzersiz Havuzu",
+    "version": "1.0.0",
+
+    "JSON_DÜZENLEME_REHBERİ": {
+      "zorunlu_alanlar": ["id", "name_tr", "branch", "stroke", "category", "difficulty"],
+      "id": "Benzersiz tanımlayıcı. Küçük harf, tire ile. Örn: 'freestyle-drill-catch-up'. ASLA değiştirme.",
+      "name_tr": "Türkçe egzersiz adı.",
+      "branch": "Her zaman 'swimming'.",
+      "stroke": "Yüzme stili: 'freestyle' | 'backstroke' | 'breaststroke' | 'butterfly' | 'im' | 'drill' | 'kick' | 'pull' | 'general'",
+      "category": "Ana kategori: 'technique' | 'endurance' | 'speed' | 'kick' | 'pull' | 'drill' | 'conditioning'",
+      "difficulty": "1=Başlangıç | 2=Orta | 3=İleri",
+      "distance_m": "Egzersizin standart mesafesi (metre). Sayı veya null.",
+      "duration_min": "Standart süre (dakika). Mesafe yoksa kullan.",
+      "equipment": "Gereken ekipman. Değerler: 'kickboard' | 'pull-buoy' | 'fins' | 'paddles' | 'snorkel' | 'band' | 'clock'",
+      "muscles": "Fitness ile aynı sistem, yüzmeye uyarlanmış kas grupları.",
+      "gif": "CDN URL. Henüz yoksa null bırak.",
+      "video_url": "YouTube embed veya CDN video URL. Henüz yoksa null."
+    },
+
+    "CDN_REHBER": {
+      "açıklama": "GIF ve video dosyaları için CDN sistemi. Dosyaları Firebase Storage veya Cloudflare R2'ye yükle.",
+      "önerilen_CDN": "Cloudflare R2 — ücretsiz 10GB, hızlı CDN",
+      "alternatif": "Firebase Storage — aynı hesap, kolay entegrasyon",
+      "gif_format": "data/media/exercises/{branch}/{exercise-id}.gif",
+      "video_format": "data/media/exercises/{branch}/{exercise-id}.mp4",
+      "örnek_url": "https://cdn.ravenfit.app/exercises/swimming/freestyle-catch-up.gif",
+      "boyut_rehber": {
+        "gif": "Max 2MB, 480x270px, 15fps, 3-5 sn döngü",
+        "video": "Max 10MB, 720p, H.264, ses opsiyonel"
+      },
+      "nasıl_eklenir": "1) Firebase Storage > 'exercises/swimming/' klasörü oluştur. 2) GIF veya video yükle. 3) URL'yi kopyala. 4) exercises-swimming.json'da ilgili egzersizin 'gif' veya 'video_url' alanına yapıştır. 5) GitHub'a push et."
+    },
+
+    "STROKE_LABELS": {
+      "freestyle": "Serbest Stil",
+      "backstroke": "Sırt Üstü",
+      "breaststroke": "Kurbağalama",
+      "butterfly": "Kelebek",
+      "im": "Karışık Stil (IM)",
+      "drill": "Teknik Drill",
+      "kick": "Bacak Çalışması",
+      "pull": "Kol Çalışması",
+      "general": "Genel"
+    }
+  },
+
+  "exercises": [
+
+    {
+      "id": "freestyle-basic",
+      "name_tr": "Serbest Stil Temel",
+      "name_en": "Freestyle / Front Crawl",
+      "branch": "swimming",
+      "stroke": "freestyle",
+      "category": "technique",
+      "difficulty": 1,
+      "distance_m": 100,
+      "equipment": [],
+      "muscles": {
+        "lats": 8, "mid-traps": 6, "front-shoulder": 7,
+        "triceps-long": 5, "quads": 5, "gastrocnemius": 4, "abs-upper": 6
+      },
+      "gif": null,
+      "video_url": null,
+      "instructions_tr": [
+        "Yüz suya dönük, vücut düz ve yatay pozisyonda.",
+        "Kollar öne uzatılmış, su çekiş hareketi yapılır.",
+        "Nefes: her 3 vuruşta bir yana dönerek al.",
+        "Bacaklar düzenli flutter kick hareketi yapar.",
+        "Her vuruşta omuz rotasyonu sağlan."
+      ],
+      "tips_tr": [
+        "Baş suyun içinde, göz aşağıya bakmalı.",
+        "Dirsek yüksek tutularak çekiş yapılmalı (high elbow)."
+      ],
+      "common_mistakes_tr": [
+        "Başı çok kaldırmak — bu kalçaların batmasına yol açar.",
+        "Bacakları çok bükmek — diz, küçük fleksiyon ile çalışmalı."
+      ]
+    },
+
+    {
+      "id": "freestyle-catch-up",
+      "name_tr": "Serbest Stil — Catch Up Drill",
+      "name_en": "Freestyle Catch-Up Drill",
+      "branch": "swimming",
+      "stroke": "drill",
+      "category": "drill",
+      "difficulty": 1,
+      "distance_m": 50,
+      "equipment": [],
+      "muscles": {
+        "lats": 7, "front-shoulder": 8, "triceps-long": 5, "abs-upper": 5
+      },
+      "gif": null,
+      "video_url": null,
+      "instructions_tr": [
+        "Bir kol öne uzatılmış şekilde bekler.",
+        "Diğer kol tam çekişi tamamlayıp öne uzatılınca ilk kol harekete geçer.",
+        "Her an bir kol öne uzatılmış olur — 'catch up' prensibi.",
+        "Uzun, dengeli vuruşlar için idealdir."
+      ],
+      "tips_tr": ["Yavaş çalış, form öncelikli."],
+      "common_mistakes_tr": ["İki kolu aynı anda hareket ettirmek."]
+    },
+
+    {
+      "id": "freestyle-fingertip-drag",
+      "name_tr": "Parmak Ucu Sürükleme Drill",
+      "name_en": "Fingertip Drag Drill",
+      "branch": "swimming",
+      "stroke": "drill",
+      "category": "drill",
+      "difficulty": 1,
+      "distance_m": 50,
+      "equipment": [],
+      "muscles": { "front-shoulder": 8, "mid-shoulder": 6, "triceps-long": 5 },
+      "gif": null, "video_url": null,
+      "instructions_tr": [
+        "Kol toparlama (recovery) fazında parmak uçları su yüzeyinden sürüklenir.",
+        "Bu dirsek yüksekliğini ve omuz rotasyonunu öğretir.",
+        "Normal serbest stil temposuyla yüz, sadece toparlama farklı."
+      ],
+      "tips_tr": ["Dirsek, parmak uçlarından her zaman yüksekte olmalı."],
+      "common_mistakes_tr": ["Dirseği düşürüp avuç içini sürüklemek."]
+    },
+
+    {
+      "id": "backstroke-basic",
+      "name_tr": "Sırt Üstü Temel",
+      "name_en": "Backstroke",
+      "branch": "swimming",
+      "stroke": "backstroke",
+      "category": "technique",
+      "difficulty": 1,
+      "distance_m": 100,
+      "equipment": [],
+      "muscles": {
+        "lats": 9, "mid-traps": 7, "rear-shoulder": 7,
+        "biceps": 5, "abs-upper": 5, "quads": 4, "gastrocnemius": 4
+      },
+      "gif": null, "video_url": null,
+      "instructions_tr": [
+        "Sırt üstü yatık pozisyon, kulaklar suyun içinde.",
+        "Kollar sırayla havadan geçerek suya girer — küçük parmak önce.",
+        "Çekiş düz değil S-eğrisi şeklinde yapılır.",
+        "Bacaklar sürekli flutter kick yapar.",
+        "Her vuruşta omuz rotasyonu sağlan."
+      ],
+      "tips_tr": [
+        "Kalçalar su yüzeyine yakın olmalı.",
+        "Baş sabit, göz tavana bakmalı."
+      ],
+      "common_mistakes_tr": ["Kalçaları düşürmek.", "Kolları yan vuruşla suya sokmak."]
+    },
+
+    {
+      "id": "breaststroke-basic",
+      "name_tr": "Kurbağalama Temel",
+      "name_en": "Breaststroke",
+      "branch": "swimming",
+      "stroke": "breaststroke",
+      "category": "technique",
+      "difficulty": 2,
+      "distance_m": 100,
+      "equipment": [],
+      "muscles": {
+        "adductors": 9, "quads": 7, "glutes": 6,
+        "chest": 7, "front-shoulder": 6, "abs-upper": 5
+      },
+      "gif": null, "video_url": null,
+      "instructions_tr": [
+        "Vücut düz, kollar öne uzatılmış.",
+        "Kollar dışa ve içe çeker, elleri göğüste birleşir.",
+        "Bacaklar aynı anda dışa açılıp kapatılır (whip kick).",
+        "Nefes: kol çekişi sırasında baş yukarı çıkar.",
+        "Süzülme fazında vücut tamamen düzleşir."
+      ],
+      "tips_tr": [
+        "Süzülme fazında bacakları acele kapatma.",
+        "Baş minimal hareket etmeli."
+      ],
+      "common_mistakes_tr": ["Dizleri çok dışa açmak.", "Süzülme fazında ayak parmakları aşağı bakmak."]
+    },
+
+    {
+      "id": "breaststroke-kick-drill",
+      "name_tr": "Kurbağalama Bacak Drill",
+      "name_en": "Breaststroke Kick Drill",
+      "branch": "swimming",
+      "stroke": "drill",
+      "category": "kick",
+      "difficulty": 1,
+      "distance_m": 50,
+      "equipment": ["kickboard"],
+      "muscles": { "adductors": 9, "quads": 7, "glutes": 6 },
+      "gif": null, "video_url": null,
+      "instructions_tr": [
+        "Kickboard'u iki elle tut, kollar önde uzatılmış.",
+        "Sadece kurbağalama bacak vuruşu yap.",
+        "Her vuruştan sonra tam süzülme pozisyonunda bekle.",
+        "Ayak tabanı tam dışa dönük olmalı (whip kick)."
+      ],
+      "tips_tr": ["Tempo düşük tutulup form öncelensin."],
+      "common_mistakes_tr": ["Flutter kick yapmak.", "Topukları kalçaya getirememek."]
+    },
+
+    {
+      "id": "butterfly-basic",
+      "name_tr": "Kelebek Temel",
+      "name_en": "Butterfly",
+      "branch": "swimming",
+      "stroke": "butterfly",
+      "category": "technique",
+      "difficulty": 3,
+      "distance_m": 50,
+      "equipment": [],
+      "muscles": {
+        "chest": 8, "front-shoulder": 9, "lats": 8,
+        "triceps-long": 6, "abs-upper": 7, "obliques": 6, "glutes": 5
+      },
+      "gif": null, "video_url": null,
+      "instructions_tr": [
+        "İki kol aynı anda havadan suya girer — omuz genişliğinde.",
+        "Kol çekişi sırasında kalça dalgalanma (dolphin kick) yapar.",
+        "Her kol döngüsünde 2 dolphin kick: biri girişte, biri çekiş sonunda.",
+        "Nefes: kol çekişinin sonunda baş kaldırılır.",
+        "Vücut dalgalanması omurga boyunca akar."
+      ],
+      "tips_tr": [
+        "Dalgalanma belden değil, göğüsten başlar.",
+        "Başı fazla kaldırma — boyun geride kalmalı."
+      ],
+      "common_mistakes_tr": ["Kelebek yerine breaststroke kick yapmak.", "Kolları çok geniş tutmak."]
+    },
+
+    {
+      "id": "butterfly-one-arm",
+      "name_tr": "Tek Kol Kelebek Drill",
+      "name_en": "One-Arm Butterfly Drill",
+      "branch": "swimming",
+      "stroke": "drill",
+      "category": "drill",
+      "difficulty": 2,
+      "distance_m": 50,
+      "equipment": [],
+      "muscles": { "front-shoulder": 9, "lats": 7, "chest": 7 },
+      "gif": null, "video_url": null,
+      "instructions_tr": [
+        "Bir kol öne uzatılmış, diğer kol kelebek hareketi yapar.",
+        "25m'de kol değiştir.",
+        "Her vuruşta dolphin kick devam eder.",
+        "Nefes: çalışan kolun yanına doğru al."
+      ],
+      "tips_tr": ["Kol koordinasyonunu ve dalgalanmayı hissetmek için mükemmel."],
+      "common_mistakes_tr": ["Dolphin kick'i durdurmak."]
+    },
+
+    {
+      "id": "kick-flutter",
+      "name_tr": "Flutter Kick (Tahta ile)",
+      "name_en": "Flutter Kick with Kickboard",
+      "branch": "swimming",
+      "stroke": "kick",
+      "category": "kick",
+      "difficulty": 1,
+      "distance_m": 100,
+      "equipment": ["kickboard"],
+      "muscles": {
+        "quads": 7, "hamstrings": 5, "gastrocnemius": 7, "hip-flexors": 8, "abs-lower": 5
+      },
+      "gif": null, "video_url": null,
+      "instructions_tr": [
+        "Kickboard'u iki elle tut.",
+        "Bacaklar alternatif, düz ve hızlı kıçlar.",
+        "Vuruş kalçadan gelir, diz minimal bükülür.",
+        "Ayak parmakları hafifçe içe döner, ayaklar esnek olmalı."
+      ],
+      "tips_tr": ["Ayak bileklerini gevşet — sert ayak verim düşürür."],
+      "common_mistakes_tr": ["Dizleri çok bükmek.", "Bacakları su dışına çıkarmak."]
+    },
+
+    {
+      "id": "kick-dolphin",
+      "name_tr": "Dolphin Kick (Yüz Üstü)",
+      "name_en": "Dolphin Kick Face Down",
+      "branch": "swimming",
+      "stroke": "kick",
+      "category": "kick",
+      "difficulty": 2,
+      "distance_m": 50,
+      "equipment": ["fins"],
+      "muscles": {
+        "abs-upper": 8, "abs-lower": 9, "glutes": 7, "quads": 6, "obliques": 5
+      },
+      "gif": null, "video_url": null,
+      "instructions_tr": [
+        "Kollar öne uzatılmış veya vücut yanında.",
+        "Tüm vücut dalgalanır — kalçadan ayağa güç akar.",
+        "Fins ile başlamak önerilir — tempo ve his daha iyi.",
+        "Nefes alma için arada çıkış yapılabilir."
+      ],
+      "tips_tr": ["Güç göğüsten değil karından gelir."],
+      "common_mistakes_tr": ["Sadece bacakları hareket ettirip gövdeyi sabit tutmak."]
+    },
+
+    {
+      "id": "pull-freestyle",
+      "name_tr": "Serbest Stil Kol Çalışması (Pull-Buoy)",
+      "name_en": "Freestyle Pull with Pull-Buoy",
+      "branch": "swimming",
+      "stroke": "pull",
+      "category": "pull",
+      "difficulty": 1,
+      "distance_m": 200,
+      "equipment": ["pull-buoy"],
+      "muscles": {
+        "lats": 9, "mid-traps": 7, "front-shoulder": 8,
+        "triceps-long": 6, "forearm-flexors": 5
+      },
+      "gif": null, "video_url": null,
+      "instructions_tr": [
+        "Pull-buoy'u bacaklar arasına sıkıştır.",
+        "Sadece kollarla yüz — bacakları çalıştırma.",
+        "Yüksek dirsek çekiş (high elbow catch) odaklı çalış.",
+        "Her vuruşta omuz rotasyonunu hisset."
+      ],
+      "tips_tr": ["Pull-buoy üst vücut kaslarını izole eder."],
+      "common_mistakes_tr": ["Kolları çok erken suya sokmak."]
+    },
+
+    {
+      "id": "im-200",
+      "name_tr": "200m Karışık Stil (IM)",
+      "name_en": "200m Individual Medley",
+      "branch": "swimming",
+      "stroke": "im",
+      "category": "endurance",
+      "difficulty": 3,
+      "distance_m": 200,
+      "equipment": [],
+      "muscles": {
+        "front-shoulder": 8, "lats": 8, "chest": 7,
+        "adductors": 7, "quads": 6, "abs-upper": 7, "glutes": 6
+      },
+      "gif": null, "video_url": null,
+      "instructions_tr": [
+        "Sıra: Kelebek → Sırt Üstü → Kurbağalama → Serbest Stil.",
+        "Her stil için 50m yüz.",
+        "Stil geçişlerinde dönüş tekniklerine dikkat et.",
+        "Kelebek ile başlandığı için enerji yönetimi kritik."
+      ],
+      "tips_tr": ["İlk 50m (kelebek) için enerji sakla."],
+      "common_mistakes_tr": ["Kelebek bölümünde aşırı sprintlemek."]
+    },
+
+    {
+      "id": "endurance-400",
+      "name_tr": "400m Dayanıklılık Serbest Stil",
+      "name_en": "400m Freestyle Endurance",
+      "branch": "swimming",
+      "stroke": "freestyle",
+      "category": "endurance",
+      "difficulty": 2,
+      "distance_m": 400,
+      "equipment": [],
+      "muscles": {
+        "lats": 8, "front-shoulder": 7, "abs-upper": 6, "quads": 5, "gastrocnemius": 5
+      },
+      "gif": null, "video_url": null,
+      "instructions_tr": [
+        "Sabit, sürdürülebilir tempo seç.",
+        "Her 100m'de nefes ve tempoyu değerlendir.",
+        "Strok verimliliğine odaklan — her vuruşta ilerlemeyi hisset.",
+        "Son 100m'de tempo artırılabilir."
+      ],
+      "tips_tr": ["Her 50m'de zaman al — strateji geliştirmek için."],
+      "common_mistakes_tr": ["İlk 100m'yi çok hızlı başlamak."]
+    },
+
+    {
+      "id": "sprint-25",
+      "name_tr": "25m Sprint",
+      "name_en": "25m Sprint",
+      "branch": "swimming",
+      "stroke": "freestyle",
+      "category": "speed",
+      "difficulty": 2,
+      "distance_m": 25,
+      "equipment": [],
+      "muscles": {
+        "lats": 9, "front-shoulder": 9, "triceps-long": 7,
+        "abs-upper": 7, "quads": 8, "gastrocnemius": 7, "glutes": 6
+      },
+      "gif": null, "video_url": null,
+      "instructions_tr": [
+        "Maksimal hız için diğer vuruşlardan farklı — yüksek frekans.",
+        "Güçlü itişle başla.",
+        "Her vuruşta tam güç.",
+        "Dönüş varsa maksimal hızda duvar itişi."
+      ],
+      "tips_tr": ["Sprint setleri arasında tam dinlenme şart (1-2 dk)."],
+      "common_mistakes_tr": ["Sprint sırasında form bozulmalarını görmezden gelmek."]
+    },
+
+    {
+      "id": "dryland-shoulder",
+      "name_tr": "Kara Antrenmanı — Omuz Rotasyon",
+      "name_en": "Dryland Shoulder Rotation",
+      "branch": "swimming",
+      "stroke": "general",
+      "category": "conditioning",
+      "difficulty": 1,
+      "duration_min": 10,
+      "distance_m": null,
+      "equipment": ["resistance-band"],
+      "muscles": {
+        "rotator-cuff": 9, "rear-shoulder": 7, "mid-traps": 6
+      },
+      "gif": null, "video_url": null,
+      "instructions_tr": [
+        "Direnç bandını dirsek hizasında bir noktaya sabitle.",
+        "Kolunu 90° bükerek iç rotasyon ve dış rotasyon hareketleri yap.",
+        "Her yönde 15 tekrar, 3 set.",
+        "Ağırlık/direnç düşük tutulmalı — kontrol önemli."
+      ],
+      "tips_tr": ["Yüzücü omzunu önlemek için haftalık 2-3 kez yap."],
+      "common_mistakes_tr": ["Çok fazla dirençle çalışmak."]
+    }
+
+  ]
+}

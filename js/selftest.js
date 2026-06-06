@@ -12,7 +12,7 @@ import {
 import { SUPPS, calcSuppScores, SUPP_QS } from './supplements.js';
 import { determineBodyProfile, getDietTipByProfile } from './profile.js';
 import { _roundTripTest } from './storage.js';
-import { filterExercises } from './exercises.js';
+import { filterExercises, uniqueCategories } from './exercises.js';
 import { PROGRAMS } from './programs.js';
 import { saveJSON, loadJSON, removeJSON } from './storage.js';
 import { summarizeProgress, goalNote } from './progress.js';
@@ -142,6 +142,12 @@ export function runSelfTest() {
   eq(SUPP_QS.every(q => q.key && q.opts && q.opts.length >= 2), true, 'Anket: her soru >=2 seçenek');
   const badSleep = Object.fromEntries(calcSuppScores({ sleep: 'bad' }, { age: 25, gender: 'male' }, null).map(x => [x.id, x.score]));
   eq(badSleep.zma >= 30, true, 'Anket: kötü uyku -> zma >=30');
+
+
+  // GRUP 18 — Branş kategorileri
+  const mockBr = [{ category: 'kick', equipment: ['fins'] }, { category: 'pull', equipment: [] }, { category: 'kick', equipment: [] }];
+  eq(uniqueCategories(mockBr).length, 2, 'Branş: benzersiz kategori sayısı 2');
+  eq(filterExercises(mockBr, { cat: 'kick' }).length, 2, 'Branş: kategori filtresi (kick=2)');
 
   console.log(`%c🔬 Öz-test: ${passed} geçti, ${failed} kaldı`,
     failed === 0 ? 'color:#4ade80;font-weight:bold' : 'color:#f87171;font-weight:bold');
