@@ -14,11 +14,12 @@ import { loadExercises, filterExercises, uniqueEquipment, uniqueCategories, CAT_
 import { PROGRAMS } from './programs.js';
 import { summarizeProgress, goalNote } from './progress.js';
 import { THEMES, applyTheme } from './themes.js';
+import { formulaEpley, formulaBrzycki, formulaLombardi, formulaWathen, ONE_RM_PCTS, ONE_RM_REP_MAP, calcWorkingSet, calcSleep, fmtTime } from './tools.js';
 import { showScreen } from './ui.js';
 import { saveUser, loadUser, clearUser, saveJSON, loadJSON, setSyncHandler, exportAll, importAll, clearAll } from './storage.js';
 import { runSelfTest } from './selftest.js';
 
-const APP_VERSION = '0.0.16';
+const APP_VERSION = '0.0.17';
 const GOAL_LABELS = { cut: 'Cut (yağ ver)', recomp: 'Recomp', maintain: 'Koru', bulk: 'Bulk (kütle al)' };
 const EV = { high: '🟢 Yüksek kanıt', mid: '🟡 Orta kanıt', low: '🔴 Sınırlı kanıt' };
 
@@ -237,7 +238,8 @@ let currentBranch = 'fitness';
 const exCache = {};
 let exFilters = { cat: '', equip: '', q: '' };
 let exDetail = null;
-let antrenSub = 'havuz';      // havuz | programlar
+let antrenSub = 'havuz';      // havuz | programlar | araclar
+let activeCalc = null, calcState = {};
 let selectedProgram = null;
 let activeWorkout = null;      // { program, dayIdx, done:{exIdx:setSayısı} }
 let builder = null;            // { name, items:[{ex,sets,reps}] }
@@ -365,7 +367,7 @@ function renderExerciseDetail(e) {
 }
 const exName = (id) => { for (const arr of Object.values(exCache)) { const e = arr && arr.find(x => x.id === id); if (e) return e.name_tr; } const e = exData && exData.find(x => x.id === id); return e ? e.name_tr : id; };
 function antrenBar() {
-  const subs = [['havuz', 'Havuz'], ['programlar', 'Programlar']];
+  const subs = [['havuz', 'Havuz'], ['programlar', 'Programlar'], ['araclar', 'Araçlar']];
   return '<div class="subtabs">' + subs.map(([k, l]) =>
     `<button data-action="antrenTab" data-arg="${k}" class="${antrenSub === k ? 'on' : ''}">${l}</button>`).join('') + '</div>';
 }
@@ -415,7 +417,109 @@ function renderActiveWorkout() {
     `<div class="excount">${doneSets} / ${totalSets} set tamamlandı</div>` + rows +
     `<button class="go" style="width:100%;margin-top:12px" data-action="finishWorkout">Antrenmanı Bitir ✓</button>`;
 }
+// ══ ANTRENMAN ARAÇLARI — HESAPLAYICILAR (RavenFit2 formülleri birebir) ══
+function renderTools() {
+  if (activeCalc) return renderCalc(activeCalc);
+  const card = (id, icon, label, sub) => `<div class="calc-card" data-action="calcOpen" data-arg="${id}"><div class="calc-ic">${icon}</div><div class="calc-lb">${label}</div><div class="calc-sb">${sub}</div></div>`;
+  return `<div class="calc-grid">` +
+    card('1rm', '💪', '1RM', 'Max Tahmini') +
+    card('ws', '⚙️', 'Çalışma Seti', '%1RM × Rep') +
+    card('sleep', '😴', 'Uyku', 'REM Döngüsü') +
+    `</div>` +
+    `<div class="status">🧮 Formüller RavenFit2'den birebir taşındı; sonuçlar tahmin amaçlıdır.</div>`;
+}
+function renderCalc(id) {
+  const back = `<button data-action="calcBack">← Araçlar</button>`;
+  if (id === '1rm') return back + render1RM();
+  if (id === 'ws') return back + renderWS();
+  if (id === 'sleep') return back + renderSleep();
+  return back;
+}
+function calcResultHTML(id) {
+  if (id === '1rm') {
+    const kg = parseFloat(calcState.kg) || 0, reps = parseInt(calcState.reps) || 0;
+    if (!kg || !reps || reps < 1 || reps > 12) return `<div class="cres muted">Yük ve tekrar gir (1-12 rep)</div>`;
+    const wa = formulaWathen(kg, reps), ep = formulaEpley(kg, reps), br = formulaBrzycki(kg, reps), lo = formulaLombardi(kg, reps);
+    let dist = '';
+    ONE_RM_PCTS.forEach(p => { dist += `<div class="crow"><span>%${p}</span><span>${(wa * p / 100).toFixed(1)} kg</span><span class="muted">${ONE_RM_REP_MAP[p]} rep</span></div>`; });
+    return `<div class="cres"><div class="cres-sub">TAHMİNİ 1RM</div><div class="cres-val">${wa.toFixed(1)}</div><div class="cres-unit">kg · Wathen (ana hesap)</div></div>` +
+      `<div class="cgrid4">` +
+        `<div class="ccell" style="border-color:var(--accent)"><div class="ccell-val" style="color:var(--accent)">${wa.toFixed(1)}</div><div class="ccell-lbl">Wathen ★</div></div>` +
+        `<div class="ccell"><div class="ccell-val">${ep.toFixed(1)}</div><div class="ccell-lbl">Epley</div></div>` +
+        `<div class="ccell"><div class="ccell-val">${br.toFixed(1)}</div><div class="ccell-lbl">Brzycki</div></div>` +
+        `<div class="ccell"><div class="ccell-val">${lo.toFixed(1)}</div><div class="ccell-lbl">Lombardi</div></div>` +
+      `</div>` + grp('% 1RM DAĞILIMI', dist);
+  }
+  if (id === 'ws') {
+    const r = calcWorkingSet(calcState.wsTarget, calcState.wsSets, calcState.wsReps, calcState.wsDiff, calcState.wsFixed);
+    if (r.error) return `<div class="cres muted">${r.error}</div>`;
+    const diffLabel = { easy: '😌 Kolay', medium: '💪 Orta', hard: '🔥 Zor' }[r.diff];
+    let plan = '';
+    r.weights.forEach((w, i) => { const pct = Math.round(w / r.target * 100); plan += `<div class="crow"><span>Set ${i + 1}</span><span>${w} kg × ${r.reps}</span><span class="muted">%${pct}</span></div>`; });
+    return `<div class="cres"><div class="cres-sub">${diffLabel} · ${r.fixed ? 'SABİT' : 'PİRAMİT'}</div><div class="cres-val">${r.volume}</div><div class="cres-unit">birim toplam hacim</div><div class="cres-sub">💤 ${r.rest} dk dinlenme</div></div>` +
+      grp('SET PLANI', plan);
+  }
+  if (id === 'sleep') {
+    const mode = calcState.sleepMode || 'wake';
+    const timeStr = mode === 'wake' ? (calcState.wakeHour || '07:00') : (calcState.bedHour || '23:00');
+    const fmt24 = calcState.sleep24 === true;
+    const times = calcSleep(mode, timeStr, { includeFall: calcState.sleepFall, isWorkoutDay: calcState.sleepWorkout });
+    if (!times) return `<div class="cres muted">Saat gir</div>`;
+    const tp = { h: parseInt(timeStr.split(':')[0]) || 0, m: parseInt(timeStr.split(':')[1]) || 0 };
+    const label = mode === 'wake' ? `Saat ${fmtTime(tp, fmt24)} kalkacaksın → şu saatlerde YAT:` : `Saat ${fmtTime(tp, fmt24)} yatacaksın → şu saatlerde UYAN:`;
+    const isW = calcState.sleepWorkout === true;
+    const tags = isW ? ['⚠️ Minimum', '👍 İyi', '💪 Optimal', '💤 Uzun'] : ['⚠️ Minimum', '👍 İyi', '✨ Optimal', '💤 Uzun'];
+    let rows = '';
+    times.forEach((tt, i) => { rows += `<div class="crow"><span style="font-size:22px;font-weight:800;color:var(--accent)">${fmtTime(tt.time, fmt24)}</span><span class="muted">${tt.cycles} döngü · ${tt.sleep} sa</span><span style="font-weight:700">${tags[i]}</span></div>`; });
+    return `<div class="cres" style="text-align:left"><div class="cres-sub" style="margin-bottom:8px">${label}</div>${rows}</div>`;
+  }
+  return '';
+}
+function render1RM() {
+  return `<div class="card">` +
+    `<label>Kaldırdığın Yük (kg)</label>` +
+    `<input type="number" inputmode="decimal" step="0.5" placeholder="örn. 80" value="${calcState.kg || ''}" data-action-input="calcInput" data-arg="kg">` +
+    `<label>Tekrar Sayısı (1-12)</label>` +
+    `<input type="number" inputmode="numeric" min="1" max="12" placeholder="örn. 8" value="${calcState.reps || ''}" data-action-input="calcInput" data-arg="reps">` +
+    `</div>` +
+    `<div id="calc-result">${calcResultHTML('1rm')}</div>` +
+    `<div class="status">💡 1RM = 1 tekrar yapabileceğin tahmini maksimum. Wathen ana hesaptır; diğerleri referans.</div>`;
+}
+function renderWS() {
+  const sets = calcState.wsSets || 3, diff = calcState.wsDiff || 'medium', fixed = calcState.wsFixed === true;
+  const dbtn = (idv, l) => `<button data-action="calcWsDiff" data-arg="${idv}" class="${diff === idv ? 'on' : ''}">${l}</button>`;
+  return `<div class="card">` +
+    `<label>Hedef Ağırlık (kg)</label>` +
+    `<input type="number" inputmode="decimal" step="0.5" placeholder="örn. 100" value="${calcState.wsTarget || ''}" data-action-input="calcInput" data-arg="wsTarget">` +
+    `<div style="display:flex;gap:10px">` +
+      `<div style="flex:1"><label>Set (1-5)</label><input type="number" inputmode="numeric" min="1" max="5" value="${sets}" data-action-input="calcInput" data-arg="wsSets"></div>` +
+      `<div style="flex:1"><label>Tekrar (1-10)</label><input type="number" inputmode="numeric" min="1" max="10" placeholder="örn. 5" value="${calcState.wsReps || ''}" data-action-input="calcInput" data-arg="wsReps"></div>` +
+    `</div>` +
+    `<label>Zorluk</label><div class="cdiff">${dbtn('easy', '😌 Kolay')}${dbtn('medium', '💪 Orta')}${dbtn('hard', '🔥 Zor')}</div>` +
+    `<div class="ctoggle" data-action="calcWsFixed"><div><b style="font-size:13px">Sabit Ağırlık</b><div class="muted" style="font-size:11px">Kapalı: piramit · Açık: tüm setler aynı</div></div>` +
+      `<div class="csw" style="background:${fixed ? 'var(--accent)' : 'var(--line)'}"><i style="left:${fixed ? '22px' : '3px'}"></i></div></div>` +
+    `</div>` +
+    `<div id="calc-result">${calcResultHTML('ws')}</div>`;
+}
+function renderSleep() {
+  const mode = calcState.sleepMode || 'wake';
+  const mbtn = (m, l) => `<button data-action="calcSleepMode" data-arg="${m}" class="${mode === m ? 'on' : ''}">${l}</button>`;
+  const tog = (key, title, sub) => { const on = calcState[key] === true; return `<div class="ctoggle" data-action="calcSleepToggle" data-arg="${key}"><div><b style="font-size:13px">${title}</b><div class="muted" style="font-size:11px">${sub}</div></div><div class="csw" style="background:${on ? 'var(--accent)' : 'var(--line)'}"><i style="left:${on ? '22px' : '3px'}"></i></div></div>`; };
+  return `<div class="card">` +
+    `<label>Hangisine göre?</label><div class="cdiff">${mbtn('wake', '⏰ Kalkışıma')}${mbtn('bed', '🛏️ Yatışıma')}</div>` +
+    (mode === 'wake'
+      ? `<label>Kalkış saatin</label><input type="time" value="${calcState.wakeHour || '07:00'}" data-action-input="calcInput" data-arg="wakeHour">`
+      : `<label>Yatış saatin</label><input type="time" value="${calcState.bedHour || '23:00'}" data-action-input="calcInput" data-arg="bedHour">`) +
+    tog('sleep24', '🕐 24 Saat Biçimi', 'Kapalı: AM/PM') +
+    tog('sleepFall', '⏱️ Uykuya Dalma', '+15 dk ekler') +
+    tog('sleepWorkout', '💪 Antrenman Günü', 'Açık: +30 dk') +
+    `</div>` +
+    `<div id="calc-result">${calcResultHTML('sleep')}</div>` +
+    `<div class="status">💡 Uyku ~90 dk döngüler halinde gelir; döngü sonunda uyanmak daha dinç hissettirir.</div>`;
+}
+
 function renderAntrenman() {
+  if (antrenSub === 'araclar') return antrenBar() + renderTools();
   if (exData === null) {
     if (!exLoading) {
       exLoading = true;
@@ -473,7 +577,7 @@ const actions = {
   exBranch(el, b) { if (b === currentBranch) return; currentBranch = b; exFilters = { cat: '', equip: '', q: '' }; exDetail = null; exData = exCache[b] || null; renderTab(); },
   exBack() { exDetail = null; renderTab(); },
   // programlar
-  antrenTab(el, a) { antrenSub = a; selectedProgram = null; exDetail = null; renderTab(); },
+  antrenTab(el, a) { antrenSub = a; selectedProgram = null; exDetail = null; activeCalc = null; renderTab(); },
   openProgram(el, id) { selectedProgram = allPrograms().find(p => p.id === id) || null; renderTab(); window.scrollTo(0, 0); },
   backToPrograms() { selectedProgram = null; renderTab(); },
   startWorkout(el, arg) { const [pid, di] = arg.split(':'); const p = allPrograms().find(x => x.id === pid); if (p) { activeWorkout = { program: p, dayIdx: +di, done: {} }; stopRest(); renderTab(); window.scrollTo(0, 0); } },
@@ -541,6 +645,13 @@ const actions = {
   authGuest() { doAuth('guest'); },
   logOut() { didLogout = true; if (FB) FB.logOut(); },
   setTheme(el, key) { U.theme = applyTheme(key); saveUser(U); renderTab(); },
+  calcOpen(el, id) { activeCalc = id; if (id === 'ws') calcState = { wsSets: 3, wsDiff: 'medium', wsFixed: false }; else if (id === 'sleep') calcState = { sleepMode: 'wake', wakeHour: '07:00', bedHour: '23:00', sleep24: true, sleepFall: true, sleepWorkout: false }; else calcState = {}; renderTab(); },
+  calcBack() { activeCalc = null; renderTab(); },
+  calcInput(el, key) { calcState[key] = el.value; const r = document.getElementById('calc-result'); if (r) r.innerHTML = calcResultHTML(activeCalc); },
+  calcWsDiff(el, dd) { calcState.wsDiff = dd; renderTab(); },
+  calcWsFixed() { calcState.wsFixed = !calcState.wsFixed; renderTab(); },
+  calcSleepMode(el, m) { calcState.sleepMode = m; renderTab(); },
+  calcSleepToggle(el, key) { calcState[key] = !calcState[key]; renderTab(); },
 };
 
 document.addEventListener('click', (e) => {
@@ -587,7 +698,7 @@ function resetMemory() {
   Object.assign(U, { gender: 'male', age: 25, height: 180, neck: 40, shoulder: 0, waist: 85, hip: 95, weight: 80, actM: 1.55, goal: 'maintain', trainingAge: 'intermediate', theme: 'dark' });
   customPrograms = []; measurements = []; suppAnswers = null; workoutHistory = [];
   step = 0; activeTab = 'vucudum'; activeVsub = 'analiz'; antrenSub = 'havuz';
-  selectedProgram = null; activeWorkout = null; builder = null; exSelectMode = false;
+  selectedProgram = null; activeWorkout = null; builder = null; exSelectMode = false; activeCalc = null; calcState = {};
   suppSurvey = false; exDetail = null; openSupp = null;
 }
 function initAppUI(hasData) { applyTheme(U.theme || 'dark'); fillInputs(); applyHighlights(); if (hasData) enterDashboard(); else showScreen('scr-welcome'); }

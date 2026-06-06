@@ -17,6 +17,7 @@ import { PROGRAMS } from './programs.js';
 import { saveJSON, loadJSON, removeJSON } from './storage.js';
 import { summarizeProgress, goalNote } from './progress.js';
 import { THEMES } from './themes.js';
+import { formulaEpley, formulaWathen, calcWorkingSet, calcSleep, fmtTime } from './tools.js';
 
 export function runSelfTest() {
   let passed = 0, failed = 0;
@@ -154,6 +155,15 @@ export function runSelfTest() {
   // GRUP 19 — Temalar
   eq(THEMES.length, 6, 'Tema: 6 tema');
   eq(THEMES.every(t => t.key && t.vars && t.vars.accent && t.vars.bg && t.vars.surface), true, 'Tema: tüm renkler dolu');
+
+
+  // GRUP 20 — Antrenman araçları (RavenFit2 birebir)
+  eq(Math.round(formulaEpley(80, 8) * 100) / 100, 101.33, 'Araç: Epley(80,8)=101.33');
+  eq(Math.round(formulaWathen(80, 8) * 100) / 100, 102.14, 'Araç: Wathen(80,8)=102.14');
+  const _ws = calcWorkingSet(100, 3, 5, 'medium', false);
+  eq(_ws.volume, 1137.5, 'Araç: ÇS hacim 3×5 orta = 1137.5');
+  eq(JSON.stringify(_ws.weights), JSON.stringify([75, 75, 77.5]), 'Araç: ÇS setler [75,75,77.5]');
+  eq(fmtTime(calcSleep('wake', '07:00', { includeFall: true, isWorkoutDay: false })[1].time, true), '23:15', 'Araç: uyku 5 döngü yatış 23:15');
 
   console.log(`%c🔬 Öz-test: ${passed} geçti, ${failed} kaldı`,
     failed === 0 ? 'color:#4ade80;font-weight:bold' : 'color:#f87171;font-weight:bold');

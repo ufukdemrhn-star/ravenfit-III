@@ -9,7 +9,7 @@
   <link rel="manifest" href="manifest.json">
   <title>Raven Fit</title>
   <style>
-    :root{ --bg:#080809; --card:#161618; --line:#2A2A2F; --accent:#E63946; --text:#F2F2F4; --muted:#9090A0; --surface:#0F0F11; --btn:#23232b; }
+    :root{ --bg:#080809; --card:#161618; --line:#2A2A2F; --accent:#E63946; --text:#F2F2F4; --muted:#9090A0; --surface:#0F0F11; --btn:#1F1F24; --glow:rgba(255,77,90,.30); }
     *{ box-sizing:border-box; }
     body{ margin:0 auto; max-width:480px; padding:20px; font-family:system-ui,-apple-system,sans-serif;
           background:var(--bg); color:var(--text); }
@@ -19,7 +19,7 @@
     .center{ text-align:center; padding-top:18px; }
     /* Açılış ikonu — büyük + animasyonlu */
     .welcome-icon{ width:124px; height:124px; border-radius:30px; object-fit:cover;
-      animation:floaty 3.2s ease-in-out infinite; box-shadow:0 14px 40px rgba(230,57,70,.28); }
+      animation:floaty 3.2s ease-in-out infinite; box-shadow:0 14px 40px var(--glow); }
     @keyframes floaty{ 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(-12px) } }
     .ver{ font-size:11px; color:var(--muted); text-align:center; margin-top:16px; letter-spacing:.05em; }
     .card{ background:var(--card); border-radius:14px; padding:16px; margin:14px 0; }
@@ -108,6 +108,23 @@
     .tdots{ display:flex; gap:12px; margin-top:6px; flex-wrap:wrap; }
     .tdot{ width:32px; height:32px; border-radius:50%; cursor:pointer; border:2px solid transparent; box-shadow:0 0 0 1px var(--line); }
     .tdot.on{ border-color:var(--text); }
+    .calc-grid{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:4px; }
+    .calc-card{ background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px 6px; text-align:center; cursor:pointer; }
+    .calc-card:active{ background:var(--btn); }
+    .calc-ic{ font-size:26px; } .calc-lb{ font-size:13px; font-weight:700; margin-top:4px; } .calc-sb{ font-size:10px; color:var(--muted); margin-top:1px; }
+    .cres{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px; text-align:center; margin:12px 0; }
+    .cres.muted{ opacity:.7; }
+    .cres-val{ font-size:40px; font-weight:800; color:var(--accent); line-height:1; margin:2px 0; }
+    .cres-unit{ font-size:12px; color:var(--muted); } .cres-sub{ font-size:11px; color:var(--muted); }
+    .cgrid4{ display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+    .ccell{ background:var(--card); border:1px solid var(--line); border-radius:10px; padding:10px; text-align:center; }
+    .ccell-val{ font-size:18px; font-weight:700; } .ccell-lbl{ font-size:10px; color:var(--muted); margin-top:2px; }
+    .crow{ display:flex; justify-content:space-between; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid var(--line); font-size:13px; }
+    .crow:last-child{ border-bottom:none; }
+    .cdiff{ display:flex; gap:6px; margin-bottom:4px; }
+    .ctoggle{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px; margin-top:12px; background:var(--surface); border-radius:10px; cursor:pointer; }
+    .csw{ width:44px; height:25px; border-radius:13px; position:relative; flex-shrink:0; transition:background .2s; }
+    .csw i{ position:absolute; top:3px; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .2s; }
   </style>
 </head>
 <body>

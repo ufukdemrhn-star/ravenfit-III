@@ -4,7 +4,7 @@
 //  Yeni sürüm yayınlarken CACHE adındaki "v1"i artır (v2, v3...).
 // ════════════════════════════════════════════════════════════
 
-const CACHE = 'ravenfit-v0.0.16';
+const CACHE = 'ravenfit-v0.0.17';
 const ASSETS = [
   './',
   './index.html',
@@ -24,6 +24,7 @@ const ASSETS = [
   './js/programs.js',
   './js/progress.js',
   './js/themes.js',
+  './js/tools.js',
   './js/firebase.js',
   './data/exercises-fitness.json',
   './data/exercises-swimming.json',
