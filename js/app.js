@@ -19,7 +19,7 @@ import { showScreen } from './ui.js';
 import { saveUser, loadUser, clearUser, saveJSON, loadJSON, setSyncHandler, exportAll, importAll, clearAll } from './storage.js';
 import { runSelfTest } from './selftest.js';
 
-const APP_VERSION = '0.0.17';
+const APP_VERSION = '0.0.18';
 const GOAL_LABELS = { cut: 'Cut (yağ ver)', recomp: 'Recomp', maintain: 'Koru', bulk: 'Bulk (kütle al)' };
 const EV = { high: '🟢 Yüksek kanıt', mid: '🟡 Orta kanıt', low: '🔴 Sınırlı kanıt' };
 
@@ -647,7 +647,7 @@ const actions = {
   setTheme(el, key) { U.theme = applyTheme(key); saveUser(U); renderTab(); },
   calcOpen(el, id) { activeCalc = id; if (id === 'ws') calcState = { wsSets: 3, wsDiff: 'medium', wsFixed: false }; else if (id === 'sleep') calcState = { sleepMode: 'wake', wakeHour: '07:00', bedHour: '23:00', sleep24: true, sleepFall: true, sleepWorkout: false }; else calcState = {}; renderTab(); },
   calcBack() { activeCalc = null; renderTab(); },
-  calcInput(el, key) { calcState[key] = el.value; const r = document.getElementById('calc-result'); if (r) r.innerHTML = calcResultHTML(activeCalc); },
+  calcInput(el, val) { const key = el.dataset.arg; calcState[key] = val; const r = document.getElementById('calc-result'); if (r) r.innerHTML = calcResultHTML(activeCalc); },
   calcWsDiff(el, dd) { calcState.wsDiff = dd; renderTab(); },
   calcWsFixed() { calcState.wsFixed = !calcState.wsFixed; renderTab(); },
   calcSleepMode(el, m) { calcState.sleepMode = m; renderTab(); },
