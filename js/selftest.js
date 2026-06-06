@@ -16,6 +16,7 @@ import { filterExercises, uniqueCategories } from './exercises.js';
 import { PROGRAMS } from './programs.js';
 import { saveJSON, loadJSON, removeJSON } from './storage.js';
 import { summarizeProgress, goalNote } from './progress.js';
+import { THEMES } from './themes.js';
 
 export function runSelfTest() {
   let passed = 0, failed = 0;
@@ -148,6 +149,11 @@ export function runSelfTest() {
   const mockBr = [{ category: 'kick', equipment: ['fins'] }, { category: 'pull', equipment: [] }, { category: 'kick', equipment: [] }];
   eq(uniqueCategories(mockBr).length, 2, 'Branş: benzersiz kategori sayısı 2');
   eq(filterExercises(mockBr, { cat: 'kick' }).length, 2, 'Branş: kategori filtresi (kick=2)');
+
+
+  // GRUP 19 — Temalar
+  eq(THEMES.length, 6, 'Tema: 6 tema');
+  eq(THEMES.every(t => t.key && t.vars && t.vars.accent && t.vars.bg && t.vars.surface), true, 'Tema: tüm renkler dolu');
 
   console.log(`%c🔬 Öz-test: ${passed} geçti, ${failed} kaldı`,
     failed === 0 ? 'color:#4ade80;font-weight:bold' : 'color:#f87171;font-weight:bold');

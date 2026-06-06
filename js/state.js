@@ -13,5 +13,6 @@ export const U = {
   actM: 1.55,
   goal: 'maintain',
   trainingAge: 'intermediate',
+  theme: 'dark',
 };
 export const R = {};

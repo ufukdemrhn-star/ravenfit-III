@@ -13,11 +13,12 @@ import { determineBodyProfile, getDietTipByProfile } from './profile.js';
 import { loadExercises, filterExercises, uniqueEquipment, uniqueCategories, CAT_TR, BRANCHES } from './exercises.js';
 import { PROGRAMS } from './programs.js';
 import { summarizeProgress, goalNote } from './progress.js';
+import { THEMES, applyTheme } from './themes.js';
 import { showScreen } from './ui.js';
 import { saveUser, loadUser, clearUser, saveJSON, loadJSON, setSyncHandler, exportAll, importAll, clearAll } from './storage.js';
 import { runSelfTest } from './selftest.js';
 
-const APP_VERSION = '0.0.15';
+const APP_VERSION = '0.0.16';
 const GOAL_LABELS = { cut: 'Cut (yağ ver)', recomp: 'Recomp', maintain: 'Koru', bulk: 'Bulk (kütle al)' };
 const EV = { high: '🟢 Yüksek kanıt', mid: '🟡 Orta kanıt', low: '🔴 Sınırlı kanıt' };
 
@@ -132,11 +133,18 @@ function renderMeasureForm() {
     (female ? `<label>Kalça (cm)</label><input id="m-hip" type="number" value="${U.hip}">` : '')) +
     `<div class="nav"><button data-action="cancelMeasure">İptal</button><button class="go" data-action="saveMeasure">Kaydet</button></div>`;
 }
+function renderHistory() {
+  if (!workoutHistory.length) return '';
+  const rows = [...workoutHistory].reverse().slice(0, 25).map(w =>
+    `<div class="wkrow"><div><div class="exname">${esc(w.program)} — ${esc(w.day)}</div>` +
+    `<div class="exmeta">${new Date(w.date).toLocaleDateString('tr-TR')} &nbsp;·&nbsp; ${w.sets}/${w.total} set</div></div></div>`).join('');
+  return grp(`ANTRENMAN GEÇMİŞİ (${workoutHistory.length})`, rows);
+}
 function renderIlerleme() {
   if (measureForm) return renderMeasureForm();
   if (!measurements.length) {
     return grp('İLERLEME', `<span class="muted">Henüz ölçüm kaydın yok. Düzenli ölçüm ekleyerek kilo ve yağ oranı değişimini takip et.</span>`) +
-      `<button class="go" style="width:100%" data-action="openMeasure">İlk Ölçümü Ekle</button>`;
+      `<button class="go" style="width:100%" data-action="openMeasure">İlk Ölçümü Ekle</button>` + renderHistory();
   }
   const s = summarizeProgress(measurements);
   const arrow = (d) => d > 0.05 ? `<span style="color:#fca5a5">▲ ${d.toFixed(1)}</span>` : d < -0.05 ? `<span style="color:#4ade80">▼ ${Math.abs(d).toFixed(1)}</span>` : '<span class="muted">–</span>';
@@ -154,6 +162,7 @@ function renderIlerleme() {
       `<button data-action="deleteMeasure" data-arg="${m.date}">Sil</button></div>`;
   });
   h += grp('KAYITLAR', rows) + `<button class="go" style="width:100%" data-action="openMeasure">+ Ölçüm Ekle</button>`;
+  h += renderHistory();
   return h;
 }
 function renderVucudum() {
@@ -244,6 +253,8 @@ let suppSurvey = false;
 let suppDraft = {};
 let openSupp = null;
 const BUDGET_MAX = { min: 3, low: 5, mid: 8, high: 99 };
+const HIST_KEY = 'ravenfit_history_v1';
+let workoutHistory = loadJSON(HIST_KEY) || [];
 const allPrograms = () => customPrograms.concat(PROGRAMS);
 // dinlenme sayacı
 let restRemaining = 0, restInterval = null;
@@ -428,6 +439,7 @@ function renderProfil() {
       `Cinsiyet: <b>${R.male ? 'Erkek' : 'Kadın'}</b><br>` +
       `Yaş: <b>${U.age}</b> &nbsp;·&nbsp; Boy: <b>${U.height} cm</b> &nbsp;·&nbsp; Kilo: <b>${U.weight} kg</b><br>` +
       `Aktivite: <b>×${U.actM}</b> &nbsp;·&nbsp; Deneyim: <b>${U.trainingAge}</b> &nbsp;·&nbsp; Hedef: <b>${GOAL_LABELS[U.goal]}</b>`) +
+    grp('TEMA', `<div class="tdots">${THEMES.map(t => `<span class="tdot ${U.theme === t.key ? 'on' : ''}" data-action="setTheme" data-arg="${t.key}" style="background:${t.dot}" title="${t.name}"></span>`).join('')}</div>`) +
     `<button class="go" style="width:100%;margin-top:4px" data-action="editInfo">Bilgileri Düzenle</button>` +
     `<button style="width:100%;margin-top:8px" data-action="logOut">Çıkış Yap</button>` +
     `<div class="ver">Raven Fit · v${APP_VERSION}${accountLine()}</div>`;
@@ -466,7 +478,17 @@ const actions = {
   backToPrograms() { selectedProgram = null; renderTab(); },
   startWorkout(el, arg) { const [pid, di] = arg.split(':'); const p = allPrograms().find(x => x.id === pid); if (p) { activeWorkout = { program: p, dayIdx: +di, done: {} }; stopRest(); renderTab(); window.scrollTo(0, 0); } },
   workoutSet(el, i) { if (!activeWorkout) return; const k = +i; activeWorkout.done[k] = (activeWorkout.done[k] || 0) + 1; startRest(90); renderTab(); },
-  finishWorkout() { stopRest(); activeWorkout = null; renderTab(); alert('Tebrikler! Antrenman tamamlandı 💪'); },
+  finishWorkout() {
+    if (activeWorkout) {
+      const { program, dayIdx, done } = activeWorkout;
+      const d = program.days[dayIdx];
+      let total = 0, doneN = 0;
+      d.items.forEach((it, i) => { total += it.sets; doneN += Math.min(done[i] || 0, it.sets); });
+      workoutHistory.push({ date: Date.now(), program: program.name, day: d.name, sets: doneN, total });
+      saveJSON(HIST_KEY, workoutHistory);
+    }
+    stopRest(); activeWorkout = null; renderTab(); alert('Tebrikler! Antrenman tamamlandı 💪');
+  },
   cancelWorkout() { if (confirm('Antrenmanı bitirmeden çıkmak istiyor musun?')) { stopRest(); activeWorkout = null; renderTab(); } },
   // dinlenme sayacı
   rest(el, a) { startRest(+a); },
@@ -518,6 +540,7 @@ const actions = {
   authSignup() { doAuth('signup'); },
   authGuest() { doAuth('guest'); },
   logOut() { didLogout = true; if (FB) FB.logOut(); },
+  setTheme(el, key) { U.theme = applyTheme(key); saveUser(U); renderTab(); },
 };
 
 document.addEventListener('click', (e) => {
@@ -557,16 +580,17 @@ function reloadFromStorage() {
   customPrograms = loadJSON(PROG_KEY) || [];
   measurements = loadJSON(MEAS_KEY) || [];
   suppAnswers = loadJSON(SUPP_KEY) || null;
+  workoutHistory = loadJSON(HIST_KEY) || [];
   return !!saved;
 }
 function resetMemory() {
-  Object.assign(U, { gender: 'male', age: 25, height: 180, neck: 40, shoulder: 0, waist: 85, hip: 95, weight: 80, actM: 1.55, goal: 'maintain', trainingAge: 'intermediate' });
-  customPrograms = []; measurements = []; suppAnswers = null;
+  Object.assign(U, { gender: 'male', age: 25, height: 180, neck: 40, shoulder: 0, waist: 85, hip: 95, weight: 80, actM: 1.55, goal: 'maintain', trainingAge: 'intermediate', theme: 'dark' });
+  customPrograms = []; measurements = []; suppAnswers = null; workoutHistory = [];
   step = 0; activeTab = 'vucudum'; activeVsub = 'analiz'; antrenSub = 'havuz';
   selectedProgram = null; activeWorkout = null; builder = null; exSelectMode = false;
   suppSurvey = false; exDetail = null; openSupp = null;
 }
-function initAppUI(hasData) { fillInputs(); applyHighlights(); if (hasData) enterDashboard(); else showScreen('scr-welcome'); }
+function initAppUI(hasData) { applyTheme(U.theme || 'dark'); fillInputs(); applyHighlights(); if (hasData) enterDashboard(); else showScreen('scr-welcome'); }
 function localOnlyStart() { initAppUI(reloadFromStorage()); }
 
 function scheduleSync() {

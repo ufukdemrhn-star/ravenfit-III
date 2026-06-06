@@ -21,6 +21,7 @@ export const KEYS = {
   programs: 'ravenfit_programs_v1',
   measurements: 'ravenfit_measurements_v1',
   supp: 'ravenfit_supp_v1',
+  history: 'ravenfit_history_v1',
 };
 
 // Kayıt sonrası tetiklenecek bulut-senkron geri çağrısı
