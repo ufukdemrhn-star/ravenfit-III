@@ -75,3 +75,43 @@ export const PROGRAMS = [
     ],
   },
 ];
+
+// ════════════════════════════════════════════════════════════
+//  BRANŞA ÖZEL HAZIR PROGRAMLAR (yüzme / postür) — RavenFit2 verisi
+//  workouts-*.json'u RavenFit3 program formatına normalize eder.
+// ════════════════════════════════════════════════════════════
+const BRANCH_WORKOUT_FILES = {
+  swimming: './data/workouts-swimming.json',
+  posture: './data/workouts-posture.json',
+};
+const _DIFF_LABEL = { 1: 'Başlangıç', 2: 'Orta', 3: 'İleri' };
+
+// Tek bir workout objesini RavenFit3 program şekline çevir
+export function normalizeWorkout(w) {
+  return {
+    id: w.id,
+    name: w.name_tr,
+    level: _DIFF_LABEL[w.difficulty] || 'Orta',
+    desc: w.description_tr || '',
+    branch: w.branch,
+    days: (w.days || []).map(d => ({
+      name: d.name,
+      items: (d.exercises || []).map(e => ({
+        ex: e.exercise_id,
+        sets: e.sets || 1,
+        reps: e.reps != null ? e.reps : '—',
+      })),
+    })),
+  };
+}
+
+// Bir branşın hazır programlarını yükle (normalize edilmiş dizi)
+export async function loadBranchPrograms(branch) {
+  const file = BRANCH_WORKOUT_FILES[branch];
+  if (!file) return [];
+  const res = await fetch(file);
+  if (!res.ok) throw new Error('workouts fetch ' + res.status);
+  const data = await res.json();
+  const list = Array.isArray(data.workouts) ? data.workouts : (Array.isArray(data) ? data : []);
+  return list.map(normalizeWorkout);
+}

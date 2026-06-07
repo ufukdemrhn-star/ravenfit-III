@@ -1,0 +1,143 @@
+{
+  "workouts": [
+    {
+      "id": "posture-lower-back",
+      "name_tr": "Bel Ağrısı Programı",
+      "description_tr": "Bel ağrısını azaltmak ve core stabilitesini artırmak için 4 haftalık program.",
+      "branch": "posture",
+      "goal": ["health"],
+      "difficulty": 1,
+      "days_per_week": 3,
+      "duration_weeks": 4,
+      "days": [
+        {
+          "day": 1,
+          "name": "Core Aktivasyon",
+          "exercises": [
+            {"exercise_id": "pelvic-tilt",         "sets": 3, "reps": 15, "rest_sec": 30, "duration_sec": 30},
+            {"exercise_id": "dead-bug",             "sets": 3, "reps": 10, "rest_sec": 30, "duration_sec": 40},
+            {"exercise_id": "glute-bridge-posture",  "sets": 3, "reps": 12, "rest_sec": 30, "duration_sec": 30},
+            {"exercise_id": "cat-cow",              "sets": 3, "reps": 12, "rest_sec": 20, "duration_sec": 45}
+          ]
+        },
+        {
+          "day": 2,
+          "name": "Stabilite & Mobilite",
+          "exercises": [
+            {"exercise_id": "bird-dog",             "sets": 3, "reps": 10, "rest_sec": 30, "duration_sec": 40},
+            {"exercise_id": "core-stabilization",   "sets": 3, "reps": 3,  "rest_sec": 30, "duration_sec": 30},
+            {"exercise_id": "thoracic-rotation",    "sets": 2, "reps": 8,  "rest_sec": 20, "duration_sec": 30},
+            {"exercise_id": "hip-90-90",            "sets": 2, "reps": 5,  "rest_sec": 20, "duration_sec": 45}
+          ]
+        },
+        {
+          "day": 3,
+          "name": "Güçlendirme & Germe",
+          "exercises": [
+            {"exercise_id": "glute-bridge-posture",  "sets": 3, "reps": 15, "rest_sec": 30, "duration_sec": 30},
+            {"exercise_id": "dead-bug",             "sets": 3, "reps": 12, "rest_sec": 30, "duration_sec": 40},
+            {"exercise_id": "side-plank-modified",  "sets": 3, "reps": 3,  "rest_sec": 30, "duration_sec": 20},
+            {"exercise_id": "cat-cow",              "sets": 2, "reps": 15, "rest_sec": 20, "duration_sec": 45},
+            {"exercise_id": "ankle-dorsiflexion",   "sets": 2, "reps": 10, "rest_sec": 15, "duration_sec": 30}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "posture-neck-upper",
+      "name_tr": "Boyun & Üst Sırt Düzeltme",
+      "description_tr": "Boyun düzleşmesi, baş ilerlemesi ve kambur duruşu düzeltmek için program.",
+      "branch": "posture",
+      "goal": ["health"],
+      "difficulty": 1,
+      "days_per_week": 4,
+      "duration_weeks": 6,
+      "days": [
+        {
+          "day": 1,
+          "name": "Boyun Restorasyonu",
+          "exercises": [
+            {"exercise_id": "chin-tuck",            "sets": 3, "reps": 15, "rest_sec": 20, "duration_sec": 20},
+            {"exercise_id": "cervical-retraction",  "sets": 3, "reps": 12, "rest_sec": 20, "duration_sec": 20},
+            {"exercise_id": "neck-flexor-strengthen","sets": 3, "reps": 10, "rest_sec": 30, "duration_sec": 30},
+            {"exercise_id": "chest-opener-stretch",  "sets": 2, "reps": 3,  "rest_sec": 15, "duration_sec": 30}
+          ]
+        },
+        {
+          "day": 2,
+          "name": "Üst Sırt Açma",
+          "exercises": [
+            {"exercise_id": "wall-angel",           "sets": 3, "reps": 10, "rest_sec": 30, "duration_sec": 45},
+            {"exercise_id": "thoracic-extension",   "sets": 3, "reps": 10, "rest_sec": 20, "duration_sec": 30},
+            {"exercise_id": "face-pull-band",       "sets": 3, "reps": 15, "rest_sec": 30, "duration_sec": 40},
+            {"exercise_id": "thoracic-rotation",    "sets": 2, "reps": 8,  "rest_sec": 20, "duration_sec": 30}
+          ]
+        },
+        {
+          "day": 3,
+          "name": "Boyun + Omuz",
+          "exercises": [
+            {"exercise_id": "chin-tuck",            "sets": 3, "reps": 15, "rest_sec": 20, "duration_sec": 20},
+            {"exercise_id": "shoulder-cars",        "sets": 2, "reps": 5,  "rest_sec": 20, "duration_sec": 40},
+            {"exercise_id": "chest-opener-stretch",  "sets": 2, "reps": 3,  "rest_sec": 15, "duration_sec": 30},
+            {"exercise_id": "wall-angel",           "sets": 3, "reps": 10, "rest_sec": 30, "duration_sec": 45}
+          ]
+        },
+        {
+          "day": 4,
+          "name": "Tam Üst Vücut",
+          "exercises": [
+            {"exercise_id": "cervical-retraction",  "sets": 3, "reps": 12, "rest_sec": 20, "duration_sec": 20},
+            {"exercise_id": "thoracic-extension",   "sets": 3, "reps": 10, "rest_sec": 20, "duration_sec": 30},
+            {"exercise_id": "face-pull-band",       "sets": 3, "reps": 15, "rest_sec": 30, "duration_sec": 40},
+            {"exercise_id": "neck-flexor-strengthen","sets": 2, "reps": 10, "rest_sec": 30, "duration_sec": 30},
+            {"exercise_id": "shoulder-cars",        "sets": 2, "reps": 5,  "rest_sec": 20, "duration_sec": 40}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "posture-general-mobility",
+      "name_tr": "Genel Mobilite & Hareket Kalitesi",
+      "description_tr": "Tüm vücut için mobilite, esneklik ve hareket kalitesini artırma programı.",
+      "branch": "posture",
+      "goal": ["health","perf"],
+      "difficulty": 2,
+      "days_per_week": 3,
+      "duration_weeks": 8,
+      "days": [
+        {
+          "day": 1,
+          "name": "Üst Vücut Mobilite",
+          "exercises": [
+            {"exercise_id": "shoulder-cars",        "sets": 2, "reps": 5,  "rest_sec": 20, "duration_sec": 40},
+            {"exercise_id": "wall-angel",           "sets": 3, "reps": 10, "rest_sec": 30, "duration_sec": 45},
+            {"exercise_id": "thoracic-rotation",    "sets": 3, "reps": 8,  "rest_sec": 20, "duration_sec": 30},
+            {"exercise_id": "chest-opener-stretch",  "sets": 2, "reps": 3,  "rest_sec": 15, "duration_sec": 30}
+          ]
+        },
+        {
+          "day": 2,
+          "name": "Alt Vücut Mobilite",
+          "exercises": [
+            {"exercise_id": "hip-90-90",            "sets": 3, "reps": 5,  "rest_sec": 20, "duration_sec": 45},
+            {"exercise_id": "ankle-dorsiflexion",   "sets": 3, "reps": 10, "rest_sec": 15, "duration_sec": 30},
+            {"exercise_id": "glute-bridge-posture",  "sets": 3, "reps": 15, "rest_sec": 30, "duration_sec": 30},
+            {"exercise_id": "cat-cow",              "sets": 2, "reps": 12, "rest_sec": 20, "duration_sec": 45}
+          ]
+        },
+        {
+          "day": 3,
+          "name": "Tüm Vücut Stabilite",
+          "exercises": [
+            {"exercise_id": "bird-dog",             "sets": 3, "reps": 10, "rest_sec": 30, "duration_sec": 40},
+            {"exercise_id": "dead-bug",             "sets": 3, "reps": 10, "rest_sec": 30, "duration_sec": 40},
+            {"exercise_id": "core-stabilization",   "sets": 3, "reps": 3,  "rest_sec": 30, "duration_sec": 30},
+            {"exercise_id": "side-plank-modified",  "sets": 3, "reps": 3,  "rest_sec": 30, "duration_sec": 20},
+            {"exercise_id": "thoracic-extension",   "sets": 2, "reps": 10, "rest_sec": 20, "duration_sec": 30}
+          ]
+        }
+      ]
+    }
+  ]
+}

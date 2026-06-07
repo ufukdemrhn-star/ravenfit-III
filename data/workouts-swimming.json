@@ -1,0 +1,179 @@
+{
+  "_README": {
+    "title": "RavenFit — Yüzme Antrenman Programları",
+    "version": "1.0.0",
+
+    "PROGRAM_EKLEME_REHBERİ": {
+      "id": "Benzersiz tanımlayıcı. Küçük harf, tire. Örn: 'swim-beginner-3day'. ASLA değiştirme.",
+      "branch": "Her zaman 'swimming'.",
+      "days": "Gün listesi. Yüzmede 'sets' farklı: her egzersiz için mesafe/tekrar kombinasyonu.",
+
+      "EGZERSİZ_ALANLARI": {
+        "exercise_id": "exercises-swimming.json'daki id. BÜYÜK/KÜÇÜK harf duyarlı.",
+        "sets": "Set sayısı.",
+        "reps": "Her sette yüzülecek mesafe veya tekrar. Örn: '100m' veya '4×25m'.",
+        "rest_sec": "Set arası dinlenme (saniye).",
+        "notes_tr": "Ek not."
+      }
+    }
+  },
+
+  "workouts": [
+
+    {
+      "id": "swim-beginner-3day",
+      "name_tr": "Yüzme Başlangıç — 3 Gün",
+      "branch": "swimming",
+      "days_per_week": 3,
+      "goal": ["health", "recomp"],
+      "difficulty": 1,
+      "duration_weeks": 8,
+      "description_tr": "Havuza yeni başlayanlar için. Teknik ve dayanıklılık temeli atılır. Her seans ~1000m toplam mesafe.",
+      "progressive_overload": {
+        "rule": "Her 2 haftada bir toplam mesafeyi %10 artır. Teknik öncelikli — form bozulursa mesafeyi azalt.",
+        "minimum_reps_before_increase": 2
+      },
+      "days": [
+        {
+          "day": 1,
+          "name": "Teknik & Temel",
+          "exercises": [
+            { "exercise_id": "freestyle-basic",      "sets": 4, "reps": "50m",  "rest_sec": 60,  "notes_tr": "Rahat tempoda, formda kal." },
+            { "exercise_id": "kick-flutter",         "sets": 4, "reps": "25m",  "rest_sec": 45,  "notes_tr": "Kickboard ile. Hız değil, teknik." },
+            { "exercise_id": "freestyle-catch-up",   "sets": 4, "reps": "25m",  "rest_sec": 60,  "notes_tr": "Catch-up drill. Yavaş çalış." },
+            { "exercise_id": "freestyle-basic",      "sets": 2, "reps": "100m", "rest_sec": 90,  "notes_tr": "Öğrendiklerini uygula." }
+          ]
+        },
+        {
+          "day": 2,
+          "name": "Kol & Nefes Çalışması",
+          "exercises": [
+            { "exercise_id": "freestyle-basic",      "sets": 2, "reps": "100m", "rest_sec": 60  },
+            { "exercise_id": "pull-freestyle",       "sets": 4, "reps": "50m",  "rest_sec": 60,  "notes_tr": "Pull-buoy ile. Kol hissine odaklan." },
+            { "exercise_id": "freestyle-fingertip-drag","sets":4,"reps":"25m",  "rest_sec": 45  },
+            { "exercise_id": "freestyle-basic",      "sets": 2, "reps": "100m", "rest_sec": 90  }
+          ]
+        },
+        {
+          "day": 3,
+          "name": "Dayanıklılık",
+          "exercises": [
+            { "exercise_id": "freestyle-basic",      "sets": 1, "reps": "200m", "rest_sec": 120, "notes_tr": "Kesintisiz 200m hedef." },
+            { "exercise_id": "kick-flutter",         "sets": 4, "reps": "25m",  "rest_sec": 45  },
+            { "exercise_id": "freestyle-basic",      "sets": 4, "reps": "50m",  "rest_sec": 45,  "notes_tr": "Tempo biraz artsın." },
+            { "exercise_id": "dryland-shoulder",     "sets": 3, "reps": "15tek","rest_sec": 60,  "notes_tr": "Havuz çıkışı veya ısınmada yap." }
+          ]
+        }
+      ]
+    },
+
+    {
+      "id": "swim-intermediate-4day",
+      "name_tr": "Yüzme Orta Seviye — 4 Gün",
+      "branch": "swimming",
+      "days_per_week": 4,
+      "goal": ["perf", "recomp"],
+      "difficulty": 2,
+      "duration_weeks": 10,
+      "description_tr": "Çoklu stil geliştirme ve dayanıklılık programı. Her seans ~2000m. Serbest stil ve sırt üstü temel alınır.",
+      "progressive_overload": {
+        "rule": "Her 2 haftada bir toplam mesafeyi 200m artır veya dinlenme sürelerini 10sn azalt.",
+        "minimum_reps_before_increase": 2
+      },
+      "days": [
+        {
+          "day": 1,
+          "name": "Serbest Stil Hız",
+          "exercises": [
+            { "exercise_id": "freestyle-basic",      "sets": 1, "reps": "400m", "rest_sec": 120, "notes_tr": "Isınma, rahat tempo." },
+            { "exercise_id": "sprint-25",            "sets": 8, "reps": "25m",  "rest_sec": 60,  "notes_tr": "Maksimal sprint. Tam dinlenme." },
+            { "exercise_id": "pull-freestyle",       "sets": 4, "reps": "100m", "rest_sec": 60  },
+            { "exercise_id": "freestyle-basic",      "sets": 1, "reps": "200m", "rest_sec": 0,   "notes_tr": "Soğuma — yavaş tempo." }
+          ]
+        },
+        {
+          "day": 2,
+          "name": "Sırt Üstü & Kurbağalama",
+          "exercises": [
+            { "exercise_id": "freestyle-basic",      "sets": 1, "reps": "200m", "rest_sec": 60,  "notes_tr": "Isınma." },
+            { "exercise_id": "backstroke-basic",     "sets": 4, "reps": "100m", "rest_sec": 60  },
+            { "exercise_id": "breaststroke-kick-drill","sets":4,"reps":"50m",   "rest_sec": 45,  "notes_tr": "Kurbağalama bacak tekniği." },
+            { "exercise_id": "breaststroke-basic",   "sets": 4, "reps": "50m",  "rest_sec": 60  },
+            { "exercise_id": "freestyle-basic",      "sets": 1, "reps": "200m", "rest_sec": 0,   "notes_tr": "Soğuma." }
+          ]
+        },
+        {
+          "day": 3,
+          "name": "Dayanıklılık",
+          "exercises": [
+            { "exercise_id": "freestyle-basic",      "sets": 1, "reps": "200m", "rest_sec": 60,  "notes_tr": "Isınma." },
+            { "exercise_id": "endurance-400",        "sets": 2, "reps": "400m", "rest_sec": 180, "notes_tr": "Sabit tempo, tekrar sayısını koru." },
+            { "exercise_id": "kick-dolphin",         "sets": 4, "reps": "25m",  "rest_sec": 60,  "notes_tr": "Yüzgeçle dolphin kick." },
+            { "exercise_id": "freestyle-basic",      "sets": 1, "reps": "200m", "rest_sec": 0,   "notes_tr": "Soğuma." }
+          ]
+        },
+        {
+          "day": 4,
+          "name": "Karışık Stil & Teknik",
+          "exercises": [
+            { "exercise_id": "freestyle-basic",      "sets": 1, "reps": "200m", "rest_sec": 60,  "notes_tr": "Isınma." },
+            { "exercise_id": "butterfly-one-arm",    "sets": 4, "reps": "50m",  "rest_sec": 90,  "notes_tr": "Kelebek giriş. Her 25m'de kol değiştir." },
+            { "exercise_id": "im-200",               "sets": 2, "reps": "200m", "rest_sec": 180, "notes_tr": "Karışık stil. Form öncelikli." },
+            { "exercise_id": "dryland-shoulder",     "sets": 3, "reps": "15tek","rest_sec": 60,  "notes_tr": "Kara egzersizi — havuz çıkışı." }
+          ]
+        }
+      ]
+    },
+
+    {
+      "id": "swim-technique-focus",
+      "name_tr": "Teknik Odaklı — 3 Gün",
+      "branch": "swimming",
+      "days_per_week": 3,
+      "goal": ["perf", "health"],
+      "difficulty": 2,
+      "duration_weeks": 6,
+      "description_tr": "Mesafeden çok form ve teknik geliştirmeye odaklanır. Drilller ağırlıklı. Orta-ileri seviye.",
+      "progressive_overload": {
+        "rule": "Her hafta drill mesafesini 25m artır. Teknik drill oranını koru.",
+        "minimum_reps_before_increase": 1
+      },
+      "days": [
+        {
+          "day": 1,
+          "name": "Serbest Stil Teknik",
+          "exercises": [
+            { "exercise_id": "freestyle-basic",         "sets": 2, "reps": "100m", "rest_sec": 60,  "notes_tr": "Isınma." },
+            { "exercise_id": "freestyle-fingertip-drag","sets": 6, "reps": "25m",  "rest_sec": 45,  "notes_tr": "Yüksek dirsek bilinci." },
+            { "exercise_id": "freestyle-catch-up",      "sets": 6, "reps": "25m",  "rest_sec": 45  },
+            { "exercise_id": "pull-freestyle",           "sets": 4, "reps": "75m",  "rest_sec": 60,  "notes_tr": "Drill sonrası uygulama." },
+            { "exercise_id": "freestyle-basic",         "sets": 2, "reps": "100m", "rest_sec": 0,   "notes_tr": "Soğuma." }
+          ]
+        },
+        {
+          "day": 2,
+          "name": "Bacak & Kelebek Giriş",
+          "exercises": [
+            { "exercise_id": "freestyle-basic",      "sets": 2, "reps": "100m", "rest_sec": 60,  "notes_tr": "Isınma." },
+            { "exercise_id": "kick-flutter",         "sets": 6, "reps": "25m",  "rest_sec": 30  },
+            { "exercise_id": "kick-dolphin",         "sets": 4, "reps": "25m",  "rest_sec": 60,  "notes_tr": "Yüzgeçsiz de denenebilir." },
+            { "exercise_id": "butterfly-one-arm",    "sets": 4, "reps": "25m",  "rest_sec": 90  },
+            { "exercise_id": "freestyle-basic",      "sets": 2, "reps": "100m", "rest_sec": 0,   "notes_tr": "Soğuma." }
+          ]
+        },
+        {
+          "day": 3,
+          "name": "Sırt & Kurbağalama Teknik",
+          "exercises": [
+            { "exercise_id": "freestyle-basic",      "sets": 2, "reps": "100m", "rest_sec": 60,  "notes_tr": "Isınma." },
+            { "exercise_id": "backstroke-basic",     "sets": 6, "reps": "50m",  "rest_sec": 45,  "notes_tr": "Omuz rotasyonuna dikkat." },
+            { "exercise_id": "breaststroke-kick-drill","sets":6,"reps": "25m",  "rest_sec": 45  },
+            { "exercise_id": "breaststroke-basic",   "sets": 4, "reps": "50m",  "rest_sec": 60  },
+            { "exercise_id": "dryland-shoulder",     "sets": 3, "reps": "15tek","rest_sec": 60  }
+          ]
+        }
+      ]
+    }
+
+  ]
+}

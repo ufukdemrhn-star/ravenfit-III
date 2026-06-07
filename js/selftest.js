@@ -18,6 +18,7 @@ import { saveJSON, loadJSON, removeJSON } from './storage.js';
 import { summarizeProgress, goalNote } from './progress.js';
 import { THEMES } from './themes.js';
 import { formulaEpley, formulaWathen, calcWorkingSet, calcSleep, fmtTime } from './tools.js';
+import { normalizeWorkout } from './programs.js';
 
 export function runSelfTest() {
   let passed = 0, failed = 0;
@@ -164,6 +165,15 @@ export function runSelfTest() {
   eq(_ws.volume, 1137.5, 'Araç: ÇS hacim 3×5 orta = 1137.5');
   eq(JSON.stringify(_ws.weights), JSON.stringify([75, 75, 77.5]), 'Araç: ÇS setler [75,75,77.5]');
   eq(fmtTime(calcSleep('wake', '07:00', { includeFall: true, isWorkoutDay: false })[1].time, true), '23:15', 'Araç: uyku 5 döngü yatış 23:15');
+
+
+  // GRUP 21 — Branş programları (normalize)
+  const _mw = { id: 'x', name_tr: 'Test', difficulty: 2, description_tr: 'd', branch: 'swimming', days: [{ name: 'G1', exercises: [{ exercise_id: 'freestyle-basic', sets: 4, reps: '50m' }] }] };
+  const _nz = normalizeWorkout(_mw);
+  eq(_nz.name, 'Test', 'Program: name_tr → name');
+  eq(_nz.level, 'Orta', 'Program: difficulty 2 → Orta');
+  eq(_nz.days[0].items[0].ex, 'freestyle-basic', 'Program: exercise_id → ex');
+  eq(_nz.days[0].items[0].reps, '50m', 'Program: reps "50m" korunur');
 
   console.log(`%c🔬 Öz-test: ${passed} geçti, ${failed} kaldı`,
     failed === 0 ? 'color:#4ade80;font-weight:bold' : 'color:#f87171;font-weight:bold');

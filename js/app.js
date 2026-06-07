@@ -11,7 +11,7 @@ import { recGoalDetailed, gateWarning, checkRedsRisk } from './goals.js';
 import { calcSuppScores, SUPP_QS } from './supplements.js';
 import { determineBodyProfile, getDietTipByProfile } from './profile.js';
 import { loadExercises, filterExercises, uniqueEquipment, uniqueCategories, CAT_TR, BRANCHES } from './exercises.js';
-import { PROGRAMS } from './programs.js';
+import { PROGRAMS, loadBranchPrograms } from './programs.js';
 import { summarizeProgress, goalNote } from './progress.js';
 import { THEMES, applyTheme } from './themes.js';
 import { formulaEpley, formulaBrzycki, formulaLombardi, formulaWathen, ONE_RM_PCTS, ONE_RM_REP_MAP, calcWorkingSet, calcSleep, fmtTime } from './tools.js';
@@ -19,7 +19,7 @@ import { showScreen } from './ui.js';
 import { saveUser, loadUser, clearUser, saveJSON, loadJSON, setSyncHandler, exportAll, importAll, clearAll } from './storage.js';
 import { runSelfTest } from './selftest.js';
 
-const APP_VERSION = '0.0.18';
+const APP_VERSION = '0.0.19';
 const GOAL_LABELS = { cut: 'Cut (yağ ver)', recomp: 'Recomp', maintain: 'Koru', bulk: 'Bulk (kütle al)' };
 const EV = { high: '🟢 Yüksek kanıt', mid: '🟡 Orta kanıt', low: '🔴 Sınırlı kanıt' };
 
@@ -257,7 +257,8 @@ let openSupp = null;
 const BUDGET_MAX = { min: 3, low: 5, mid: 8, high: 99 };
 const HIST_KEY = 'ravenfit_history_v1';
 let workoutHistory = loadJSON(HIST_KEY) || [];
-const allPrograms = () => customPrograms.concat(PROGRAMS);
+let branchProgCache = {}, branchProgLoading = false;
+const allPrograms = () => customPrograms.concat(PROGRAMS, Object.values(branchProgCache).reduce((a, b) => a.concat(b), []));
 // dinlenme sayacı
 let restRemaining = 0, restInterval = null;
 const mmss = (s) => Math.floor(Math.max(0, s) / 60) + ':' + String(Math.max(0, s) % 60).padStart(2, '0');
@@ -365,6 +366,7 @@ function renderExerciseDetail(e) {
     (e.caution_tr ? grp('⚠️ UYARI', li(e.caution_tr)) : '') +
     grp('SIK HATALAR', li(e.common_mistakes_tr));
 }
+const repLabel = (r) => /[a-zA-Z]/.test(String(r)) ? String(r) : String(r) + ' tekrar';
 const exName = (id) => { for (const arr of Object.values(exCache)) { const e = arr && arr.find(x => x.id === id); if (e) return e.name_tr; } const e = exData && exData.find(x => x.id === id); return e ? e.name_tr : id; };
 function antrenBar() {
   const subs = [['havuz', 'Havuz'], ['programlar', 'Programlar'], ['araclar', 'Araçlar']];
@@ -378,12 +380,29 @@ function progCard(p, isCustom) {
     `<div class="exmeta">${p.level} · ${p.days.length} gün · ${esc(p.desc)}</div></div>` +
     (isCustom ? `<button data-action="deleteProgram" data-arg="${p.id}">Sil</button>` : '') + `</div>`;
 }
+function ensureBranchProgsLoaded() {
+  if (branchProgCache[currentBranch] || branchProgLoading) return;
+  branchProgLoading = true;
+  loadBranchPrograms(currentBranch)
+    .then(list => { branchProgCache[currentBranch] = list; branchProgLoading = false; if (activeTab === 'antrenman') renderTab(); })
+    .catch(() => { branchProgCache[currentBranch] = []; branchProgLoading = false; if (activeTab === 'antrenman') renderTab(); });
+}
 function renderProgramList() {
-  let h = `<button class="go" style="width:100%;margin-bottom:12px" data-action="newProgram">+ Yeni Program Oluştur</button>`;
+  const brPills = '<div class="pills exf">' + BRANCHES.map(b =>
+    `<button data-action="exBranch" data-arg="${b.key}" class="${currentBranch === b.key ? 'on' : ''}">${b.label}</button>`).join('') + '</div>';
+  let h = brPills + `<button class="go" style="width:100%;margin-bottom:12px" data-action="newProgram">+ Yeni Program Oluştur</button>`;
   if (customPrograms.length) {
     h += `<div class="ph">PROGRAMLARIM</div>` + customPrograms.map(p => progCard(p, true)).join('');
   }
-  h += `<div class="ph muted">HAZIR PROGRAMLAR</div>` + PROGRAMS.map(p => progCard(p, false)).join('');
+  h += `<div class="ph muted">HAZIR PROGRAMLAR</div>`;
+  if (currentBranch === 'fitness') {
+    h += PROGRAMS.map(p => progCard(p, false)).join('');
+  } else {
+    const list = branchProgCache[currentBranch];
+    if (!list) { ensureBranchProgsLoaded(); h += `<div class="status">Programlar yükleniyor…</div>`; }
+    else if (!list.length) { h += `<div class="status">Bu branşta hazır program yok.</div>`; }
+    else { h += list.map(p => progCard(p, false)).join(''); }
+  }
   return h;
 }
 function renderProgramDetail(p) {
@@ -407,7 +426,7 @@ function renderActiveWorkout() {
     const complete = dn >= it.sets;
     rows += `<div class="wkrow ${complete ? 'done' : ''}">` +
       `<div><div class="exname" data-action="exOpen" data-arg="${it.ex}" style="cursor:pointer">${esc(exName(it.ex))} ${complete ? '✓' : ''}</div>` +
-      `<div class="exmeta">Set ${Math.min(dn, it.sets)} / ${it.sets} &nbsp;·&nbsp; ${it.reps} tekrar</div></div>` +
+      `<div class="exmeta">Set ${Math.min(dn, it.sets)} / ${it.sets} &nbsp;·&nbsp; ${repLabel(it.reps)}</div></div>` +
       `<button data-action="workoutSet" data-arg="${i}" ${complete ? 'disabled' : ''}>+1 set</button></div>`;
   });
   return `<div class="wkhead"><div><b>${program.name}</b><div class="muted" style="font-size:13px">${d.name}</div></div>` +
@@ -574,7 +593,7 @@ const actions = {
   exEquip(el, val) { exFilters.equip = val; document.getElementById('ex-list').innerHTML = exListHTML(exSelectMode); },
   exSearch(el, val) { exFilters.q = val; document.getElementById('ex-list').innerHTML = exListHTML(exSelectMode); },
   exOpen(el, id) { let f = null; for (const arr of Object.values(exCache)) { const e = arr && arr.find(x => x.id === id); if (e) { f = e; break; } } exDetail = f || (exData && exData.find(e => e.id === id)) || null; renderTab(); window.scrollTo(0, 0); },
-  exBranch(el, b) { if (b === currentBranch) return; currentBranch = b; exFilters = { cat: '', equip: '', q: '' }; exDetail = null; exData = exCache[b] || null; renderTab(); },
+  exBranch(el, b) { if (b === currentBranch) return; currentBranch = b; exFilters = { cat: '', equip: '', q: '' }; exDetail = null; selectedProgram = null; exData = exCache[b] || null; renderTab(); },
   exBack() { exDetail = null; renderTab(); },
   // programlar
   antrenTab(el, a) { antrenSub = a; selectedProgram = null; exDetail = null; activeCalc = null; renderTab(); },
