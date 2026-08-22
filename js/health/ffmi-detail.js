@@ -1,0 +1,99 @@
+/* ══════════════════════════════════════════════════════════
+   RavenFit — ffmi-detail.js
+   FFMI detay modalı
+   ══════════════════════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════════════════════
+   📊 FFMI DETAY MODALI
+   Modülerleşmede → js/ui/ffmi-detail.js
+   ══════════════════════════════════════════════════════════ */
+
+function openFFMIDetail(){
+  var body=document.getElementById('ffmi-detail-body');
+  if(!body) return;
+  var male = U && U.gender === 'male';
+  var ffmi = (R && R.ffmi) ? R.ffmi : null;
+  
+  /* Cinsiyet bazlı bantlar */
+  var bands;
+  if(male){
+    bands = [
+      {min:0,    max:18, label:'Zayıf',     cls:'bb', desc:'Ortalamanın altında. Düzenli direnç antrenmanı ve protein alımıyla geliştirilebilir.'},
+      {min:18,   max:20, label:'Ortalama',  cls:'bb', desc:'Yetişkin erkekler için ortalama kas kütlesi seviyesi.'},
+      {min:20,   max:22, label:'İyi',       cls:'bg', desc:'Ortalamanın üzerinde kas gelişimi. Düzenli antrenmanın etkisi görülüyor.'},
+      {min:22,   max:24, label:'Çok İyi',   cls:'bg', desc:'Atletik seviyede kas kütlesi. Güçlü ve dengeli bir fizik.'},
+      {min:24,   max:26, label:'Elit',      cls:'bp', desc:'İleri düzey kas gelişimi. Yıllarca disiplinli antrenmanın sonucu.'},
+      {min:26,   max:99, label:'İstisnai',  cls:'br', desc:'Doğal yollarla ulaşılması son derece nadir. Olağanüstü bir seviye.'}
+    ];
+  } else {
+    bands = [
+      {min:0,    max:14, label:'Zayıf',     cls:'bb', desc:'Ortalamanın altında. Direnç antrenmanı ve protein alımıyla geliştirilebilir.'},
+      {min:14,   max:16, label:'Ortalama',  cls:'bb', desc:'Yetişkin kadınlar için ortalama yağsız kütle seviyesi.'},
+      {min:16,   max:18, label:'İyi',       cls:'bg', desc:'Ortalamanın üzerinde kas gelişimi.'},
+      {min:18,   max:20, label:'Çok İyi',   cls:'bg', desc:'Atletik seviyede kas kütlesi.'},
+      {min:20,   max:22, label:'Elit',      cls:'bp', desc:'İleri düzey kas gelişimi.'},
+      {min:22,   max:99, label:'İstisnai',  cls:'br', desc:'Doğal yollarla ulaşılması son derece nadir.'}
+    ];
+  }
+  
+  /* Mevcut FFMI hangi banta düşüyor? */
+  var currentBand = null;
+  if(ffmi != null){
+    for(var i=0; i<bands.length; i++){
+      if(ffmi >= bands[i].min && ffmi < bands[i].max){
+        currentBand = i;
+        break;
+      }
+    }
+  }
+  
+  var html = '';
+  
+  /* Şu anki değer */
+  if(ffmi != null){
+    html += '<div style="background:rgba(76,201,240,.06);border:1px solid var(--info);border-radius:12px;padding:14px;margin-bottom:18px">';
+    html += '<div style="font-size:11px;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">Senin Değerin</div>';
+    html += '<div style="display:flex;align-items:baseline;gap:10px"><div style="font-size:32px;font-weight:800;color:var(--info)">'+ffmi.toFixed(2)+'</div>';
+    if(currentBand !== null){
+      html += '<div style="font-size:13px;font-weight:600;color:var(--text)">'+bands[currentBand].label+'</div>';
+    }
+    html += '</div></div>';
+  }
+  
+  /* FFMI nedir? */
+  html += '<div style="margin-bottom:18px"><div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px">📖 FFMI Nedir?</div>';
+  html += '<div style="font-size:12px;color:var(--text2);line-height:1.6">FFMI (Fat-Free Mass Index / Yağsız Kütle Endeksi), vücudundaki yağsız kütleyi (kas, kemik, organ vb.) boyuna göre normalize eden bir göstergedir. <strong style="color:var(--text)">BMI\'nin yapamadığı</strong> şeyi yapar: kas-yağ ayrımı. Sporcular ve düzenli antrenman yapanlar için kas gelişiminin daha doğru bir göstergesidir.</div></div>';
+  
+  /* Bant tablosu */
+  html += '<div style="margin-bottom:18px"><div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px">📊 '+(male?'Erkek':'Kadın')+' FFMI Bantları</div>';
+  for(var i=0; i<bands.length; i++){
+    var b = bands[i];
+    var isCurrent = (i === currentBand);
+    var rangeStr;
+    if(i === bands.length-1) rangeStr = b.min+'+';
+    else rangeStr = b.min+' - '+b.max;
+    
+    html += '<div style="display:flex;align-items:flex-start;gap:10px;padding:10px;border-radius:10px;margin-bottom:6px;'+(isCurrent?'background:rgba(76,201,240,.08);border:1.5px solid var(--info)':'background:var(--card2);border:1px solid var(--border)')+'">';
+    html += '<div style="flex-shrink:0;min-width:75px"><div class="badge '+b.cls+'" style="font-size:10px">'+b.label+'</div><div style="font-size:10px;color:var(--text2);margin-top:3px;font-weight:600">FFMI '+rangeStr+'</div></div>';
+    html += '<div style="font-size:11px;color:'+(isCurrent?'var(--text)':'var(--text2)')+';line-height:1.5;flex:1">'+b.desc+(isCurrent?' <span style="color:var(--info);font-weight:700">← Sen buradasın</span>':'')+'</div>';
+    html += '</div>';
+  }
+  html += '</div>';
+  
+  /* Bilgi notu */
+  html += '<div style="background:rgba(76,201,240,.06);border-left:3px solid var(--info);border-radius:8px;padding:12px 14px;margin-bottom:12px">';
+  html += '<div style="font-size:11px;font-weight:700;color:var(--info);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">ℹ️ Önemli Not</div>';
+  html += '<div style="font-size:11px;color:var(--text2);line-height:1.5">FFMI bir tahmin metriğidir. Hesaplama, Navy vücut yağı formülünden türetilen yağsız kütle üzerinden yapılır. Ölçüm protokolüne bağlı olarak gerçek değerden ±%5-10 sapabilir. Tek ölçüme değil, trend ve düzenli takibe odaklan.</div></div>';
+  
+  /* Referans */
+  html += '<div style="font-size:10px;color:var(--text3);text-align:center;line-height:1.5;padding:8px"><em>Referanslar: Kouri et al. 1995, ISSN Position Stand. Boy normalize formülü uygulanmıştır (1.80m baz alınır).</em></div>';
+  
+  body.innerHTML = html;
+  document.getElementById('ffmi-detail-overlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeFFMIDetail(){
+  document.getElementById('ffmi-detail-overlay').classList.remove('active');
+  document.body.style.overflow = '';
+}

@@ -1,0 +1,146 @@
+/* ══════════════════════════════════════════════════════════
+   RavenFit — misc.css
+   Animasyonlar, modal, tema noktaları, rozet sistemi
+   ══════════════════════════════════════════════════════════ */
+
+/* ── SAYFA SAYISI ANİMASYONU ─────────────────────────────────  */
+.anim-num{display:inline-block;transition:opacity .15s}
+.ptable-wrapper { overflow-x: auto; margin-top: 10px; border-radius: 8px; border: 1px solid var(--border); }
+.ptable { width: 100%; min-width: 480px; border-collapse: collapse; font-size: 11px; background: var(--card2); }
+.ptable th, .ptable td { padding: 9px 7px; text-align: center; border-bottom: 1px solid var(--border); }
+.ptable th { background: var(--card); color: var(--text2); font-weight: 600; font-size: 10px; text-transform: uppercase; }
+.ptable th:first-child,.ptable td:first-child { text-align: left; font-weight: 600; color: var(--text); background: var(--card); position: sticky; left: 0; }
+.ptable th:nth-child(2),.ptable td:nth-child(2){background:rgba(var(--accent-rgb,230,57,70),.05)}
+.ptable tr:last-child td { border-bottom: none; }
+.diff { font-size: 9px; margin-left: 4px; font-weight: 700; display: inline-block; }
+.diff-up { color: var(--success); }
+.diff-down { color: var(--accent); }
+.diff-neutral { color: var(--text3); }
+
+/* ── MODAL ───────────────────────────────────────────────────  */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 999; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 16px; }
+.modal-overlay.active { display: flex; animation: fi .2s ease; }
+.modal-content { background: var(--card); border: 1px solid var(--border); border-radius: 16px; width: 100%; max-width: 400px; padding: 20px; max-height: 90vh; overflow-y: auto; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+.modal-title { font-family: 'Bebas Neue', cursive; font-size: 24px; letter-spacing: 1px; color: var(--accent); }
+.modal-close { background: none; border: none; color: var(--text2); font-size: 24px; cursor: pointer; }
+
+/* ── THEME DOTS IN SETTINGS ──────────────────────────────────  */
+.tdots{display:flex;gap:7px;flex-wrap:wrap;margin-top: 8px;}
+.tdot{width:30px;height:30px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;transition:all .2s;position:relative}
+.tdot.act,.tdot:hover{border-color:var(--text);}
+.tdot.act::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:white;font-weight:700}
+
+.hi{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)}
+.hi:last-child{border-bottom:none}
+.hi-left{flex:1;min-width:0}
+.hi-date{font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px}
+.hi-d{font-size:11px;color:var(--text2)}
+.hi-stats{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.hi-stat{text-align:center;min-width:36px}
+.hi-sv{font-size:13px;font-weight:700}
+.hi-sl{font-size:9px;color:var(--text2)}
+.edit-btn{background:none;border:1px solid var(--border);color:var(--text2);cursor:pointer;font-size:11px;padding:3px 7px;border-radius:6px;-webkit-tap-highlight-color:transparent}
+.edit-btn:hover{color:var(--info);border-color:var(--info)}
+
+.chart-card{margin-bottom:8px}
+.chart-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text2);margin-bottom:8px}
+.chart-svg{width:100%;height:130px;display:block;overflow:visible}
+.chart-empty{text-align:center;color:var(--text3);font-size:12px;padding:20px 0}
+
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:62px;background:var(--hbg);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border-top:1px solid var(--border);display:none;align-items:stretch;justify-content:space-around;z-index:300;padding-bottom:env(safe-area-inset-bottom,0px)}
+.bottom-nav.visible{display:flex}
+.bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;color:var(--text3);font-family:'Outfit',sans-serif;font-size:9px;font-weight:600;letter-spacing:.3px;cursor:pointer;padding:8px 4px 6px;transition:color .22s;-webkit-tap-highlight-color:transparent;position:relative;text-transform:uppercase}
+.bnav-btn svg{width:22px;height:22px;transition:transform .22s}
+.bnav-btn.active{color:var(--accent)}
+.bnav-btn.active svg{transform:translateY(-1px)}
+/* Aktif sekme üst çizgisi */
+.bnav-btn::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%) scaleX(0);width:32px;height:2.5px;background:var(--accent);border-radius:0 0 3px 3px;transition:transform .25s cubic-bezier(.4,0,.2,1);box-shadow:0 0 8px var(--ag)}
+.bnav-btn.active::before{transform:translateX(-50%) scaleX(1)}
+/* Aktif sekme hafif arka plan parlaması */
+.bnav-btn.active::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(180deg,var(--ag) 0%,transparent 100%);pointer-events:none;border-radius:0}
+.bnav-ico{display:none}/* eski emoji ikonları gizle */
+.main-section{display:none}
+.main-section.active{display:block;animation:fi .2s ease}
+.wip-card{background:var(--card2);border:1px dashed var(--border);border-radius:14px;padding:32px 24px;text-align:center;margin-bottom:8px}
+.wip-badge{display:inline-block;background:var(--ag);color:var(--accent);border-radius:100px;padding:3px 12px;font-size:10px;font-weight:700;margin-top:10px;letter-spacing:1px}
+.mlist-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)}
+.mlist-row:last-child{border-bottom:none}
+.mlist-lbl{color:var(--text2);font-size:12px}
+.mlist-val{font-weight:600;font-size:12px}
+
+.water-cups-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(36px,1fr));gap:6px;margin-top:10px}
+.water-cup{width:36px;height:36px;border-radius:8px;border:1.5px solid var(--border);background:var(--card2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;transition:all .2s;-webkit-tap-highlight-color:transparent;user-select:none}
+.water-cup.filled{background:rgba(72,149,239,0.15);border-color:var(--info)}
+.water-cup:active{transform:scale(0.92)}
+.water-progress{height:6px;background:var(--card2);border-radius:3px;margin-top:10px;overflow:hidden}
+.water-progress-fill{height:100%;background:var(--info);border-radius:3px;transition:width .3s}
+.water-status{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:11px;color:var(--text2)}
+
+.chrono-display{font-family:'Bebas Neue',cursive;font-size:42px;color:var(--accent);letter-spacing:3px;text-align:center;line-height:1;margin:10px 0}
+.rest-display{font-family:'Bebas Neue',cursive;font-size:36px;color:var(--warn);letter-spacing:2px;text-align:center;line-height:1;margin:8px 0}
+@keyframes rest-pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.rest-active{animation:rest-pulse 1s ease-in-out infinite}
+.chrono-btn-row{display:flex;gap:8px;margin-top:12px;justify-content:center}
+.rest-adj{display:flex;align-items:center;gap:10px;justify-content:center;margin:10px 0}
+.rest-adj-btn{width:32px;height:32px;border-radius:8px;background:var(--card);border:1.5px solid var(--border);color:var(--text);cursor:pointer;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .2s;-webkit-tap-highlight-color:transparent}
+.rest-adj-btn:hover{border-color:var(--accent);color:var(--accent)}
+.rest-adj-val{font-size:18px;font-weight:700;min-width:50px;text-align:center}
+.set-info{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid var(--border)}
+.set-count-display{font-size:14px;font-weight:600}
+.set-count-num{font-family:'Bebas Neue',cursive;font-size:24px;color:var(--accent);margin-left:4px}
+
+.diet-tip{background:var(--card2);border-left:3px solid var(--accent);border-radius:0 9px 9px 0;padding:9px 12px;margin-bottom:6px;font-size:12px;color:var(--text2);line-height:1.5}
+.diet-tip strong{color:var(--text)}
+.hcal-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border)}
+.hcal-row:last-child{border-bottom:none}
+.hcal-name{font-size:12px;flex:1}
+.hcal-kcal{font-size:10px;color:var(--text3);width:55px;text-align:right;margin-right:8px}
+.hcal-input{width:50px;background:var(--card);border:1.5px solid var(--border);border-radius:8px;padding:6px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;text-align:center;outline:none}
+.hcal-input:focus{border-color:var(--accent)}
+.hcal-result{background:var(--ag);border-radius:10px;padding:12px;text-align:center;margin-top:10px}
+.hcal-result-big{font-family:'Bebas Neue',cursive;font-size:28px;color:var(--accent);letter-spacing:2px}
+
+.supp-result{padding:12px 0 12px 10px;border-bottom:1px solid var(--border);position:relative}
+.supp-result:last-child{border-bottom:none}
+.supp-result-head{display:flex;align-items:flex-start;gap:8px;margin-bottom:4px}
+.supp-result-ico{font-size:22px;flex-shrink:0}
+.supp-result-name{font-size:14px;font-weight:700}
+.supp-result-why{font-size:11px;color:var(--text3);line-height:1.4;margin-top:2px}
+/* progress dots aktif rengi */
+.supp-ps.act{background:var(--accent);opacity:.5}
+.supp-progress{display:flex;gap:3px;margin-bottom:12px}
+.supp-ps{flex:1;height:3px;background:var(--border);border-radius:2px}
+.supp-ps.done{background:var(--accent)}
+.supp-q-title{font-size:13px;font-weight:600;margin-bottom:8px}
+.supp-nav{display:flex;gap:8px;margin-top:14px}
+
+/* ── BADGE / ROZET SİSTEMİ ──────────────────────────── */
+.badge-popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);z-index:900;display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.badge-popup-overlay.active{display:flex}
+.badge-popup-icon{font-size:80px;animation:badgeBounce .6s cubic-bezier(.34,1.56,.64,1) both;margin-bottom:8px}
+.badge-popup-name{font-family:'Bebas Neue',cursive;font-size:32px;letter-spacing:3px;color:var(--accent);animation:badgeFade .5s .3s both}
+.badge-popup-desc{font-size:14px;color:var(--text2);margin-top:4px;text-align:center;max-width:280px;animation:badgeFade .5s .5s both}
+.badge-popup-btn{margin-top:24px;animation:badgeFade .5s .7s both}
+@keyframes badgeBounce{0%{transform:scale(0) rotate(-15deg);opacity:0}60%{transform:scale(1.3) rotate(5deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+@keyframes badgeFade{0%{opacity:0;transform:translateY(12px)}100%{opacity:1;transform:translateY(0)}}
+
+/* Confetti */
+.confetti-container{position:fixed;inset:0;pointer-events:none;z-index:901;overflow:hidden}
+.confetti-piece{position:absolute;top:-10px;width:10px;height:10px;border-radius:2px;animation:confettiFall var(--fall-duration,3s) var(--fall-delay,0s) linear forwards}
+@keyframes confettiFall{
+  0%{transform:translateY(0) rotateZ(0deg) rotateX(0deg);opacity:1}
+  25%{transform:translateY(25vh) rotateZ(90deg) rotateX(180deg);opacity:1}
+  50%{transform:translateY(50vh) rotateZ(180deg) rotateX(360deg);opacity:.9}
+  75%{transform:translateY(75vh) rotateZ(270deg) rotateX(540deg);opacity:.6}
+  100%{transform:translateY(105vh) rotateZ(360deg) rotateX(720deg);opacity:0}
+}
+
+/* Profil rozetleri */
+.badge-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.badge-cell{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px;background:var(--card2);border-radius:10px;border:1px solid var(--border);transition:all .2s}
+.badge-cell.earned{background:rgba(46,196,182,.08);border-color:var(--success)}
+.badge-cell.locked{opacity:.4;filter:grayscale(1)}
+.badge-cell-icon{font-size:28px;line-height:1}
+.badge-cell-name{font-size:9px;font-weight:700;color:var(--text2);text-align:center;line-height:1.2}
+.badge-cell-date{font-size:8px;color:var(--text3)}

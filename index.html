@@ -1,282 +1,1082 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" data-theme="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#E63946">
-  <link rel="icon" type="image/png" href="favicon.png">
-  <link rel="apple-touch-icon" href="icon.png">
-  <link rel="manifest" href="manifest.json">
-  <title>Raven Fit</title>
-  <style>
-    :root{ --bg:#080809; --card:#161618; --line:#2A2A2F; --accent:#E63946; --text:#F2F2F4; --muted:#9090A0; --surface:#0F0F11; --btn:#1F1F24; --glow:rgba(255,77,90,.30); }
-    *{ box-sizing:border-box; }
-    body{ margin:0 auto; max-width:480px; padding:20px; font-family:system-ui,-apple-system,sans-serif;
-          background:var(--bg); color:var(--text); }
-    h1{ font-size:28px; margin:14px 0 2px; letter-spacing:-.5px; } h2{ font-size:18px; margin:0 0 12px; }
-    .tag{ color:var(--muted); font-size:13px; margin:0 0 6px; }
-    .muted{ color:var(--muted); }
-    .center{ text-align:center; padding-top:18px; }
-    /* Açılış ikonu — büyük + animasyonlu */
-    .welcome-icon{ width:124px; height:124px; border-radius:30px; object-fit:cover;
-      animation:floaty 3.2s ease-in-out infinite; box-shadow:0 14px 40px var(--glow); }
-    @keyframes floaty{ 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(-12px) } }
-    .ver{ font-size:11px; color:var(--muted); text-align:center; margin-top:16px; letter-spacing:.05em; }
-    .card{ background:var(--card); border-radius:14px; padding:16px; margin:14px 0; }
-    .prog{ font-size:12px; color:var(--muted); text-align:center; margin-bottom:8px; letter-spacing:.05em; }
-    .lbl{ font-size:13px; color:var(--muted); margin:12px 0 6px; }
-    label{ display:block; font-size:13px; color:var(--muted); margin:8px 0 4px; }
-    input{ width:100%; padding:11px; border-radius:8px; border:1px solid var(--line);
-           background:var(--surface); color:var(--text); font-size:15px; }
-    .row{ display:flex; gap:10px; } .row>div{ flex:1; }
-    .pills{ display:flex; flex-wrap:wrap; gap:8px; }
-    button{ -webkit-appearance:none; appearance:none;
-            background:var(--btn); color:var(--text); border:1px solid var(--line); border-radius:8px;
-            padding:11px 12px; font-size:14px; font-family:inherit; cursor:pointer;
-            transition:background .15s, border-color .15s; }
-    .pills button{ flex:1 1 auto; }
-    button.on{ background:var(--accent); border-color:var(--accent); color:#fff; }
-    .go{ background:var(--accent); border-color:var(--accent); font-weight:600; }
-    .nav{ display:flex; gap:10px; margin-top:16px; }
-    .nav button{ flex:1; } .nav .go{ flex:2; }
-    .screen{ display:none; }
-    .screen.active{ display:block; animation:fade .2s ease; }
-    @keyframes fade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
-    .status{ font-size:13px; padding:8px 12px; border-radius:8px; margin:6px 0; background:var(--surface); color:var(--muted); }
-    .status.ok{ background:#0f2a1e; color:#4ade80; } .status.bad{ background:#2a0f12; color:#f87171; }
-    /* Dashboard */
-    .dash-head{ display:flex; align-items:center; gap:10px; margin-bottom:6px; }
-    .dash-head img{ width:34px; height:34px; border-radius:9px; }
-    .dash-head .t{ font-size:18px; font-weight:700; }
-    #tab-content{ padding-bottom:78px; }
-    .subtabs{ display:flex; gap:8px; margin:4px 0 12px; }
-    .subtabs button{ flex:1; font-size:13px; padding:8px; }
-    .grp{ background:var(--card); border-radius:12px; padding:14px; margin:10px 0; line-height:1.9; }
-    .grp .h{ font-size:11px; letter-spacing:.08em; color:var(--accent); margin-bottom:6px; }
-    .ev{ font-size:11px; color:var(--muted); }
-    .warn{ background:#2a1e0f; color:#fbbf24; border:1px solid #5a4516; border-radius:10px; padding:12px; margin:10px 0; font-size:13px; line-height:1.6; }
-    .warn.reds{ background:#2a0f12; color:#fca5a5; border-color:#5a1620; }
-    .bottomnav{ position:fixed; left:50%; transform:translateX(-50%); bottom:0; width:100%; max-width:480px;
-      display:flex; background:var(--surface); border-top:1px solid var(--line); }
-    .bottomnav button{ flex:1; border:none; border-radius:0; background:none; color:var(--muted);
-      display:flex; flex-direction:column; align-items:center; gap:2px; padding:9px 0; }
-    .bottomnav button .ic{ font-size:20px; } .bottomnav button .lb{ font-size:11px; }
-    .bottomnav button.on{ color:var(--accent); }
-    /* Egzersiz havuzu */
-    .exbar{ margin-bottom:8px; }
-    .exf{ margin-bottom:8px; }
-    .exf button{ font-size:13px; padding:7px 10px; }
-    .exrow{ display:flex; gap:8px; }
-    .exsel{ flex:0 0 42%; padding:10px; border-radius:8px; border:1px solid var(--line); background:var(--surface); color:var(--text); font-size:14px; -webkit-appearance:none; appearance:none; }
-    .exsearch{ flex:1; padding:10px; border-radius:8px; border:1px solid var(--line); background:var(--surface); color:var(--text); font-size:14px; }
-    .excount{ font-size:12px; color:var(--muted); margin:6px 2px; }
-    .excard{ background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin:8px 0; cursor:pointer; }
-    .excard:active{ background:#1f1f26; }
-    .exname{ font-weight:600; font-size:15px; }
-    .exmeta{ font-size:12px; color:var(--muted); margin-top:3px; }
-    .exbadges{ font-size:12px; color:var(--muted); margin:8px 0 4px; }
-    .exul{ margin:4px 0; padding-left:20px; line-height:1.7; }
-    .mrow{ display:flex; align-items:center; gap:10px; margin:5px 0; }
-    .mname{ flex:0 0 42%; font-size:13px; }
-    .mbar{ flex:1; height:8px; background:var(--surface); border-radius:5px; overflow:hidden; }
-    .mfill{ height:100%; background:var(--accent); border-radius:5px; }
-    h3{ font-size:18px; margin:6px 0; }
-    .wkhead{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:6px; }
-    .wkhead button{ flex:0 0 auto; }
-    .wkrow{ display:flex; align-items:center; justify-content:space-between; gap:10px; background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin:8px 0; }
-    .wkrow.done{ border-color:#2e6b46; background:#0f2417; }
-    .wkrow button{ flex:0 0 auto; }
-    .restbar{ display:flex; align-items:center; gap:8px; background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:8px 12px; margin:8px 0; font-size:14px; }
-    .restbar #rest-timer{ font-weight:700; font-variant-numeric:tabular-nums; color:var(--accent); min-width:42px; }
-    .restbtns{ margin-left:auto; display:flex; gap:5px; }
-    .restbtns button{ padding:6px 9px; font-size:12px; }
-    .mini{ padding:4px 9px; font-size:14px; }
-    .repsin{ width:64px; padding:6px 8px; border-radius:6px; border:1px solid var(--line); background:var(--surface); color:var(--text); font-size:13px; }
-    .ph{ font-size:11px; letter-spacing:.08em; color:var(--accent); margin:14px 2px 6px; }
-    .ph.muted{ color:var(--muted); }
-    .suppcard{ background:var(--card); border:1px solid var(--line); border-radius:10px; margin:8px 0; overflow:hidden; }
-    .supphead{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 14px; cursor:pointer; }
-    .supphead .ev{ font-size:11px; white-space:nowrap; }
-    .suppbody{ padding:10px 14px 12px; font-size:13px; line-height:1.65; border-top:1px solid var(--line); }
-    .suppbody > div{ margin-top:6px; }
-    .suppbody .reasons{ margin-top:8px; color:var(--accent); font-size:12px; }
-    .legal{ font-size:11px; color:var(--muted); border:1px solid var(--line); border-radius:8px; padding:10px; margin:10px 0; line-height:1.5; }
-    .qblock{ margin:14px 0; }
-    .qtitle{ font-size:14px; margin-bottom:8px; }
-    .qopts{ flex-direction:column; }
-    .qopts button{ width:100%; text-align:left; }
-    .tdots{ display:flex; gap:12px; margin-top:6px; flex-wrap:wrap; }
-    .tdot{ width:32px; height:32px; border-radius:50%; cursor:pointer; border:2px solid transparent; box-shadow:0 0 0 1px var(--line); }
-    .tdot.on{ border-color:var(--text); }
-    .calc-grid{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:4px; }
-    .calc-card{ background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px 6px; text-align:center; cursor:pointer; }
-    .calc-card:active{ background:var(--btn); }
-    .calc-ic{ font-size:26px; } .calc-lb{ font-size:13px; font-weight:700; margin-top:4px; } .calc-sb{ font-size:10px; color:var(--muted); margin-top:1px; }
-    .cres{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px; text-align:center; margin:12px 0; }
-    .cres.muted{ opacity:.7; }
-    .cres-val{ font-size:40px; font-weight:800; color:var(--accent); line-height:1; margin:2px 0; }
-    .cres-unit{ font-size:12px; color:var(--muted); } .cres-sub{ font-size:11px; color:var(--muted); }
-    .cgrid4{ display:grid; grid-template-columns:1fr 1fr; gap:6px; }
-    .ccell{ background:var(--card); border:1px solid var(--line); border-radius:10px; padding:10px; text-align:center; }
-    .ccell-val{ font-size:18px; font-weight:700; } .ccell-lbl{ font-size:10px; color:var(--muted); margin-top:2px; }
-    .crow{ display:flex; justify-content:space-between; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid var(--line); font-size:13px; }
-    .crow:last-child{ border-bottom:none; }
-    .cdiff{ display:flex; gap:6px; margin-bottom:4px; }
-    .ctoggle{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px; margin-top:12px; background:var(--surface); border-radius:10px; cursor:pointer; }
-    .csw{ width:44px; height:25px; border-radius:13px; position:relative; flex-shrink:0; transition:background .2s; }
-    .csw i{ position:absolute; top:3px; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .2s; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>RavenFit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Stil dosyaları -->
+<link rel="stylesheet" href="css/themes.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/profile.css">
+<link rel="stylesheet" href="css/workout.css">
+<link rel="stylesheet" href="css/misc.css">
+<link rel="stylesheet" href="css/supplements.css">
+<link rel="stylesheet" href="css/calculators.css">
+<link rel="icon" href="assets/icons/favicon.png" type="image/png">
+<link rel="icon" href="assets/icons/icon-192.png" type="image/png" sizes="192x192">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/icons/icon-192.png">
+<link rel="apple-touch-icon" sizes="152x152" href="assets/icons/icon-192.png">
+<link rel="apple-touch-icon" sizes="120x120" href="assets/icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RavenFit">
+<meta name="theme-color" content="#E63946">
+<meta name="description" content="Kişisel fitness analiz ve antrenman takip uygulaması">
+
 </head>
 <body>
+<header class="hdr">
+  <div class="logo" onclick="goHome()">
+  <img src="assets/icons/logo.png" width="30">
+  <span class="logo-txt">RAVEN<span>FIT</span></span>
+</div>
+</header>
 
-  <!-- ══ YÜKLENİYOR (başlangıç) ══ -->
-  <div id="scr-loading" class="screen active">
-    <div class="center">
-      <img src="icon.png" alt="Raven Fit" class="welcome-icon" onerror="this.style.display='none'">
-      <h1>Raven Fit</h1>
-      <p class="tag">Yükleniyor…</p>
+<!-- 🔥 AUTH EKRANI -->
+<div id="auth-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:500;align-items:center;justify-content:center;padding:20px;flex-direction:column;overflow-y:auto">
+  <!-- Background silüet animasyonu -->
+  <img src="assets/icons/logo.png" aria-hidden="true" class="auth-bg-silhouette">
+  <div class="auth-bg-gradient"></div>
+  <div style="width:100%;max-width:360px;padding:10px 0;position:relative;z-index:2">
+    <!-- Logo -->
+    <div style="text-align:center;margin-bottom:24px">
+      <img src="assets/icons/logo.png" width="92" style="margin-bottom:12px;filter:drop-shadow(0 6px 20px var(--ag));animation:authLogoFloat 4s ease-in-out infinite">
+      <div style="font-family:'Bebas Neue',cursive;font-size:36px;letter-spacing:5px;color:var(--text)">RAVEN<span style="color:var(--accent)">FIT</span></div>
+      <div style="font-size:11px;color:var(--text2);margin-top:3px;letter-spacing:2px;text-transform:uppercase">Hesabına giriş yap</div>
+    </div>
+    <!-- Tab seçici -->
+    <div style="display:flex;background:var(--card2);border-radius:10px;padding:3px;margin-bottom:18px;border:1px solid var(--border)">
+      <button id="auth-tab-login" onclick="showLoginTab()" style="flex:1;padding:9px;border:none;border-radius:8px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;background:var(--accent);color:#fff">Giriş Yap</button>
+      <button id="auth-tab-register" onclick="showRegisterTab()" style="flex:1;padding:9px;border:none;border-radius:8px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;background:transparent;color:var(--text2)">Kayıt Ol</button>
+    </div>
+    <!-- Giriş formu -->
+    <div id="auth-form-login">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <label style="font-size:12px;color:var(--text2);font-weight:500">Kullanıcı Adı</label>
+          <input id="auth-nick" type="text" inputmode="text" autocomplete="username" placeholder="kullanici_adin" class="auth-inp" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <label style="font-size:12px;color:var(--text2);font-weight:500">Şifre</label>
+          <input id="auth-pass" type="password" autocomplete="current-password" placeholder="Şifren" class="auth-inp" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter')doLogin()">
+        </div>
+        <div id="auth-err" style="font-size:12px;color:var(--accent);min-height:16px;text-align:center;line-height:1.4"></div>
+        <button id="auth-btn-login" onclick="doLogin()" style="background:var(--accent);color:#fff;border:none;border-radius:11px;padding:14px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;cursor:pointer;width:100%;box-shadow:0 4px 16px var(--ag)">Giriş Yap</button>
+      </div>
+    </div>
+    <!-- Kayıt formu -->
+    <div id="auth-form-register" style="display:none">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <label style="font-size:12px;color:var(--text2);font-weight:500">Kullanıcı Adı</label>
+          <input id="auth-nick-r" type="text" inputmode="text" autocomplete="username" placeholder="kullanici_adin" class="auth-inp" oninput="_authClearErr(\'nick-r\')" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+          <div style="font-size:10px;color:var(--text3)">Harf, rakam ve _ kullanabilirsin. Min 3 karakter.</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <label style="font-size:12px;color:var(--text2);font-weight:500">Şifre</label>
+          <input id="auth-pass-r" type="password" autocomplete="new-password" placeholder="En az 6 karakter" class="auth-inp" oninput="_authClearErr(\'pass-r\')" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <label style="font-size:12px;color:var(--text2);font-weight:500">Şifre Tekrar</label>
+          <input id="auth-pass2" type="password" autocomplete="new-password" placeholder="Şifreni tekrar gir" class="auth-inp" oninput="_authClearErr(\'pass2\')" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter')doRegister()">
+        </div>
+        <div id="auth-err-r" style="font-size:12px;color:var(--accent);min-height:16px;text-align:center;line-height:1.4"></div>
+        <button id="auth-btn-register" onclick="doRegister()" style="background:var(--accent);color:#fff;border:none;border-radius:11px;padding:14px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;cursor:pointer;width:100%;box-shadow:0 4px 16px var(--ag)">Kayıt Ol</button>
+      </div>
+    </div>
+    <!-- Misafir Girişi -->
+    <div style="margin-top:16px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+        <div style="font-size:11px;color:var(--text3);white-space:nowrap">veya</div>
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+      </div>
+      <button onclick="enterAsGuest()" style="width:100%;background:none;border:1.5px solid var(--border);border-radius:11px;padding:13px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+        <span style="font-size:18px">👀</span>
+        Misafir Olarak Devam Et
+      </button>
+      <div style="font-size:10px;color:var(--text3);margin-top:7px;text-align:center;line-height:1.5">Kayıt olmadan keşfet. Veriler yalnızca bu cihazda saklanır,<br>hesap oluşturulana kadar buluta yüklenmez.</div>
+    </div>
+  </div>
+</div>
+
+<div id="app-main">
+<main class="main">
+
+<div class="screen active" id="splash">
+  <div class="s-bg"></div>
+  <img src="assets/icons/logo.png" class="s-silhouette" aria-hidden="true">
+  <div class="splash-icon">
+  <img src="assets/icons/logo.png" width="148">
+</div>
+  <h1 class="splash-title">RAVEN<span style="color:var(--accent)">FIT</span></h1>
+  <div class="splash-tag">Versiyon 0.3.0.1(beta)</div>
+  <div class="splash-sub">Sen sadece antrenmanına odaklan</div>
+  <div class="pills">
+    <div class="pill"><div class="pill-dot"></div>Çoklu Branş</div>
+    <div class="pill"><div class="pill-dot"></div>Beslenme & Makro</div>
+    <div class="pill"><div class="pill-dot"></div>Su Takibi</div>
+    <div class="pill"><div class="pill-dot"></div>Supplement Rehberi</div>
+    <div class="pill"><div class="pill-dot"></div>Vücut Analizi</div>
+    <div class="pill"><div class="pill-dot"></div>Antrenman Programları</div>
+    <div class="pill"><div class="pill-dot"></div>Rozet Sistemi</div>
+    <div class="pill"><div class="pill-dot"></div>1RM & PR Hesaplayıcılar</div>
+    <div class="pill"><div class="pill-dot"></div>Postür Düzeltme</div>
+    <div class="pill"><div class="pill-dot"></div>Yüzme Modülü</div>
+  </div>
+  <button class="btn btn-p btn-lg" type="button" onclick="startWizard()" ontouchend="startWizardFromTouch(event)">Analize Başla <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+  <!-- Ana menüye dön — sadece analiz tamamlanmışsa görünür -->
+  <button id="splash-home-btn" type="button" onclick="goToMainMenu()" style="display:none;margin-top:14px;background:transparent;border:1.5px solid var(--border);border-radius:50%;width:48px;height:48px;cursor:pointer;align-items:center;justify-content:center;transition:all .2s;-webkit-tap-highlight-color:transparent" onmousedown="this.style.transform='scale(.92)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(.92)'" ontouchend="this.style.transform=''" title="Ana Menüye Dön">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text2)">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+      <polyline points="9 22 9 12 15 12 15 22"/>
+    </svg>
+  </button>
+</div>
+
+<div class="screen" id="wizard">
+  <div class="wiz-prog">
+    <div class="prog-steps">
+      <div class="ps act" id="ps0"></div><div class="ps" id="ps1"></div><div class="ps" id="ps2"></div><div class="ps" id="ps3"></div><div class="ps" id="ps4"></div><div class="ps" id="ps5"></div><div class="ps" id="ps6"></div>
+    </div>
+    <div class="prog-lbl" id="prog-lbl">Adım 1 / 7</div>
+  </div>
+  <div class="wiz-body">
+
+    <div class="step active" id="s0">
+      <div class="step-hdr"><h2>KİŞİSEL BİLGİLER</h2><p>Seni tanıyalım</p></div>
+      <div class="fg"><label class="fl">İsim (isteğe bağlı)</label><input class="fi" id="i-name" type="text" placeholder="Adın"></div>
+      <div class="fg"><label class="fl">Cinsiyet *</label>
+        <div class="gender-grid">
+          <div class="gbtn" id="gm" onclick="selGender('male')"><div class="gi">♂</div><div class="gl">Erkek</div></div>
+          <div class="gbtn" id="gf" onclick="selGender('female')"><div class="gi">♀</div><div class="gl">Kadın</div></div>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Yaş *</label><div class="iw"><input class="fi" id="i-age" type="number" placeholder="25" min="14" max="80"><span class="iu">yaş</span></div></div>
+        <div class="fg"><label class="fl">Boy *</label><div class="iw"><input class="fi" id="i-ht" type="number" placeholder="175" min="140" max="220"><span class="iu">cm</span></div></div>
+      </div>
+      <div class="fg"><label class="fl">Kilo *</label><div class="iw"><input class="fi" id="i-wt" type="number" placeholder="75" min="30" max="300" step=".1"><span class="iu">kg</span></div></div>
+      <div class="alert" id="al0">⚠️ Lütfen cinsiyet dahil tüm zorunlu (*) alanları doldurun.</div>
+    </div>
+
+    <div class="step" id="s1">
+      <div class="step-hdr"><h2>VÜCUT ÖLÇÜLERİ</h2><p>Doğru noktadan ölçmek sonucu etkiler</p></div>
+      <div class="fg">
+        <label class="fl">Boyun Çevresi *</label>
+        <div class="iw"><input class="fi" id="i-nk" type="number" placeholder="37" min="20" max="70" step=".5"><span class="iu">cm</span></div>
+        <span class="fhint">📍 Adem elmasının hemen altından ölçün</span>
+      </div>
+      <div class="fg">
+        <label class="fl">Bel Çevresi *</label>
+        <div class="iw"><input class="fi" id="i-wst" type="number" placeholder="80" min="40" max="200" step=".5"><span class="iu">cm</span></div>
+        <span class="fhint" id="wst-hint">📍 Göbek deliği hizasından ölçün (erkekler)</span>
+      </div>
+      <div class="fg" id="grp-spe">
+        <label class="fl">Omuz Çevresi *</label>
+        <div class="iw"><input class="fi" id="i-spe" type="number" placeholder="110" min="50" max="200" step=".5"><span class="iu">cm</span></div>
+        <span class="fhint">📍 Omuzların en geniş noktasından ölçün</span>
+      </div>
+      <div class="fg" id="grp-hip" style="display:none">
+        <label class="fl">Kalça Çevresi *</label>
+        <div class="iw"><input class="fi" id="i-hip" type="number" placeholder="95" min="50" max="200" step=".5"><span class="iu">cm</span></div>
+        <span class="fhint">📍 Kalçanın en geniş noktasından ölçün</span>
+      </div>
+      <div class="alert" id="al1">⚠️ Lütfen tüm ölçüleri eksiksiz girin.</div>
+    </div>
+
+    <div class="step" id="s2">
+      <div class="step-hdr"><h2>AKTİVİTE ANKETİ</h2><p>Günlük hayatını ve alışkanlıklarını anlat</p></div>
+      <div class="fg"><label class="fl">İş hayatın nasıl?</label>
+        <div class="opts" id="o-job">
+          <div class="oc" data-g="job" data-v="0" onclick="selOpt(this,'job')"><div class="oi">💻</div><div class="ot"><div class="on">Masa Başı</div><div class="od">Çoğunlukla oturarak</div></div><div class="orad"></div></div>
+          <div class="oc" data-g="job" data-v="1" onclick="selOpt(this,'job')"><div class="oi">🚶</div><div class="ot"><div class="on">Hafif Hareketli</div><div class="od">Ara sıra yürüme var</div></div><div class="orad"></div></div>
+          <div class="oc" data-g="job" data-v="2" onclick="selOpt(this,'job')"><div class="oi">🏃</div><div class="ot"><div class="on">Aktif / Ayakta</div><div class="od">Çoğunlukla ayaktayım</div></div><div class="orad"></div></div>
+          <div class="oc" data-g="job" data-v="3" onclick="selOpt(this,'job')"><div class="oi">⚒️</div><div class="ot"><div class="on">Ağır Fiziksel İş</div><div class="od">İnşaat, fabrika vb.</div></div><div class="orad"></div></div>
+        </div>
+      </div>
+      <div class="fg"><label class="fl">Haftada kaç gün spor yapıyorsun?</label>
+        <div class="opts3" id="o-sd">
+          <div class="oc" data-g="sd" data-v="0" style="grid-column:1/-1" onclick="selOpt(this,'sd')"><div class="oi">😴</div><div class="ot"><div class="on">Hiç yapmıyorum</div></div><div class="orad"></div></div>
+          <div class="oc compact" data-g="sd" data-v="1" onclick="selOpt(this,'sd')"><div class="oi">📅</div><div class="ot"><div class="on">1 gün</div></div><div class="orad"></div></div>
+          <div class="oc compact" data-g="sd" data-v="2" onclick="selOpt(this,'sd')"><div class="oi">📅</div><div class="ot"><div class="on">2 gün</div></div><div class="orad"></div></div>
+          <div class="oc compact" data-g="sd" data-v="3" onclick="selOpt(this,'sd')"><div class="oi">💪</div><div class="ot"><div class="on">3 gün</div></div><div class="orad"></div></div>
+          <div class="oc compact" data-g="sd" data-v="4" onclick="selOpt(this,'sd')"><div class="oi">💪</div><div class="ot"><div class="on">4 gün</div></div><div class="orad"></div></div>
+          <div class="oc compact" data-g="sd" data-v="5" onclick="selOpt(this,'sd')"><div class="oi">🔥</div><div class="ot"><div class="on">5 gün</div></div><div class="orad"></div></div>
+          <div class="oc compact" data-g="sd" data-v="6" onclick="selOpt(this,'sd')"><div class="oi">🔥</div><div class="ot"><div class="on">6 gün</div></div><div class="orad"></div></div>
+        </div>
+      </div>
+      <div class="fg"><label class="fl">Spor seansın ne kadar sürüyor?</label>
+        <div class="opts2" id="o-sh">
+          <div class="oc locked" data-g="sh" data-v="0" onclick="selOpt(this,'sh')"><div class="oi">🚫</div><div class="ot"><div class="on">Spor yapmıyorum</div></div><div class="orad"></div></div>
+          <div class="oc" data-g="sh" data-v="0.5" onclick="selOpt(this,'sh')"><div class="oi">⏱️</div><div class="ot"><div class="on">~30 dakika</div></div><div class="orad"></div></div>
+          <div class="oc" data-g="sh" data-v="1" onclick="selOpt(this,'sh')"><div class="oi">⏱️</div><div class="ot"><div class="on">45–60 dakika</div></div><div class="orad"></div></div>
+          <div class="oc" data-g="sh" data-v="1.5" onclick="selOpt(this,'sh')"><div class="oi">🔥</div><div class="ot"><div class="on">1 saat+</div></div><div class="orad"></div></div>
+        </div>
+      </div>
+      <div class="fg"><label class="fl">Düzenli antrenman geçmişin var mı?</label>
+        <div class="opts" id="o-ta">
+          <div class="oc compact" data-g="ta" data-v="none" onclick="selOpt(this,'ta')"><div class="oi">🌱</div><div class="ot"><div class="on">Hiç düzenli yapmadım</div><div class="od">Yeni başlayan</div></div><div class="orad"></div></div>
+          <div class="oc compact" data-g="ta" data-v="lt1" onclick="selOpt(this,'ta')"><div class="oi">📈</div><div class="ot"><div class="on">1 yıldan az</div><div class="od">Yeni başlayan / kısa süreli</div></div><div class="orad"></div></div>
+          <div class="oc compact" data-g="ta" data-v="1to3" onclick="selOpt(this,'ta')"><div class="oi">💪</div><div class="ot"><div class="on">1-3 yıl</div><div class="od">Orta seviye</div></div><div class="orad"></div></div>
+          <div class="oc compact" data-g="ta" data-v="gt3" onclick="selOpt(this,'ta')"><div class="oi">🔥</div><div class="ot"><div class="on">3 yıldan fazla</div><div class="od">İleri seviye</div></div><div class="orad"></div></div>
+        </div>
+      </div>
+      <div class="fg"><label class="fl">Ek aktivite yapıyor musun?</label>
+        <div class="opts2" id="o-ex">
+          <div class="oc compact" data-g="ex" data-v="0" onclick="selOpt(this,'ex')"><div class="oi">❌</div><div class="ot"><div class="on">Hayır</div></div><div class="orad"></div></div>
+          <div class="oc compact" data-g="ex" data-v="0.3" onclick="selOpt(this,'ex')"><div class="oi">🚶</div><div class="ot"><div class="on">Kısa yürüyüşler, esneme</div></div><div class="orad"></div></div>
+          <div class="oc compact" data-g="ex" data-v="0.6" onclick="selOpt(this,'ex')"><div class="oi">🧘</div><div class="ot"><div class="on">Yürüyüş, yoga</div></div><div class="orad"></div></div>
+          <div class="oc compact" data-g="ex" data-v="1" onclick="selOpt(this,'ex')"><div class="oi">🚴</div><div class="ot"><div class="on">Uzun yürüyüş, bisiklet</div></div><div class="orad"></div></div>
+          <div class="oc compact" data-g="ex" data-v="1.4" onclick="selOpt(this,'ex')"><div class="oi">🏊</div><div class="ot"><div class="on">Koşu, yüzme</div></div><div class="orad"></div></div>
+          <div class="oc compact" data-g="ex" data-v="1.8" onclick="selOpt(this,'ex')"><div class="oi">🏃</div><div class="ot"><div class="on">HIIT, spor antrenmanları / ekstra fitness</div></div><div class="orad"></div></div>
+        </div>
+      </div>
+      <div class="alert" id="al2">⚠️ Lütfen tüm soruları cevaplayın.</div>
+    </div>
+
+    <div class="step" id="s3">
+      <div class="step-hdr"><h2>VÜCUT TİPİ TESTİ</h2><p>Somatotip yapını 8 soru ile belirleyelim</p></div>
+
+      <div class="fg"><label class="fl">1. Bir elin baş &amp; orta parmağını diğer el bileğine sardığında...</label>
+        <div class="opts" id="o-bt1">
+          <div class="oc compact" data-g="bt1" data-ec="1" data-me="0" data-en="0" onclick="selBT(this,'bt1')"><div class="oi">🤏</div><div class="ot"><div class="on">Parmaklar üst üste geldi</div></div><div class="orad"></div></div>
+          <div class="oc compact" data-g="bt1" data-ec="0" data-me="1" data-en="0" onclick="selBT(this,'bt1')"><div class="oi">👌</div><div class="ot"><div class="on">Parmaklar uç uca geldi</div></div><div class="orad"></div></div>
+          <div class="oc compact" data-g="bt1" data-ec="0" data-me="0" data-en="1" onclick="selBT(this,'bt1')"><div class="oi">✋</div><div class="ot"><div class="on">Parmaklar birbirine ulaşmadı</div></div><div class="orad"></div></div>
+        </div>
+      </div>
+
+      <div class="fg"><label class="fl">2. Aynaya baktığında ilk hangisi dikkat çekiyor?</label>
+        <div class="opts3" id="o-bt2">
+          <div class="oc compact" data-g="bt2" data-ec="1" data-me="0" data-en="0" onclick="selBT(this,'bt2')"><div class="oi">🦴</div><div class="ot"><div class="on">Kemiklerim</div></div><div class="orad"></div></div>
+          <div class="oc compact" data-g="bt2" data-ec="0" data-me="0" data-en="1" onclick="selBT(this,'bt2')"><div class="oi">💧</div><div class="ot"><div class="on">Yağlarım</div></div><div class="orad"></div></div>
+          <div class="oc compact" data-g="bt2" data-ec="0" data-me="1" data-en="0" onclick="selBT(this,'bt2')"><div class="oi">💪</div><div class="ot"><div class="on">Kaslarım</div></div><div class="orad"></div></div>
+        </div>
+      </div>
+
+      <div class="fg"><label class="fl">3. Vücudunuzu nasıl tanımlarsınız?</label>
+        <div class="opts3" id="o-bt3">
+          <div class="oc compact" data-g="bt3" data-ec="0" data-me="0" data-en="1" onclick="selBT(this,'bt3')"><div class="oi">🍐</div><div class="ot"><div class="on">Armut gibi</div></div><div class="orad"></div></div>
+          <div class="oc compact" data-g="bt3" data-ec="1" data-me="0" data-en="0" onclick="selBT(this,'bt3')"><div class="oi">📏</div><div class="ot"><div class="on">Kalem gibi</div></div><div class="orad"></div></div>
+          <div class="oc compact" data-g="bt3" data-ec="0" data-me="1" data-en="0" onclick="selBT(this,'bt3')"><div class="oi">⏳</div><div class="ot"><div class="on">Kum saati gibi</div></div><div class="orad"></div></div>
+        </div>
+      </div>
+
+      <div class="fg"><label class="fl">4. 16 yaş civarında vücudunuz hangisine yakındı?</label>
+        <div class="opts3" id="o-bt4">
+          <div class="oc compact" data-g="bt4" data-ec="0" data-me="1" data-en="0" onclick="selBT(this,'bt4')"><div class="oi">🦾</div><div class="ot"><div class="on">Güçlü ve diri</div></div><div class="orad"></div></div>
+          <div class="oc compact" data-g="bt4" data-ec="1" data-me="0" data-en="0" onclick="selBT(this,'bt4')"><div class="oi">📏</div><div class="ot"><div class="on">İnce ve uzun</div></div><div class="orad"></div></div>
+          <div class="oc compact" data-g="bt4" data-ec="0" data-me="0" data-en="1" onclick="selBT(this,'bt4')"><div class="oi">🫁</div><div class="ot"><div class="on">Tıknaz ve yumuşak</div></div><div class="orad"></div></div>
+        </div>
+      </div>
+
+      <div class="fg"><label class="fl">5. Kilo alma ve verme geçmişini düşündüğünde...</label>
+        <div class="opts" id="o-bt5">
+          <div class="oc compact" data-g="bt5" data-ec="1" data-me="0" data-en="0" onclick="selBT(this,'bt5')"><div class="oi">📈</div><div class="ot"><div class="on">Kütle kazanmakta zorlanıyorum</div></div><div class="orad"></div></div>
+          <div class="oc compact" data-g="bt5" data-ec="0" data-me="0" data-en="1" onclick="selBT(this,'bt5')"><div class="oi">📉</div><div class="ot"><div class="on">Kilo kaybetmekte zorlanıyorum</div></div><div class="orad"></div></div>
+          <div class="oc compact" data-g="bt5" data-ec="0" data-me="1" data-en="0" onclick="selBT(this,'bt5')"><div class="oi">⚖️</div><div class="ot"><div class="on">Pek fazla zorlanmıyorum</div></div><div class="orad"></div></div>
+        </div>
+      </div>
+
+      <div class="fg"><label class="fl">6. Spora birkaç hafta ara verdiğinde...</label>
+        <div class="opts" id="o-bt6">
+          <div class="oc compact" data-g="bt6" data-ec="0" data-me="0" data-en="1" onclick="selBT(this,'bt6')"><div class="oi">⬆️</div><div class="ot"><div class="on">Kilo alıyorum</div></div><div class="orad"></div></div>
+          <div class="oc compact" data-g="bt6" data-ec="1" data-me="0" data-en="0" onclick="selBT(this,'bt6')"><div class="oi">⬇️</div><div class="ot"><div class="on">Kilo kaybediyorum</div></div><div class="orad"></div></div>
+          <div class="oc compact" data-g="bt6" data-ec="0" data-me="1" data-en="0" onclick="selBT(this,'bt6')"><div class="oi">➡️</div><div class="ot"><div class="on">Pek değişmiyor</div></div><div class="orad"></div></div>
+        </div>
+      </div>
+
+      <div class="fg"><label class="fl">7. Slim fit giysi denediğinde...</label>
+        <div class="opts" id="o-bt7">
+          <div class="oc compact" data-g="bt7" data-ec="1" data-me="0" data-en="0" onclick="selBT(this,'bt7')"><div class="oi">✅</div><div class="ot"><div class="on">Rahatça içine girebiliyorum</div></div><div class="orad"></div></div>
+          <div class="oc compact" data-g="bt7" data-ec="0" data-me="0" data-en="1" onclick="selBT(this,'bt7')"><div class="oi">❌</div><div class="ot"><div class="on">Slim fit sevmiyorum</div></div><div class="orad"></div></div>
+          <div class="oc compact" data-g="bt7" data-ec="0" data-me="1" data-en="0" onclick="selBT(this,'bt7')"><div class="oi">😅</div><div class="ot"><div class="on">Zorlasam giyebiliyorum</div></div><div class="orad"></div></div>
+        </div>
+      </div>
+
+      <div class="fg"><label class="fl">8. Seni en iyi tarif eden hangisi?</label>
+        <div class="opts" id="o-bt8">
+          <div class="oc compact" data-g="bt8" data-ec="0" data-me="0" data-en="1" onclick="selBT(this,'bt8')"><div class="oi">💧</div><div class="ot"><div class="on">"Su içsem yarıyor"</div></div><div class="orad"></div></div>
+          <div class="oc compact" data-g="bt8" data-ec="0" data-me="1" data-en="0" onclick="selBT(this,'bt8')"><div class="oi">⚖️</div><div class="ot"><div class="on">"Veririm de alırım da"</div></div><div class="orad"></div></div>
+          <div class="oc compact" data-g="bt8" data-ec="1" data-me="0" data-en="0" onclick="selBT(this,'bt8')"><div class="oi">😤</div><div class="ot"><div class="on">"Yiyorum ama kilo alamıyorum"</div></div><div class="orad"></div></div>
+        </div>
+      </div>
+      <div class="alert" id="al3">⚠️ Lütfen tüm 8 soruyu cevaplayın.</div>
+    </div>
+
+    <div class="step" id="s4">
+      <div class="step-hdr"><h2>HEDEFİNİ BELİRLE</h2><p>Spor türü ve kalori hedefinle makrolarını özelleştir</p></div>
+      <div class="g-rec"><div class="g-rec-lbl">🎯 RavenFit Önerisi</div><div class="g-rec-txt" id="g-rec-txt">Hesaplanıyor...</div></div>
+
+      <div class="seclbl">Spor Türün</div>
+      <div class="opts3" id="o-st">
+        <div class="oc compact" data-g="st" data-v="bb" onclick="selOpt(this,'st')"><div class="oi">🏋️</div><div class="ot"><div class="on">Vücut Geliştirme</div><div class="od">Ağırlık odaklı</div></div><div class="orad"></div></div>
+        <div class="oc compact" data-g="st" data-v="cardio" onclick="selOpt(this,'st')"><div class="oi">🏃</div><div class="ot"><div class="on">Kardiyo</div><div class="od">Kondisyon odaklı</div></div><div class="orad"></div></div>
+        <div class="oc compact" data-g="st" data-v="hybrid" onclick="selOpt(this,'st')"><div class="oi">⚡</div><div class="ot"><div class="on">Hibrit</div><div class="od">Her ikisi de</div></div><div class="orad"></div></div>
+      </div>
+
+      <div class="seclbl" style="margin-top:8px">Kalori Hedefin</div>
+      <div class="opts" id="o-gl">
+        <div class="oc" data-g="gl" data-v="cut" onclick="selOpt(this,'gl')"><div class="oi">🔥</div><div class="ot"><div class="on">Yağ Kaybı (Cut)</div><div class="od" id="od-cut">Kalori açığı</div></div><div class="orad"></div></div>
+        <div class="oc" data-g="gl" data-v="recomp" onclick="selOpt(this,'gl')"><div class="oi">♻️</div><div class="ot"><div class="on">Recomp</div><div class="od" id="od-recomp">Yağ kaybı + kas kazanımı</div></div><div class="orad"></div></div>
+        <div class="oc" data-g="gl" data-v="maintain" onclick="selOpt(this,'gl')"><div class="oi">⚖️</div><div class="ot"><div class="on">Formunu Koru (Maintain)</div><div class="od" id="od-maintain">TDEE ± 0 kcal</div></div><div class="orad"></div></div>
+        <div class="oc" data-g="gl" data-v="bulk" onclick="selOpt(this,'gl')"><div class="oi">💪</div><div class="ot"><div class="on">Kütle Kazanma (Bulk)</div><div class="od" id="od-bulk">Kalori fazlası</div></div><div class="orad"></div></div>
+      </div>
+      <!-- Recomp ek seçenekler -->
+      <div id="recomp-extra" style="display:none;margin-top:10px;padding:12px;background:var(--card2);border:1px solid var(--border);border-radius:12px">
+        <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px">♻️ Recomp Karb Tercihi</div>
+        <div style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.4">Recomp'ta karbonhidrat ve yağ dengesini sen belirliyorsun:</div>
+        <div class="opts" id="o-rc">
+          <div class="oc compact" data-g="rc" data-v="lowcarb" onclick="selOpt(this,'rc')"><div class="oi">🥑</div><div class="ot"><div class="on">Düşük Karb</div><div class="od">Yüksek yağ — 1.0 g/kg</div></div><div class="orad"></div></div>
+          <div class="oc compact" data-g="rc" data-v="balanced" onclick="selOpt(this,'rc')"><div class="oi">⚖️</div><div class="ot"><div class="on">Dengeli</div><div class="od">Yağ 0.8 g/kg</div></div><div class="orad"></div></div>
+          <div class="oc compact" data-g="rc" data-v="performance" onclick="selOpt(this,'rc')"><div class="oi">🏃</div><div class="ot"><div class="on">Performans</div><div class="od">Yüksek karb — Yağ 0.6-0.7 g/kg</div></div><div class="orad"></div></div>
+        </div>
+      </div>
+      <div class="alert" id="al4">⚠️ Lütfen spor türü ve kalori hedefinizi seçin.</div>
+    </div>
+
+    <!-- S5: İlk Hafta Vücut Ölçüleri -->
+    <div class="step" id="s5">
+      <div class="step-hdr"><h2>İLK HAFTA ÖLÇÜLERİ</h2><p>Başlangıç verilerin kaydediliyor — ilerlemeyi buradan takip edeceksin</p></div>
+      <div class="ib" style="margin-bottom:4px"><span>📌</span><span>Önceki adımlardaki veriler otomatik geldi. Değiştirirsen ana profilin de güncellenir.</span></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Yaş</label><div class="iw"><input class="fi" id="s5-age" type="number" readonly><span class="iu">yaş</span></div></div>
+        <div class="fg"><label class="fl">Boy</label><div class="iw"><input class="fi" id="s5-ht" type="number" readonly><span class="iu">cm</span></div></div>
+      </div>
+      <div class="fg"><label class="fl">Vücut Ağırlığı (kg)</label><div class="iw"><input class="fi" id="s5-wt" type="number" inputmode="decimal" step="0.1"><span class="iu">kg</span></div></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Boyun (cm)</label><div class="iw"><input class="fi" id="s5-nk" type="number" inputmode="decimal" step="0.5"><span class="iu">cm</span></div></div>
+        <div class="fg"><label class="fl">Bel (cm)</label><div class="iw"><input class="fi" id="s5-wst" type="number" inputmode="decimal" step="0.5"><span class="iu">cm</span></div></div>
+      </div>
+      <div class="frow">
+        <div class="fg" id="s5-grp-spe">
+          <label class="fl" id="s5-lbl-spe">Omuz (cm)</label><div class="iw"><input class="fi" id="s5-spe" type="number" inputmode="decimal" step="0.5"><span class="iu">cm</span></div>
+        </div>
+        <div class="fg" id="s5-grp-hip">
+          <label class="fl" id="s5-lbl-hip">Kalça (cm)</label><div class="iw"><input class="fi" id="s5-hip" type="number" inputmode="decimal" step="0.5"><span class="iu">cm</span></div>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Göğüs (cm)</label><input class="fi" id="s5-ch" type="number" inputmode="decimal" step="0.5"></div>
+        <div class="fg"><label class="fl">Kol (cm)</label><input class="fi" id="s5-arm" type="number" inputmode="decimal" step="0.5"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Ön Kol (cm)</label><input class="fi" id="s5-farm" type="number" inputmode="decimal" step="0.5"></div>
+        <div class="fg"><label class="fl">Bacak (cm)</label><input class="fi" id="s5-leg" type="number" inputmode="decimal" step="0.5"></div>
+      </div>
+      <div class="fg"><label class="fl">Kalf (cm)</label><div class="iw"><input class="fi" id="s5-calf" type="number" inputmode="decimal" step="0.5"><span class="iu">cm</span></div></div>
+    </div>
+
+    <!-- S6: Özel Durumlar -->
+    <div class="step" id="s6">
+      <div class="step-hdr"><h2>ÖZEL DURUMLAR</h2><p>Önerileri kişiselleştirmek için sağlık bilgilerini paylaş</p></div>
+      <div class="ib" style="margin-bottom:4px"><span>🔒</span><span>Bu bilgiler yalnızca antrenman ve beslenme önerilerini optimize etmek için kullanılır. Dilediğin zaman atlayabilirsin.</span></div>
+      <div id="conditions-grid" style="display:grid;gap:7px"></div>
+      <div class="ib" style="margin-top:8px;border-color:rgba(46,196,182,.3);background:rgba(46,196,182,.06)"><span>✅</span><span>Hiçbiri seni ilgilendirmiyorsa direkt devam edebilirsin.</span></div>
+    </div>
+
+    </div><div class="wiz-nav">
+    <button class="btn btn-s" id="btn-back" onclick="prevStep()" style="display:none"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Geri</button>
+    <button class="btn btn-p btn-full" id="btn-next" onclick="nextStep()">Devam Et <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+  </div>
+</div>
+
+<div class="screen" id="results">
+
+  <!-- VÜCUDUM -->
+  <div class="main-section active" id="ms-vucudum">
+    <div class="tabs">
+      <div class="tab-nav">
+        <button class="tb act" onclick="switchTab('vc',this)">🧬 Analiz</button>
+        <button class="tb" onclick="switchTab('ol',this)">📏 Ölçüler</button>
+        <button class="tb" onclick="switchTab('il',this)">📈 İlerleme</button>
+      </div>
+    </div>
+    <div class="rb">
+      <div class="tc act" id="tc-vc">
+      <div class="rc">
+        <div class="rct">🔥 Vücut Yağ Oranı — Navy Formülü</div>
+        <div style="display:flex;align-items:flex-end;gap:5px"><div class="bv" id="bf-v">—</div><div class="bu">%</div></div>
+        <div id="bf-badge"></div>
+        <div class="mbar">
+          <div class="bar-lbls"><span id="bf-lo"></span><span id="bf-hi"></span></div>
+          <div class="bar-trk">
+            <div class="bar-fill" style="background:linear-gradient(90deg,#4895EF,#2EC4B6,#FF9F1C,#E63946);width:100%"></div>
+            <div class="bar-mrk" id="bf-mrk" style="left:0%"></div>
+            <div class="bar-ideal" id="bf-ideal"><div class="bar-il-top" id="bf-il">İdeal</div></div>
+          </div>
+        </div>
+        <div class="sg">
+          <div class="si"><div class="sv" id="lm-v">—</div><div class="sl">Yağsız Kütle (kg)</div></div>
+          <div class="si"><div class="sv" id="fm-v">—</div><div class="sl">Yağ Kütlesi (kg)</div></div>
+        </div>
+      </div>
+      <div class="rc">
+        <div class="rct">📊 FFMI Endeksi</div>
+        <div style="display:flex;align-items:flex-end;gap:5px"><div class="bv" id="ffmi-v">—</div></div>
+        <div id="ffmi-badge"></div>
+        <div class="ffmi-scale">
+          <div class="ffmi-seg" style="background:#4895EF;flex:4"></div>
+          <div class="ffmi-seg" style="background:#2EC4B6;flex:2"></div>
+          <div class="ffmi-seg" style="background:#9B72FF;flex:3"></div>
+          <div class="ffmi-seg" style="background:#E63946;flex:2"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text2);margin-top:3px">
+          <span id="ffmi-lo-lbl">Ort.(&lt;18)</span><span>Atletik(18-21)</span><span>Kaslı(21-25)</span><span>Elit(25+)</span>
+        </div>
+        <div class="mbar"><div class="bar-trk"><div class="bar-mrk" id="ffmi-mrk" style="left:0%"></div></div></div>
+        <div class="ib"><span>ℹ️</span><span id="ffmi-info">—</span></div>
+        <div style="margin-top:10px;text-align:center">
+          <button onclick="openFFMIDetail()" style="background:transparent;border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;color:var(--accent);cursor:pointer">📖 Detaylı Açıklama</button>
+        </div>
+      </div>
+      <div class="rc">
+        <div class="rct">⚖️ Vücut Kitle Endeksi (VKİ)</div>
+        <div style="display:flex;align-items:flex-end;gap:5px"><div class="bv" id="bmi-v">—</div></div>
+        <div id="bmi-badge"></div>
+        <div class="mbar">
+          <div class="bar-lbls"><span>Zayıf (&lt;18.5)</span><span>Normal (18.5–25)</span><span>Obez (30+)</span></div>
+          <div class="bar-trk"><div class="bar-mrk" id="bmi-mrk" style="left:0%"></div></div>
+        </div>
+        <div class="ib"><span>ℹ️</span><span id="bmi-info">—</span></div>
+      </div>
+      <div class="rc">
+        <div class="rct">🧬 Vücut Tipi Analizi & Vücut Profili</div>
+        <div id="bt-res"></div>
+        <div id="bp-res" style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border);"></div>
+      </div>
+    </div>
+      <div class="tc" id="tc-ol">
+      <div class="rc">
+        <div class="rct">📐 Oran Analizi</div>
+        <div id="ratio-content"></div>
+      </div>
+      <div class="rc">
+        <div class="rct">⚖️ İdeal Kilo Aralığı (BMI 18.5–24.9)</div>
+        <div style="display:flex;align-items:flex-end;gap:5px;margin-bottom:4px">
+          <span style="font-size:13px;color:var(--text2)">Alt:</span><div style="font-family:'Bebas Neue';font-size:30px;color:var(--success);line-height:1" id="iw-lo-v">—</div>
+          <span style="font-size:13px;color:var(--text2);margin-left:10px">Üst:</span><div style="font-family:'Bebas Neue';font-size:30px;color:var(--warn);line-height:1" id="iw-hi-v">—</div>
+          <span style="font-size:13px;color:var(--text2)">kg</span>
+        </div>
+        <div id="iw-diff" style="font-size:13px;color:var(--text2);margin-bottom:6px"></div>
+        <div class="mbar">
+          <div class="bar-lbls"><span id="iw-lo-lbl">—</span><span>Şu anki kilonuz</span><span id="iw-hi-lbl">—</span></div>
+          <div class="bar-trk"><div class="bar-mrk" id="iw-mrk" style="left:50%"></div></div>
+        </div>
+      </div>
+      <div class="rc">
+        <div class="rct">📋 Ölçülerim — Başlangıç & Şu An</div>
+        <div id="mlist"></div>
+      </div>
+    </div>
+      <div class="tc" id="tc-il">
+      <div class="rc chart-card" id="chart-bf"></div>
+      <div class="rc chart-card" id="chart-weight"></div>
+      <div class="rc chart-card" id="chart-lm"></div>
+      <div class="rc">
+        <div class="rct">📅 Ölçüm Takibi & Karşılaştırma</div>
+        <p style="color:var(--text2);font-size:12px;margin-bottom:11px">Her hafta tüm ölçülerini girerek detaylı gelişimini takip et.</p>
+        <button class="btn btn-p btn-full" onclick="openMeasurementModal()">📏 Yeni Ölçü Gir</button>
+        
+        <div id="progress-table-container" style="margin-top:15px; display:none;">
+          </div>
+      </div>
+      
+      <div class="rc">
+        <div class="rct">📈 Geçmiş Kayıtlar (Özet)</div>
+        <div id="h-list"></div>
+      </div>
+      
+      </div>
     </div>
   </div>
 
-  <!-- ══ GİRİŞ / KAYIT ══ -->
-  <div id="scr-auth" class="screen">
-    <div class="center">
-      <img src="icon.png" alt="Raven Fit" class="welcome-icon" onerror="this.style.display='none'">
-      <h1>Raven Fit</h1>
-      <p class="tag">Giriş yap veya hesap oluştur</p>
-    </div>
-    <div class="card">
-      <label>Kullanıcı adı</label>
-      <input id="au-user" type="text" autocomplete="username" placeholder="kullanıcı adın (3-20 karakter)">
-      <label>Şifre</label>
-      <input id="au-pass" type="password" autocomplete="current-password" placeholder="en az 6 karakter">
-      <div id="au-msg" class="status" style="display:none"></div>
-      <div class="nav">
-        <button data-action="authLogin">Giriş Yap</button>
-        <button class="go" data-action="authSignup">Kayıt Ol</button>
+  <!-- BESLENME -->
+  <div class="main-section" id="ms-beslenme">
+    <div class="rb">
+      <!-- 1. Günlük Kalori Hedefi -->
+      <div class="rc">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <div class="rct" style="margin-bottom:0">🎯 Günlük Kalori Hedefi</div>
+          <button onclick="openGoalQuickEdit()" style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:6px 9px;color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:4px;font-size:11px;font-family:'Outfit',sans-serif;transition:all .2s" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'" title="Hedefi Düzenle">
+            <span style="font-size:14px">⚙️</span>
+            <span>Düzenle</span>
+          </button>
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:5px"><div class="bv" id="cal-v">—</div><div class="bu">kcal</div></div>
+        <div id="goal-badge"></div>
+        <div id="cal-floor-warn" style="display:none;margin-top:8px;padding:9px 11px;background:rgba(255,159,28,.09);border:1px solid rgba(255,159,28,.4);border-radius:8px;font-size:11px;color:var(--text2);line-height:1.5"></div>
+        <div class="ib" style="margin-top:9px"><span>🔥</span><span>TDEE: <strong id="tdee-info">—</strong> kcal &nbsp;|&nbsp; BMR (K-McA): <strong id="bmr-info">—</strong> kcal</span></div>
+        <div class="ib"><span>🏃</span><span id="act-lbl">—</span></div>
+        <div class="ib" id="workout-advice" style="display:none;border-color:rgba(255,159,28,.3);background:rgba(255,159,28,.07)"></div>
       </div>
-      <button style="width:100%;margin-top:8px" data-action="authGuest">Misafir olarak devam et</button>
-    </div>
-    <div class="ver" id="ver-auth"></div>
-  </div>
-
-  <!-- ══ HOŞ GELDİN ══ -->
-  <div id="scr-welcome" class="screen">
-    <div class="center">
-      <img src="icon.png" alt="Raven Fit" class="welcome-icon" onerror="this.style.display='none'">
-      <h1>Raven Fit</h1>
-      <p class="tag">Kişisel fitness analiz & antrenman</p>
-    </div>
-    <div class="card">
-      <div id="selftest" class="status">Öz-test çalışıyor…</div>
-      <div id="pwa" class="status">Service worker kontrol ediliyor…</div>
-    </div>
-    <button class="go" style="width:100%" data-action="wizNext">Başla →</button>
-    <div class="ver" id="ver-welcome"></div>
-  </div>
-
-  <!-- ══ ADIM 1: TEMEL ══ -->
-  <div id="scr-basic" class="screen">
-    <div class="prog">ADIM 1 / 4</div>
-    <h2>Temel Bilgiler</h2>
-    <div class="card">
-      <div class="lbl">Cinsiyet</div>
-      <div class="pills">
-        <button data-action="setGender" data-arg="male">Erkek</button>
-        <button data-action="setGender" data-arg="female">Kadın</button>
+      <!-- 2. Makro Dağılımı + Protein (birleşik) -->
+      <div class="rc">
+        <div class="rct">🥗 Makro Dağılımı</div>
+        <div class="mg">
+          <div class="mi"><div class="mv mp" id="mp-v">—</div><div class="mu">gram/gün</div><div class="ml mp">Protein</div></div>
+          <div class="mi"><div class="mv mc" id="mc-v">—</div><div class="mu">gram/gün</div><div class="ml mc">Karbonhidrat</div></div>
+          <div class="mi"><div class="mv mf" id="mf-v">—</div><div class="mu">gram/gün</div><div class="ml mf">Yağ</div></div>
+        </div>
+        <div class="mg" style="margin-top:5px">
+          <div class="mi"><div class="mv mp" style="font-size:13px" id="mp-c">—</div><div class="mu">kcal</div></div>
+          <div class="mi"><div class="mv mc" style="font-size:13px" id="mc-c">—</div><div class="mu">kcal</div></div>
+          <div class="mi"><div class="mv mf" style="font-size:13px" id="mf-c">—</div><div class="mu">kcal</div></div>
+        </div>
+        <!-- Protein detay — makronun içinde -->
+        <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
+          <div style="display:flex;align-items:flex-end;gap:6px;margin-bottom:4px">
+            <span style="font-size:13px;font-weight:700;color:var(--accent)">🥩</span>
+            <span style="font-size:13px;font-weight:700;color:var(--text)">Günlük Protein:</span>
+            <span style="font-size:18px;font-weight:700;color:var(--accent)" id="prot-v">—</span>
+            <span style="font-size:11px;color:var(--text2)">g/gün</span>
+          </div>
+          <div class="ib" style="margin-top:4px"><span>💡</span><span id="prot-info">—</span></div>
+        </div>
       </div>
-      <div class="row">
-        <div><label>Yaş</label><input id="in-age" type="number" value="25"></div>
-        <div><label>Boy (cm)</label><input id="in-height" type="number" value="180"></div>
+      <!-- 3. Su Takibi -->
+      <div class="rc">
+        <div class="rct">💧 Günlük Su Takibi</div>
+        <div class="water-d">
+          <div style="font-size:34px">💧</div>
+          <div><div class="water-v" id="water-v">—<span class="water-u"> lt</span></div>
+          <div style="font-size:11px;color:var(--text2);margin-top:3px" id="water-cups">—</div></div>
+        </div>
+        <div class="water-progress"><div class="water-progress-fill" id="water-prog-fill" style="width:0%"></div></div>
+        <div id="water-cups-grid" class="water-cups-grid"></div>
+        <div class="water-status">
+          <span id="water-status-txt">İçilen: 0 lt / Hedef: — lt</span>
+          <button class="btn btn-s" style="padding:5px 10px;font-size:10px" onclick="resetWaterToday()">Sıfırla</button>
+        </div>
+        <div id="water-supp-note"></div>
+        <div id="water-hypo-warn" style="display:none;margin-top:8px;padding:9px 11px;background:rgba(230,57,70,.09);border:1px solid rgba(230,57,70,.35);border-radius:8px;font-size:11px;color:var(--text2);line-height:1.5"></div>
       </div>
-      <label>Kilo (kg)</label><input id="in-weight" type="number" value="80">
-    </div>
-    <div class="nav">
-      <button data-action="wizBack">← Geri</button>
-      <button class="go" data-action="wizNext">İleri →</button>
-    </div>
-  </div>
-
-  <!-- ══ ADIM 2: ÖLÇÜLER ══ -->
-  <div id="scr-measure" class="screen">
-    <div class="prog">ADIM 2 / 4</div>
-    <h2>Ölçüler</h2>
-    <div class="card">
-      <div class="row">
-        <div><label>Boyun (cm)</label><input id="in-neck" type="number" value="40"></div>
-        <div><label>Bel (cm)</label><input id="in-waist" type="number" value="85"></div>
-      </div>
-      <div class="row">
-        <div><label>Kalça (cm — kadın)</label><input id="in-hip" type="number" value="95"></div>
-        <div><label>Omuz (cm — ops.)</label><input id="in-shoulder" type="number" placeholder="—"></div>
-      </div>
-    </div>
-    <div class="nav">
-      <button data-action="wizBack">← Geri</button>
-      <button class="go" data-action="wizNext">İleri →</button>
+      <!-- 4. Araçlar Grid (3 sütun) -->
+      <div id="beslenme-tools-grid"></div>
+      <!-- 5. Açılır paneller (JS ile render edilir) -->
+      <div id="beslenme-panel-content"></div>
     </div>
   </div>
 
-  <!-- ══ ADIM 3: AKTİVİTE ══ -->
-  <div id="scr-activity" class="screen">
-    <div class="prog">ADIM 3 / 4</div>
-    <h2>Aktivite Düzeyi</h2>
-    <div class="card">
-      <div class="lbl">Günlük hareket + egzersiz yoğunluğun</div>
-      <div class="pills">
-        <button data-action="setAct" data-arg="1.2">Sedanter</button>
-        <button data-action="setAct" data-arg="1.375">Az</button>
-        <button data-action="setAct" data-arg="1.55">Orta</button>
-        <button data-action="setAct" data-arg="1.725">Çok</button>
-        <button data-action="setAct" data-arg="1.9">Aşırı</button>
-      </div>
-    </div>
-    <div class="nav">
-      <button data-action="wizBack">← Geri</button>
-      <button class="go" data-action="wizNext">İleri →</button>
+  <!-- ANTRENMAN -->
+  <div class="main-section" id="ms-antrenman">
+    <div class="rb">
+      <!-- Program Yönetimi (dinamik render) -->
+      <div id="workout-main"></div>
     </div>
   </div>
 
-  <!-- ══ ADIM 4: DENEYİM & HEDEF ══ -->
-  <div id="scr-goal" class="screen">
-    <div class="prog">ADIM 4 / 4</div>
-    <h2>Deneyim & Hedef</h2>
-    <div class="card">
-      <div class="lbl">Antrenman geçmişin</div>
-      <div class="pills">
-        <button data-action="setTrain" data-arg="beginner">Yeni</button>
-        <button data-action="setTrain" data-arg="intermediate">Orta</button>
-        <button data-action="setTrain" data-arg="advanced">İleri</button>
-      </div>
-      <div class="lbl">Hedefin</div>
-      <div class="pills">
-        <button data-action="setGoal" data-arg="cut">Cut</button>
-        <button data-action="setGoal" data-arg="recomp">Recomp</button>
-        <button data-action="setGoal" data-arg="maintain">Koru</button>
-        <button data-action="setGoal" data-arg="bulk">Bulk</button>
+  <!-- PROFİL -->
+  <div class="main-section" id="ms-profil">
+    <div class="r-hero">
+      <div class="r-card-hero">
+        <!-- Avatar sağda -->
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+          <div style="flex:1;min-width:0">
+            <div class="r-name" id="r-name">Analiz Tamamlandı</div>
+            <div class="r-title">SONUÇLARIN HAZIR</div>
+            <div class="r-stats">
+              <div class="rs"><div class="rs-v" id="r-bf">—</div><div class="rs-l">Yağ Oranı</div></div>
+              <div class="rs"><div class="rs-v" id="r-lm">—</div><div class="rs-l">Yağsız Kütle</div></div>
+              <div class="rs"><div class="rs-v" id="r-ffmi">—</div><div class="rs-l">FFMI</div></div>
+              <div class="rs"><div class="rs-v" id="r-cal">—</div><div class="rs-l">Günlük Kalori</div></div>
+            </div>
+          </div>
+          <div class="avatar-wrap">
+            <div class="avatar" id="profile-avatar" onclick="triggerAvatarUpload()">
+              <span id="avatar-initials">?</span>
+              <img id="avatar-img" src="" style="display:none">
+            </div>
+            <div class="avatar-cam" onclick="triggerAvatarUpload()" title="Fotoğraf değiştir">📷</div>
+            <input type="file" id="avatar-file-input" accept="image/*" style="display:none" onchange="handleAvatarUpload(this)">
+          </div>
+        </div>
       </div>
     </div>
-    <div class="nav">
-      <button data-action="wizBack">← Geri</button>
-      <button class="go" data-action="wizNext">Sonuçları Gör →</button>
+    <div class="rb">
+      <!-- Hesap bilgisi + Ayarlar butonu -->
+      <div class="rc">
+        <div class="rct">👤 Hesabım</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0">
+          <div>
+            <div style="font-size:11px;color:var(--text2);margin-bottom:2px">Giriş yapılan hesap</div>
+            <div id="user-email-display" style="font-size:14px;font-weight:600;color:var(--text)">—</div>
+            <div id="guest-mode-note" style="display:none;font-size:10px;color:var(--warn);margin-top:2px">👀 Misafir Modu — veriler buluta kaydedilmiyor</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button onclick="openSettingsDrawer()" style="background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:8px 14px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer">⚙️ Ayarlar</button>
+            <button onclick="doLogout()" style="background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:8px 14px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer">🚪 Çıkış</button>
+          </div>
+        </div>
+        <!-- Özel Durumlar düzenle butonu -->
+        <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px">🩺 Özel Durumlarım</div>
+              <div id="conditions-summary" style="font-size:11px;color:var(--text2);line-height:1.4">Yükleniyor...</div>
+            </div>
+            <button onclick="openConditionsEdit()" style="background:var(--card2);border:1.5px solid var(--accent);border-radius:9px;padding:8px 14px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;color:var(--accent);cursor:pointer;flex-shrink:0;margin-left:10px">⚙️ Düzenle</button>
+          </div>
+        </div>
+      </div>
+      <!-- Vücut Gelişimim -->
+      <div class="rc">
+        <div class="rct">📊 Vücut Gelişimim</div>
+        <div id="mlist-profil"></div>
+      </div>
+      <!-- Rozetlerim -->
+      <div class="rc">
+        <div class="rct">🏅 Rozetlerim</div>
+        <div id="profil-badges"></div>
+      </div>
     </div>
   </div>
 
-  <!-- ══ DASHBOARD ══ -->
-  <div id="scr-dashboard" class="screen">
-    <div class="dash-head">
-      <img src="icon.png" alt="" onerror="this.style.display='none'">
-      <span class="t">Raven Fit</span>
+  <!-- Badge Popup Overlay -->
+  <div class="badge-popup-overlay" id="badge-popup-overlay">
+    <div class="confetti-container" id="confetti-container"></div>
+    <div class="badge-popup-icon" id="badge-popup-icon"></div>
+    <div class="badge-popup-name" id="badge-popup-name"></div>
+    <div class="badge-popup-desc" id="badge-popup-desc"></div>
+    <div class="badge-popup-btn">
+      <button class="btn btn-p" onclick="closeBadgePopup()" style="padding:12px 32px;font-size:14px;border-radius:12px">Harika! 🎉</button>
     </div>
-    <div id="tab-content"></div>
-    <nav class="bottomnav">
-      <button data-action="tab" data-arg="vucudum"><span class="ic">🏋️</span><span class="lb">Vücudum</span></button>
-      <button data-action="tab" data-arg="beslenme"><span class="ic">🍽️</span><span class="lb">Beslenme</span></button>
-      <button data-action="tab" data-arg="antrenman"><span class="ic">💪</span><span class="lb">Antrenman</span></button>
-      <button data-action="tab" data-arg="profil"><span class="ic">👤</span><span class="lb">Profil</span></button>
-    </nav>
   </div>
 
-  <script type="module" src="js/app.js"></script>
+  <!-- Settings Drawer overlay -->
+  <div class="settings-drawer-overlay" id="sdw-overlay" onclick="closeSettingsDrawer()"></div>
+  <!-- Settings Drawer -->
+  <div class="settings-drawer" id="settings-drawer">
+    <div class="settings-drawer-handle"></div>
+    <div style="padding:4px 20px 10px;font-family:'Bebas Neue',cursive;font-size:20px;letter-spacing:2px;color:var(--text)">AYARLAR</div>
+    <!-- Tema -->
+    <div class="sdw-theme-row">
+      <div class="sdw-theme-lbl">🎨 Görünüm Teması</div>
+      <div class="tdots">
+        <div class="tdot" data-t="dark"    style="background:#E63946" onclick="setTheme('dark')" title="Dark"></div>
+        <div class="tdot" data-t="crimson" style="background:#C0392B" onclick="setTheme('crimson')" title="Crimson"></div>
+        <div class="tdot" data-t="violet"  style="background:#9B72FF" onclick="setTheme('violet')" title="Violet"></div>
+        <div class="tdot" data-t="forest"  style="background:#22A857" onclick="setTheme('forest')" title="Forest"></div>
+        <div class="tdot" data-t="rose"    style="background:#F472B6" onclick="setTheme('rose')" title="Rose"></div>
+        <div class="tdot" data-t="light"   style="background:#E8E4DC;border:2px solid #C4BFB6" onclick="setTheme('light')" title="Light"></div>
+      </div>
+    </div>
+    <!-- Birim sistemi -->
+    <div class="sdw-theme-row">
+      <div class="sdw-theme-lbl">⚖️ Ağırlık Birimi</div>
+      <div style="display:flex;background:var(--card2);border-radius:9px;padding:3px;border:1px solid var(--border)">
+        <button data-unit-btn="kg" onclick="setUnit('kg')" style="flex:1;padding:9px;border:none;border-radius:6px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:transparent;color:var(--text2)">KG (Metrik)</button>
+        <button data-unit-btn="lb" onclick="setUnit('lb')" style="flex:1;padding:9px;border:none;border-radius:6px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:transparent;color:var(--text2)">LB (İngiliz)</button>
+      </div>
+    </div>
+    <!-- Seviye -->
+    <div class="sdw-theme-row">
+      <div class="sdw-theme-lbl">🎚️ Antrenman Seviyesi</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        <button data-level-btn="auto" onclick="setUserLevelMode('auto');refreshLevelButtons()" style="padding:8px 4px;border:1.5px solid var(--border);border-radius:8px;background:var(--card2);color:var(--text2);font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;cursor:pointer">🤖 Otomatik</button>
+        <button data-level-btn="beginner" onclick="setUserLevelMode('beginner');refreshLevelButtons()" style="padding:8px 4px;border:1.5px solid var(--border);border-radius:8px;background:var(--card2);color:var(--text2);font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;cursor:pointer">🌱 Yeni Başlayan</button>
+        <button data-level-btn="intermediate" onclick="setUserLevelMode('intermediate');refreshLevelButtons()" style="padding:8px 4px;border:1.5px solid var(--border);border-radius:8px;background:var(--card2);color:var(--text2);font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;cursor:pointer">💪 Orta Seviye</button>
+        <button data-level-btn="advanced" onclick="setUserLevelMode('advanced');refreshLevelButtons()" style="padding:8px 4px;border:1.5px solid var(--border);border-radius:8px;background:var(--card2);color:var(--text2);font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;cursor:pointer">🔥 İleri Seviye</button>
+      </div>
+      <div id="sdw-level-auto-info" style="margin-top:6px;font-size:10px;color:var(--text3)">—</div>
+    </div>
+    <div class="sdw-sep"></div>
+    <button class="sdw-item" onclick="startWizard();closeSettingsDrawer()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      Bilgilerimi Güncelle
+    </button>
+    <button class="sdw-item" onclick="exportData();closeSettingsDrawer()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Verileri Dışa Aktar
+    </button>
+    <button class="sdw-item" onclick="importData();closeSettingsDrawer()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Verileri İçe Aktar
+    </button>
+    <div class="sdw-sep"></div>
+    <button class="sdw-item danger" onclick="resetAll();closeSettingsDrawer()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      Tüm Verileri Sıfırla
+    </button>
+    <div style="height:20px"></div>
+  </div>
+
+</div><!-- Toast -->
+<div id="rf-toast" style="position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--card);border:1px solid var(--border);border-radius:12px;padding:11px 18px;font-size:13px;color:var(--text);z-index:1100;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.4)"></div>
+
+<!-- Confirm Modal -->
+<div class="modal-overlay" id="rf-confirm-overlay">
+  <div class="modal-content" style="max-width:340px">
+    <div class="modal-header">
+      <div class="modal-title" id="rf-confirm-title">Emin misin?</div>
+    </div>
+    <div id="rf-confirm-body" style="color:var(--text2);font-size:13px;margin-bottom:18px;line-height:1.5"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-s btn-full" id="rf-confirm-cancel" onclick="rfConfirmCancel()">İptal</button>
+      <button class="btn btn-p btn-full" id="rf-confirm-ok" onclick="rfConfirmOk()">Evet</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="measureModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <div class="modal-title">Haftalık Ölçümler</div>
+      <button class="modal-close" onclick="closeMeasurementModal()">✕</button>
+    </div>
+    <div style="color:var(--text2);font-size:11px;margin-bottom:12px;">Yeni ölçülerini girdiğinde ana profilindeki kalori, makro, vücut tipi ve yağ oranları otomatik güncellenecektir.</div>
+    
+    <div class="frow" style="margin-bottom:8px">
+      <div class="fg"><label class="fl">Yaş</label><input class="fi" id="m-age" type="number" inputmode="numeric" min="10" max="100" placeholder="ör. 28"></div>
+      <div class="fg"><label class="fl">Boy (cm)</label><input class="fi" id="m-ht" type="number" inputmode="decimal" step="0.5" min="100" max="250" placeholder="ör. 178"></div>
+    </div>
+    <div class="fg" style="margin-bottom:8px"><label class="fl">Vücut Ağırlığı (kg)</label><input class="fi" id="m-wt" type="number" inputmode="decimal" step="0.1"></div>
+    <div class="frow" style="margin-bottom:8px">
+      <div class="fg"><label class="fl">Boyun (cm)</label><input class="fi" id="m-nk" type="number" inputmode="decimal" step="0.5"></div>
+      <div class="fg"><label class="fl">Bel (cm)</label><input class="fi" id="m-wst" type="number" inputmode="decimal" step="0.5"></div>
+    </div>
+    <div class="frow" style="margin-bottom:8px">
+      <div class="fg" id="modal-shoulder-grp"><label class="fl">Omuz (cm)</label><input class="fi" id="m-sh" type="number" inputmode="decimal" step="0.5"></div>
+      <div class="fg"><label class="fl">Göğüs (cm)</label><input class="fi" id="m-ch" type="number" inputmode="decimal" step="0.5"></div>
+    </div>
+    <div class="frow" style="margin-bottom:8px">
+      <div class="fg"><label class="fl">Kol (cm)</label><input class="fi" id="m-arm" type="number" inputmode="decimal" step="0.5"></div>
+      <div class="fg"><label class="fl">Ön Kol (cm)</label><input class="fi" id="m-farm" type="number" inputmode="decimal" step="0.5"></div>
+    </div>
+    <div class="frow" style="margin-bottom:15px">
+      <div class="fg"><label class="fl">Kalça (cm)</label><input class="fi" id="m-hip" type="number" inputmode="decimal" step="0.5"></div>
+      <div class="fg"><label class="fl">Bacak (cm)</label><input class="fi" id="m-leg" type="number" inputmode="decimal" step="0.5"></div>
+    </div>
+    <div class="fg" style="margin-bottom:15px"><label class="fl">Kalf (cm)</label><input class="fi" id="m-calf" type="number" inputmode="decimal" step="0.5"></div>
+    
+    <button class="btn btn-p btn-full" onclick="saveWeeklyMeasurements()">💾 Kaydet & Raporu Güncelle</button>
+  </div>
+</div>
+
+
+<!-- Supplement Modal -->
+<div class="modal-overlay" id="supp-modal">
+  <div class="modal-content" style="display:flex;flex-direction:column;padding:0;max-height:92vh">
+    <div style="padding:16px 20px 12px;border-bottom:1px solid var(--border);flex-shrink:0">
+      <div class="modal-header" style="margin-bottom:8px">
+        <div class="modal-title">💊 Supplement Analizi</div>
+        <button class="modal-close" onclick="closeSuppModal()">✕</button>
+      </div>
+      <div id="supp-progress" class="supp-progress" style="margin-bottom:0"></div>
+    </div>
+    <div id="supp-body" style="flex:1;overflow-y:auto;padding:16px 20px"></div>
+    <div class="supp-nav" id="supp-nav" style="padding:12px 20px;border-top:1px solid var(--border);flex-shrink:0;background:var(--card)">
+      <button class="btn btn-s" id="supp-back" onclick="suppBack()" style="display:none">← Geri</button>
+      <button class="btn btn-p btn-full" id="supp-next" onclick="suppNext()">Devam →</button>
+    </div>
+  </div>
+</div>
+
+<nav class="bottom-nav" id="bottom-nav">
+  <button class="bnav-btn active" id="bnav-vucudum" onclick="switchMain('vucudum')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2C9.5 2 7.5 4 7.5 6.5c0 2 1.2 3.7 3 4.4V22h3V10.9c1.8-.7 3-2.4 3-4.4C16.5 4 14.5 2 12 2z"/>
+      <path d="M9 14H7a2 2 0 0 0-2 2v2h14v-2a2 2 0 0 0-2-2h-2"/>
+    </svg>
+    Vücudum
+  </button>
+  <button class="bnav-btn" id="bnav-beslenme" onclick="switchMain('beslenme')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 3h18v4H3z"/><path d="M5 7v11a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7"/>
+      <path d="M10 12h4"/><path d="M10 16h4"/>
+    </svg>
+    Beslenme
+  </button>
+  <button class="bnav-btn" id="bnav-antrenman" onclick="switchMain('antrenman')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 4v16M18 4v16M6 12h12M3 7h3M18 7h3M3 17h3M18 17h3"/>
+    </svg>
+    Antrenman
+  </button>
+  <button class="bnav-btn" id="bnav-profil" onclick="switchMain('profil')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="8" r="4"/>
+      <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+    </svg>
+    Profil
+  </button>
+</nav>
+
+<!-- ══ AKTİF ANTRENMAN EKRANI ════════════════════════════════ -->
+<div class="ws-screen" id="ws-screen">
+  <!-- Header -->
+  <div class="ws-header">
+    <button onclick="confirmEndWorkout()" style="background:none;border:none;color:var(--text2);cursor:pointer;padding:4px;font-size:20px;flex-shrink:0">✕</button>
+    <div class="ws-header-title">
+      <div class="ws-prog" id="ws-prog-name">—</div>
+      <div class="ws-day" id="ws-day-name">—</div>
+    </div>
+    <div class="ws-timer" id="ws-elapsed">00:00</div>
+  </div>
+  <!-- Progress bar -->
+  <div class="ws-progress-bar"><div class="ws-progress-fill" id="ws-prog-fill" style="width:0%"></div></div>
+  <!-- Body: egzersiz kartları buraya render edilir -->
+  <div class="ws-body" id="ws-body"></div>
+  <!-- Footer -->
+  <div class="ws-footer">
+    <button class="btn btn-s" onclick="ws_prevExercise()" id="ws-btn-prev" style="flex-shrink:0">← Önceki</button>
+    <button class="btn btn-p btn-full" onclick="ws_nextExercise()" id="ws-btn-next">Sonraki Egzersiz →</button>
+  </div>
+</div>
+
+<!-- ══ DİNLENME OVERLAY ═══════════════════════════════════════ -->
+<div class="ws-rest-overlay" id="ws-rest-overlay">
+  <div style="font-size:13px;color:var(--text2);text-transform:uppercase;letter-spacing:1px">DİNLENME</div>
+  <div class="ws-rest-ring">
+    <svg width="190" height="190" viewBox="0 0 190 190">
+      <circle cx="95" cy="95" r="85" fill="none" stroke="var(--border)" stroke-width="8"/>
+      <circle id="ws-rest-circle" cx="95" cy="95" r="85" fill="none" stroke="var(--accent)" stroke-width="8"
+        stroke-linecap="round"
+        stroke-dasharray="534" stroke-dashoffset="0"
+        style="transition:stroke-dashoffset .95s linear;transform:rotate(-90deg);transform-origin:95px 95px"/>
+    </svg>
+    <div class="ring-inner">
+      <div class="ws-rest-num" id="ws-rest-num">60</div>
+      <div class="ws-rest-label">saniye</div>
+    </div>
+  </div>
+  <div class="ws-rest-next" id="ws-rest-next-info">—</div>
+  <div style="display:flex;gap:10px;margin-top:6px">
+    <button class="btn btn-s" onclick="ws_skipRest()" style="min-width:120px">⏭ Atla</button>
+    <button class="btn btn-s" onclick="ws_addRest(15)" style="min-width:80px">+15s</button>
+  </div>
+</div>
+
+<!-- ══ HESAPLAYICI OVERLAY ═══════════════════════════════════ -->
+<div class="calc-overlay" id="calc-overlay">
+  <div class="calc-header">
+    <button class="calc-close" onclick="closeCalculator()">✕</button>
+    <div>
+      <div class="calc-header-sub" id="calc-header-sub">HESAPLAYICI</div>
+      <div class="calc-header-title" id="calc-header-title">—</div>
+    </div>
+  </div>
+  <div class="calc-body" id="calc-body"></div>
+</div>
+
+<!-- ══ EGZERSİZ FİLTRE SHEET ═══════════════════════════════════ -->
+<div class="ex-filter-sheet-bg" id="ex-filter-bg" onclick="closeExFilter()"></div>
+<div class="ex-filter-sheet" id="ex-filter-sheet">
+  <div class="ex-filter-sheet-head">
+    <div class="ex-filter-sheet-title">🎛 FİLTRELE</div>
+    <button class="ex-filter-sheet-x" onclick="closeExFilter()">✕</button>
+  </div>
+  <div id="ex-filter-content"></div>
+  <div class="ex-filter-footer">
+    <button class="ex-filter-clear" onclick="clearExFilters()">Temizle</button>
+    <button class="ex-filter-apply" onclick="applyExFilters()">UYGULA</button>
+  </div>
+</div>
+
+<!-- ══ HEDEF HIZLI DÜZENLEME OVERLAY ══════════════════════════ -->
+<div class="calc-overlay" id="goal-edit-overlay">
+  <div class="calc-header">
+    <button class="calc-close" onclick="closeGoalQuickEdit()">✕</button>
+    <div>
+      <div class="calc-header-sub">HEDEFİNİ DÜZENLE</div>
+      <div class="calc-header-title">⚙️ HIZLI AYAR</div>
+    </div>
+  </div>
+  <div class="calc-body" id="goal-edit-body">
+    <!-- İçerik openGoalQuickEdit() ile dolduruluyor -->
+  </div>
+</div>
+
+<!-- ══ ÖZEL DURUMLAR DÜZENLEME OVERLAY ═════════════════════════ -->
+<div class="calc-overlay" id="conditions-edit-overlay">
+  <div class="calc-header">
+    <button class="calc-close" onclick="closeConditionsEdit()">✕</button>
+    <div>
+      <div class="calc-header-sub">SAĞLIK BİLGİLERİN</div>
+      <div class="calc-header-title">🩺 ÖZEL DURUMLAR</div>
+    </div>
+  </div>
+  <div class="calc-body" id="conditions-edit-body">
+    <div style="font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:14px;padding:10px 12px;background:rgba(76,201,240,.06);border-left:3px solid var(--info);border-radius:8px">
+      ℹ️ Beyan ettiğin özel durumlar uygulamayı kişiselleştirir. Egzersiz seçimleri ve önerilerde bu bilgiler dikkate alınır.
+    </div>
+    <div id="conditions-edit-grid"></div>
+    <div style="margin-top:18px;display:flex;gap:10px">
+      <button onclick="closeConditionsEdit()" style="flex:1;background:var(--card2);border:1px solid var(--border);border-radius:11px;padding:13px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;font-family:'Outfit',sans-serif">İptal</button>
+      <button onclick="saveConditionsEdit()" style="flex:2;background:var(--accent);border:none;border-radius:11px;padding:13px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;font-family:'Outfit',sans-serif;letter-spacing:.5px">KAYDET</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ISINMA / SOĞUMA OVERLAY ══════════════════════════════ -->
+
+<!-- ══ FFMI DETAY MODALI ══════════════════════════════════ -->
+<div class="calc-overlay" id="ffmi-detail-overlay">
+  <div class="calc-header">
+    <button class="calc-close" onclick="closeFFMIDetail()">✕</button>
+    <div>
+      <div class="calc-header-sub">YAĞSIZ KÜTLE ENDEKSİ</div>
+      <div class="calc-header-title">📊 FFMI DETAYI</div>
+    </div>
+  </div>
+  <div class="calc-body" id="ffmi-detail-body">
+    <!-- İçerik openFFMIDetail() ile dolduruluyor -->
+  </div>
+</div>
+<div id="reds-warning-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:900;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px)">
+  <div style="background:var(--card);border:2px solid var(--warn);border-radius:16px;padding:24px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(255,183,3,.3)">
+    <div style="text-align:center;margin-bottom:16px">
+      <div style="font-size:42px;margin-bottom:8px">⚠️</div>
+      <div style="font-size:18px;font-weight:800;color:var(--warn);letter-spacing:.5px">SAĞLIK BİLGİLENDİRMESİ</div>
+      <div style="font-size:11px;color:var(--text2);margin-top:4px;text-transform:uppercase;letter-spacing:1px">Düşük Yağ Oranı + Cut Riski</div>
+    </div>
+    <div id="reds-warning-body" style="font-size:13px;color:var(--text);line-height:1.6;margin-bottom:18px">
+      <!-- İçerik openRedsWarning() ile dolduruluyor -->
+    </div>
+    <div style="background:rgba(255,183,3,.08);border-left:3px solid var(--warn);border-radius:8px;padding:12px 14px;margin-bottom:14px">
+      <div style="font-size:12px;color:var(--text);line-height:1.55">
+        <strong>RED-S Nedir?</strong> Sporda Göreceli Enerji Yetersizliği (Relative Energy Deficiency in Sport), düşük enerji erişilebilirliğiyle (low energy availability) bağlantılı bir <strong>klinik sendromdur</strong>. IOC (Uluslararası Olimpiyat Komitesi) 2023 konsensüsünde tanımlanmıştır. Hem kadın hem erkek sporcuları etkileyebilir; metabolik hız, hormonal denge, kemik sağlığı, bağışıklık ve performans üzerinde olumsuz etkilerle <strong>ilişkili bulunmuştur</strong>.
+      </div>
+    </div>
+    <div style="background:rgba(76,201,240,.06);border-left:3px solid var(--info);border-radius:8px;padding:11px 13px;margin-bottom:14px;font-size:11px;color:var(--text2);line-height:1.55">
+      💡 <strong style="color:var(--info)">Alternatif öneri:</strong> Bu yağ oranında <strong>maintenance</strong> (idame), <strong>diet break</strong> veya <strong>performance odaklı beslenme</strong> daha sürdürülebilir olabilir. Kalori açığı yerine antrenman kalitesine ve toparlanmaya odaklanmak hormonal sağlığı korur.
+    </div>
+    <div style="font-size:10px;color:var(--text3);text-align:center;margin-bottom:14px;line-height:1.5;font-style:italic">
+      Bu bilgiler IOC 2023 RED-S konsensüsü ve ilgili spor bilimi literatürüne dayanır. Verdiğin yağ oranı bir <strong>tahmindir</strong> (Navy formülü ±3-5% hata payı). Kişisel sağlık kararları için bir spor hekimi veya diyetisyene danışman önerilir.
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="redsWarningCancel()" style="flex:1;background:var(--card2);border:1px solid var(--border);border-radius:11px;padding:13px;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;font-family:'Outfit',sans-serif">İptal (Maintain Seç)</button>
+      <button onclick="redsWarningProceed()" style="flex:2;background:var(--warn);border:none;border-radius:11px;padding:13px;font-size:12px;font-weight:700;color:#000;cursor:pointer;font-family:'Outfit',sans-serif;letter-spacing:.5px">Riskleri Anladım, Devam Et</button>
+    </div>
+  </div>
+</div>
+<div id="bulk-warning-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:900;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px)">
+  <div style="background:var(--card);border:2px solid var(--warn);border-radius:16px;padding:24px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(255,183,3,.3)">
+    <div style="text-align:center;margin-bottom:16px">
+      <div style="font-size:42px;margin-bottom:8px">⚠️</div>
+      <div style="font-size:18px;font-weight:800;color:var(--warn);letter-spacing:.5px">SAĞLIK BİLGİLENDİRMESİ</div>
+      <div style="font-size:11px;color:var(--text2);margin-top:4px;text-transform:uppercase;letter-spacing:1px">Yüksek Yağ Oranı + Bulk Verimi</div>
+    </div>
+    <div id="bulk-warning-body" style="font-size:13px;color:var(--text);line-height:1.6;margin-bottom:18px">
+      <!-- İçerik openBulkWarning() ile dolduruluyor -->
+    </div>
+    <div style="background:rgba(255,183,3,.08);border-left:3px solid var(--warn);border-radius:8px;padding:12px 14px;margin-bottom:14px">
+      <div style="font-size:12px;color:var(--text);line-height:1.55">
+        <strong>Bilimsel Arkaplan:</strong> Yüksek yağ oranıyla bulk yapmanın "yasak" olduğuna dair <strong>kesin bir bilimsel konsensüs yoktur</strong>. Ancak çoğunluk literatür şunu gösterir: yüksek yağ oranı insülin duyarlılığını düşürebilir, aromataz aktivitesi (yağ dokusu kaynaklı östrojen dönüşümü) artabilir ve nutrient partitioning (besin dağıtımı) yağ depolama yönüne kayabilir. Bu, kalori fazlasının daha büyük kısmının yağ olarak depolanmasıyla <strong>ilişkilendirilmiştir</strong>.
+      </div>
+    </div>
+    <div style="background:rgba(76,201,240,.06);border-left:3px solid var(--info);border-radius:8px;padding:11px 13px;margin-bottom:14px;font-size:11px;color:var(--text2);line-height:1.55">
+      💡 <strong style="color:var(--info)">Alternatif öneri:</strong> Bu yağ oranında önce <strong>recomp</strong> (yağ kaybı + kas koruma) veya <strong>hafif cut</strong> ile yağ oranını düşürmek; ardından lean bulk başlatmak — uzun vadeli kas gelişimi açısından daha verimli olabilir. <strong>"Mini-cut → lean bulk"</strong> döngüsü popüler bir yaklaşımdır.
+    </div>
+    <div style="font-size:10px;color:var(--text3);text-align:center;margin-bottom:14px;line-height:1.5;font-style:italic">
+      Bu bilgiler güncel hipertrofi literatürüne dayanır (Helms, Trexler, Nuckols, Henselmans). Eşikler <strong>kesin tıbbi sınırlar değil</strong>, kanıt-bazlı yaklaşık değerlerdir. Yağ oranın bir <strong>tahmindir</strong> (Navy formülü ±3-5% hata payı). Bireysel genetik, antrenman geçmişi ve hormon profili bu sonuçları değiştirebilir.
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="bulkWarningCancel()" style="flex:1;background:var(--card2);border:1px solid var(--border);border-radius:11px;padding:13px;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;font-family:'Outfit',sans-serif">Recomp Seç</button>
+      <button onclick="bulkWarningProceed()" style="flex:2;background:var(--warn);border:none;border-radius:11px;padding:13px;font-size:12px;font-weight:700;color:#000;cursor:pointer;font-family:'Outfit',sans-serif;letter-spacing:.5px">Riskleri Anladım, Devam Et</button>
+    </div>
+  </div>
+</div>
+
+<div class="warmup-overlay" id="warmup-overlay">
+  <div class="warmup-card">
+    <div class="warmup-icon" id="warmup-icon">🔥</div>
+    <div class="warmup-title" id="warmup-title">ISINMA</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:8px" id="warmup-desc">Antrenman öncesi 5-10 dk ısınma yapman sakatlık riskini azaltır.</div>
+    <div class="warmup-list" id="warmup-list"></div>
+    <div style="display:flex;gap:8px;margin-top:14px;align-items:stretch">
+      <button class="btn btn-s" onclick="closeWarmup(true)" style="flex:1;font-size:11px;padding:10px 0">Geç</button>
+      <button class="btn btn-s" onclick="showToast('🚧 Isınma rehberi yapım aşamasında!','warn')" style="flex:1;font-size:11px;padding:10px 0;border-color:var(--warn);color:var(--warn)">🔥 Isın</button>
+      <button class="btn btn-p" onclick="closeWarmup(false)" style="flex:2;font-size:14px;padding:14px 0;font-weight:700" id="warmup-ok-btn">▶ Başlat</button>
+    </div>
+  </div>
+</div>
+
+</main>
+</div><!-- /app-main -->
+
+<!-- ══ Uygulama modülleri ══ -->
+<!-- js/core -->
+<script src="js/core/state.js"></script>
+<script src="js/core/utils.js"></script>
+<script src="js/core/data-loader.js"></script>
+<script src="js/core/theme.js"></script>
+<script src="js/core/storage.js"></script>
+
+<!-- js/ui -->
+<script src="js/ui/toast.js"></script>
+<script src="js/ui/screens.js"></script>
+<script src="js/ui/wizard.js"></script>
+<script src="js/ui/charts.js"></script>
+
+<!-- js/health -->
+<script src="js/health/calculations.js"></script>
+<script src="js/health/goals.js"></script>
+<script src="js/health/body-profile.js"></script>
+<script src="js/health/reds-warning.js"></script>
+<script src="js/health/ffmi-detail.js"></script>
+<script src="js/health/conditions.js"></script>
+
+<!-- js/tabs -->
+<script src="js/tabs/render-all.js"></script>
+<script src="js/tabs/body.js"></script>
+<script src="js/tabs/nutrition.js"></script>
+<script src="js/tabs/measurements.js"></script>
+<script src="js/tabs/progress.js"></script>
+
+<!-- js/profile -->
+<script src="js/profile/avatar.js"></script>
+<script src="js/profile/settings.js"></script>
+<script src="js/profile/profile.js"></script>
+
+<!-- js/nutrition -->
+<script src="js/nutrition/supplements.js"></script>
+<script src="js/nutrition/panels.js"></script>
+<script src="js/nutrition/water.js"></script>
+
+<!-- js/workout -->
+<script src="js/workout/labels.js"></script>
+<script src="js/workout/data.js"></script>
+<script src="js/workout/branches.js"></script>
+<script src="js/workout/menu.js"></script>
+<script src="js/workout/library.js"></script>
+<script src="js/workout/programs.js"></script>
+<script src="js/workout/history.js"></script>
+<script src="js/workout/engine.js"></script>
+<script src="js/workout/tools.js"></script>
+
+<!-- js/calculators -->
+<script src="js/calculators/index.js"></script>
+<script src="js/calculators/one-rm.js"></script>
+<script src="js/calculators/working-set.js"></script>
+<script src="js/calculators/sleep.js"></script>
+<script src="js/calculators/pr-test.js"></script>
+
+<!-- js/badges -->
+<script src="js/badges/badges.js"></script>
+
+<!-- js/auth -->
+<script src="js/auth/firebase.js"></script>
+
+<!-- js/admin -->
+<script src="js/admin/self-test.js"></script>
+
+<!-- Başlatıcı — en son yüklenir -->
+<script src="js/app.js"></script>
+
+<!-- 🔥 Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+/* Firebase'i başlat */
+initFirebase();
+</script>
 </body>
 </html>

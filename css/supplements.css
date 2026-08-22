@@ -1,0 +1,21 @@
+/* ══════════════════════════════════════════════════════════
+   RavenFit — supplements.css
+   Supplement akordiyon ve kanıt rozetleri
+   ══════════════════════════════════════════════════════════ */
+
+/* ── SUPPLEMENT AKORDİYON & KANIT ROZETLERİ ─────────────────── */
+.supp-acc{margin-top:8px;border:1px solid var(--border);border-radius:9px;background:var(--card2);overflow:hidden}
+.supp-acc-trigger{width:100%;padding:9px 12px;background:transparent;border:none;font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;color:var(--accent);cursor:pointer;display:flex;align-items:center;justify-content:space-between;text-align:left}
+.supp-acc-trigger:hover{background:rgba(155,114,255,.05)}
+.supp-acc-chev{display:inline-block;transition:transform .25s ease;font-size:9px;color:var(--text2)}
+.supp-acc.open .supp-acc-chev{transform:rotate(90deg)}
+.supp-acc-body{max-height:0;overflow:hidden;transition:max-height .3s ease;padding:0 12px}
+.supp-acc.open .supp-acc-body{max-height:1500px;padding:0 12px 12px}
+.supp-acc-row{padding:8px 0;border-top:1px solid var(--border);font-size:11px;line-height:1.5}
+.supp-acc-row:first-child{border-top:none}
+.supp-acc-label{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;display:flex;align-items:center;gap:4px}
+.supp-acc-val{color:var(--text)}
+.evidence-rosette{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:5px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.evidence-high{background:rgba(46,196,182,.15);color:#2EC4B6;border:1px solid rgba(46,196,182,.4)}
+.evidence-mid{background:rgba(255,183,3,.15);color:#FFB703;border:1px solid rgba(255,183,3,.4)}
+.evidence-low{background:rgba(230,57,70,.15);color:#E63946;border:1px solid rgba(230,57,70,.4)}

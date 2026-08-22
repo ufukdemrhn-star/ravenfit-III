@@ -1,0 +1,49 @@
+/* ══════════════════════════════════════════════════════════
+   RavenFit — base.css
+   Header, ekranlar, splash, auth arkaplanı
+   ══════════════════════════════════════════════════════════ */
+
+/* ── HEADER ──────────────────────────────────────────────────  */
+.hdr{position:fixed;top:0;left:0;right:0;height:56px;background:var(--hbg);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:200;transition:background .3s,border-color .3s}
+.logo{display:flex;align-items:center;gap:9px;cursor:pointer;user-select:none}
+.logo-txt{font-family:'Bebas Neue',cursive;font-size:20px;letter-spacing:3px;color:var(--text);line-height:1}
+.logo-txt span{color:var(--accent)}
+
+/* ── SCREENS ─────────────────────────────────────────────────  */
+.main{padding-top:56px;min-height:100vh;position:relative;}
+.screen{display:none;min-height:calc(100vh - 56px)}
+.screen.active{display:flex;flex-direction:column}
+
+/* ── SPLASH ──────────────────────────────────────────────────  */
+#splash{align-items:center;justify-content:center;text-align:center;padding:30px 22px;position:relative;overflow:hidden}
+#splash .splash-title,#splash .splash-sub,#splash .pills,#splash .btn{position:relative;z-index:3}
+.s-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 40% at 50% 100%,var(--ag),transparent 70%);pointer-events:none}
+/* Arka plan silüeti */
+.s-silhouette{position:absolute;top:50%;left:50%;transform:translate(-50%,-54%);width:min(420px,90vw);opacity:.045;pointer-events:none;z-index:1;filter:blur(1px)}
+
+/* ── AUTH SCREEN BACKGROUND ── */
+.auth-bg-silhouette{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(1);width:min(560px,110vw);opacity:.04;pointer-events:none;z-index:0;filter:blur(2px);animation:authBgFloat 12s ease-in-out infinite}
+.auth-bg-gradient{position:absolute;inset:0;background:radial-gradient(circle at 30% 20%, var(--ag), transparent 50%), radial-gradient(circle at 70% 80%, var(--ag), transparent 50%);opacity:.6;pointer-events:none;z-index:0;animation:authBgPulse 8s ease-in-out infinite}
+@keyframes authBgFloat{0%,100%{transform:translate(-50%,-50%) scale(1) rotate(0deg)}50%{transform:translate(-50%,-52%) scale(1.05) rotate(2deg)}}
+@keyframes authBgPulse{0%,100%{opacity:.4}50%{opacity:.7}}
+@keyframes authLogoFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+/* Auth input class */
+.auth-inp{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-family:'Outfit',sans-serif;font-size:15px;outline:none;width:100%;transition:border-color .2s,box-shadow .2s;text-transform:none}
+.auth-inp.auth-err-field{border-color:var(--accent)!important;box-shadow:0 0 0 3px rgba(230,57,70,.18)!important;animation:authShake .35s}
+@keyframes authShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+
+.splash-icon{width:148px;height:148px;margin:0 auto 18px;position:relative;z-index:3;filter:drop-shadow(0 8px 28px var(--ag))}
+/* Splash animasyonları */
+.splash-icon{animation:splashLogoIn .7s cubic-bezier(.22,1,.36,1) both, float 3.5s ease-in-out 0.7s infinite}
+@keyframes splashLogoIn{from{opacity:0;transform:translateY(-36px) scale(.85)}to{opacity:1;transform:translateY(0) scale(1)}}
+.splash-title{font-family:'Bebas Neue',cursive;font-size:clamp(52px,13vw,88px);letter-spacing:7px;line-height:1;margin-bottom:3px;animation:splashFadeUp .6s .2s cubic-bezier(.22,1,.36,1) both}
+.splash-tag{font-size:10px;color:var(--text2);letter-spacing:3px;text-transform:uppercase;margin-bottom:3px;animation:splashFadeUp .5s .35s both}
+.splash-sub{font-size:13px;color:var(--text2);margin-bottom:34px;font-style:italic;animation:splashFadeUp .5s .45s both}
+@keyframes splashFadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.pills{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:34px;max-width:420px}
+.pill{background:var(--card);border:1px solid var(--border);border-radius:100px;padding:5px 11px;font-size:11px;color:var(--text2);display:flex;align-items:center;gap:5px;opacity:0;animation:splashFadeUp .4s both}
+.pill:nth-child(1){animation-delay:.5s}.pill:nth-child(2){animation-delay:.55s}.pill:nth-child(3){animation-delay:.6s}.pill:nth-child(4){animation-delay:.65s}.pill:nth-child(5){animation-delay:.7s}.pill:nth-child(6){animation-delay:.75s}.pill:nth-child(7){animation-delay:.8s}.pill:nth-child(8){animation-delay:.85s}.pill:nth-child(9){animation-delay:.9s}.pill:nth-child(10){animation-delay:.95s}
+.pill-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);flex-shrink:0}
+#splash .btn{animation:splashFadeUp .5s .9s both}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}

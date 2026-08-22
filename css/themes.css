@@ -1,0 +1,47 @@
+/* ══════════════════════════════════════════════════════════
+   RavenFit — themes.css
+   6 tema değişkeni
+   ══════════════════════════════════════════════════════════ */
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+/* ── 6 THEMES ──────────────────────────────────────────────── */
+:root,[data-theme="dark"]{
+  --bg:#080809;--bg2:#0F0F11;--card:#161618;--card2:#1E1E21;
+  --border:#2A2A2F;--text:#F2F2F4;--text2:#9090A0;--text3:#44444F;
+  --accent:#E63946;--ag:rgba(230,57,70,0.18);--hbg:rgba(8,8,9,0.92);
+  --success:#2EC4B6;--warn:#FF9F1C;--info:#4895EF;--purple:#9B72FF;
+}
+[data-theme="light"]{
+  --bg:#E8E4DC;--bg2:#DDD9D0;--card:#F5F2EC;--card2:#EAE6DE;
+  --border:#C4BFB6;--text:#17171A;--text2:#4A4A56;--text3:#9898A6;
+  --accent:#B8202C;--ag:rgba(184,32,44,0.13);--hbg:rgba(232,228,220,0.96);
+  --success:#0D9E90;--warn:#C97800;--info:#2470CC;--purple:#6B42D0;
+}
+[data-theme="violet"]{
+  --bg:#09070F;--bg2:#0F0C18;--card:#171320;--card2:#1F1829;
+  --border:#2E2840;--text:#EEEAFF;--text2:#8A84B8;--text3:#3E3850;
+  --accent:#9B72FF;--ag:rgba(155,114,255,0.18);--hbg:rgba(9,7,15,0.92);
+  --success:#2EC4B6;--warn:#FF9F1C;--info:#4895EF;--purple:#9B72FF;
+}
+[data-theme="forest"]{
+  --bg:#060D08;--bg2:#0B1410;--card:#111C14;--card2:#182419;
+  --border:#253428;--text:#E8F5EC;--text2:#8DB898;--text3:#3A4C40;
+  --accent:#22A857;--ag:rgba(34,168,87,0.17);--hbg:rgba(6,13,8,0.92);
+  --success:#22A857;--warn:#FF9F1C;--info:#4895EF;--purple:#9B72FF;
+}
+[data-theme="rose"]{
+  --bg:#0F090D;--bg2:#170D12;--card:#1E1118;--card2:#261520;
+  --border:#382030;--text:#FFECF4;--text2:#C48AAA;--text3:#4C3044;
+  --accent:#F472B6;--ag:rgba(244,114,182,0.18);--hbg:rgba(15,9,13,0.92);
+  --success:#2EC4B6;--warn:#FF9F1C;--info:#4895EF;--purple:#B472FF;
+}
+[data-theme="crimson"]{
+  --bg:#0A0204;--bg2:#110508;--card:#1A080B;--card2:#230B0F;
+  --border:#3D1418;--text:#FFF4F2;--text2:#C49A94;--text3:#5A3030;
+  --accent:#C0392B;--ag:rgba(192,57,43,0.22);--hbg:rgba(10,2,4,0.92);
+  --success:#2EC4B6;--warn:#FF9F1C;--info:#4895EF;--purple:#9B72FF;
+}
+
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;transition:background .3s,color .3s}

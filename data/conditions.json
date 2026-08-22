@@ -1,0 +1,163 @@
+{
+  "_README": {
+    "description": "Kullanıcıların wizard sırasında beyan edebileceği özel durumlar.",
+    "affects_workout": "Bu durum antrenman önerilerini etkiler — kontraendike egzersizlerde uyarı gösterilir.",
+    "affects_nutrition": "Bu durum beslenme önerilerini etkiler.",
+    "affects_supplement": "Bu durum supplement önerilerini etkiler.",
+    "warn_tags": "Bu durumla çakışan egzersiz tag'leri. exercises.json içindeki 'contraindications' ile eşleşir.",
+    "warn_message_tr": "Kullanıcıya gösterilecek Türkçe uyarı metni."
+  },
+
+  "conditions": [
+    {
+      "id": "cardiovascular",
+      "label_tr": "Kalp / Kardiyovasküler Hastalık",
+      "icon": "❤️",
+      "affects": ["workout", "nutrition", "supplement"],
+      "warn_tags": ["heavy-compound", "max-intensity", "breath-hold"],
+      "warn_message_tr": "Kalp rahatsızlığın nedeniyle yüksek yoğunluklu ve ağır bileşik hareketlerde dikkatli ol. Doktor onayı almadan maksimal yoğunluk antrenmanından kaçın.",
+      "supplement_warnings": ["preworkout", "kafein"],
+      "nutrition_notes": "Düşük sodyum, omega-3 desteği önerilir."
+    },
+    {
+      "id": "hypertension",
+      "label_tr": "Hipertansiyon (Yüksek Tansiyon)",
+      "icon": "🔴",
+      "affects": ["workout", "nutrition", "supplement"],
+      "warn_tags": ["heavy-compound", "isometric", "valsalva"],
+      "warn_message_tr": "Yüksek tansiyonun nedeniyle valsalva manevrası gerektiren ağır hareketlerden kaçın. Nefesi tutma ve ıkınmadan kaçın.",
+      "supplement_warnings": ["preworkout", "kafein"],
+      "nutrition_notes": "Düşük sodyum diyeti, DASH protokolü önerilir."
+    },
+    {
+      "id": "diabetes-type1",
+      "label_tr": "Tip 1 Diyabet",
+      "icon": "🩸",
+      "affects": ["nutrition", "supplement", "workout"],
+      "warn_tags": ["long-cardio", "fasted-training"],
+      "warn_message_tr": "Uzun süreli kardiyo sırasında kan şekeri düşebilir. Antrenman öncesi ve sonrası kan şekerini takip et.",
+      "supplement_warnings": ["malto"],
+      "nutrition_notes": "Karbonhidrat zamanlaması kritik. Egzersiz öncesi/sonrası karbonhidrat alımı gerekli."
+    },
+    {
+      "id": "diabetes-type2",
+      "label_tr": "Tip 2 Diyabet",
+      "icon": "🩸",
+      "affects": ["nutrition", "supplement"],
+      "warn_tags": [],
+      "warn_message_tr": "Düşük glisemik indeksli beslenme önerilir. Direnç antrenmanı insülin duyarlılığını artırır.",
+      "supplement_warnings": [],
+      "nutrition_notes": "Düşük GI besinler, lifli gıdalar, şekerli içeceklerden kaçın."
+    },
+    {
+      "id": "lower-back",
+      "label_tr": "Bel Fıtığı / Kronik Bel Ağrısı",
+      "icon": "🔧",
+      "affects": ["workout"],
+      "warn_tags": ["spinal-load", "heavy-deadlift", "sit-ups", "leg-press-deep"],
+      "warn_message_tr": "Omurgaya yük bindiren ve bel fleksiyonu gerektiren hareketlerde dikkatli ol. Ağır deadlift ve sit-up yerine alternatifler önerilir.",
+      "supplement_warnings": [],
+      "nutrition_notes": null
+    },
+    {
+      "id": "knee-injury",
+      "label_tr": "Diz Problemi / Diz Ağrısı",
+      "icon": "🦵",
+      "affects": ["workout"],
+      "warn_tags": ["deep-squat", "knee-impact", "jump-landing", "running"],
+      "warn_message_tr": "Derin çömelme ve diz eklemine yük bindiren hareketlerden kaçın. Düşük etkili alternatiflere yönel.",
+      "supplement_warnings": [],
+      "nutrition_notes": null
+    },
+    {
+      "id": "shoulder-injury",
+      "label_tr": "Omuz Problemi / Rotator Cuff",
+      "icon": "💪",
+      "affects": ["workout"],
+      "warn_tags": ["overhead-press", "behind-neck", "upright-row", "dip"],
+      "warn_message_tr": "Kafa üstü baskı ve yüksek gerginlik gerektiren omuz hareketlerinde dikkatli ol. Rotator cuff güçlendirme egzersizlerine öncelik ver.",
+      "supplement_warnings": [],
+      "nutrition_notes": null
+    },
+    {
+      "id": "osteoporosis",
+      "label_tr": "Osteoporoz / Kemik Erimesi",
+      "icon": "🦴",
+      "affects": ["workout", "nutrition"],
+      "warn_tags": ["high-impact", "jump", "contact-risk"],
+      "warn_message_tr": "Yüksek etkili ve çarpışma riski olan hareketlerden kaçın. Düşük etkili direnç antrenmanı kemik yoğunluğu için önerilir.",
+      "supplement_warnings": [],
+      "nutrition_notes": "Kalsiyum ve D vitamini alımı kritik."
+    },
+    {
+      "id": "asthma",
+      "label_tr": "Astım",
+      "icon": "🫁",
+      "affects": ["workout"],
+      "warn_tags": ["cold-air-training", "high-intensity-cardio", "chlorine-pool"],
+      "warn_message_tr": "Yüksek yoğunluklu kardiyo sırasında inhaler yanında bulundur. Soğuk havada açık alan antrenmanından kaçın.",
+      "supplement_warnings": ["preworkout"],
+      "nutrition_notes": null
+    },
+    {
+      "id": "pregnancy",
+      "label_tr": "Hamilelik",
+      "icon": "🤱",
+      "affects": ["workout", "nutrition", "supplement"],
+      "warn_tags": ["supine-after-12weeks", "heavy-compound", "contact-sport", "breath-hold", "high-impact"],
+      "warn_message_tr": "Hamilelikte doktor onayı al. 12. haftadan sonra sırt üstü yatış gerektiren egzersizlerden kaçın. Orta yoğunluklu aktiviteler güvenlidir.",
+      "supplement_warnings": ["preworkout", "kafein", "kreatin"],
+      "nutrition_notes": "Folat, demir, omega-3 alımı kritik. Kafein kısıtlaması gerekli."
+    },
+    {
+      "id": "epilepsy",
+      "label_tr": "Epilepsi / Nöbet Bozukluğu",
+      "icon": "⚡",
+      "affects": ["workout"],
+      "warn_tags": ["solo-swimming", "cycling-road", "climbing"],
+      "warn_message_tr": "Yalnız yüzme, yüksekte çalışma veya trafik ortamında bisiklet gibi nöbet durumunda tehlikeli olabilecek aktivitelerden kaçın. Refakatçiyle antrenman et.",
+      "supplement_warnings": ["preworkout", "kafein"],
+      "nutrition_notes": null
+    },
+    {
+      "id": "vegetarian",
+      "label_tr": "Vejetaryen",
+      "icon": "🥬",
+      "affects": ["nutrition", "supplement"],
+      "warn_tags": [],
+      "warn_message_tr": null,
+      "supplement_warnings": [],
+      "nutrition_notes": "Protein çeşitliliğine dikkat. B12, demir, çinko takibi önerilir."
+    },
+    {
+      "id": "vegan",
+      "label_tr": "Vegan",
+      "icon": "🌱",
+      "affects": ["nutrition", "supplement"],
+      "warn_tags": [],
+      "warn_message_tr": null,
+      "supplement_warnings": [],
+      "nutrition_notes": "B12 takviyesi şart. Omega-3 (alg bazlı), demir, çinko, D vitamini, kreatin takviyesi önerilir."
+    },
+    {
+      "id": "gluten",
+      "label_tr": "Gluten Hassasiyeti / Çölyak",
+      "icon": "🌾",
+      "affects": ["nutrition"],
+      "warn_tags": [],
+      "warn_message_tr": null,
+      "supplement_warnings": [],
+      "nutrition_notes": "Maltodekstrin ve bazı protein tozlarında gluten bulunabilir. Supplement etiketlerini kontrol et."
+    },
+    {
+      "id": "lactose",
+      "label_tr": "Laktoz İntoleransı",
+      "icon": "🥛",
+      "affects": ["nutrition", "supplement"],
+      "warn_tags": [],
+      "warn_message_tr": null,
+      "supplement_warnings": ["whey-regular"],
+      "nutrition_notes": "Whey izolat veya bitkisel protein tozları önerilir. Kazein ve regular whey'den kaçın."
+    }
+  ]
+}

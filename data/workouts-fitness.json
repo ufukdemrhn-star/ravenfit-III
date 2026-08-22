@@ -1,0 +1,205 @@
+{
+  "_README": {
+    "title": "RavenFit — Fitness Antrenman Programları",
+    "version": "1.0.0",
+
+    "PROGRAM_EKLEME_REHBERİ": {
+      "id": "Benzersiz tanımlayıcı. Küçük harf, tire. Örn: 'upper-lower-4day'. ASLA değiştirme.",
+      "name_tr": "Programın Türkçe adı.",
+      "branch": "Hangi branşa ait: 'fitness'",
+      "days_per_week": "Haftada kaç gün antrenman. Sayı olarak gir: 2, 3, 4, 5, 6",
+      "goal": "Bu program hangi hedefler için uygundur. Dizi: ['bulk', 'cut', 'recomp', 'health', 'perf']",
+      "difficulty": "1=Başlangıç | 2=Orta | 3=İleri",
+      "duration_weeks": "Programın önerilen süresi (hafta). Sayı.",
+      "description_tr": "Programın kısa açıklaması.",
+      "progressive_overload": "Progressive overload kuralları.",
+
+      "GÜNLER": {
+        "day": "1'den başlayan gün numarası. Sıralı olmalı.",
+        "name": "Günün adı. Örn: 'Push', 'Pull', 'Legs', 'Üst Vücut', 'Alt Vücut'",
+        "exercises": "O güne ait egzersizler dizisi.",
+
+        "EGZERSİZ_ALANLARI": {
+          "exercise_id": "exercises-fitness.json'daki egzersiz id'si. BÜYÜK/KÜÇÜK harf duyarlı.",
+          "sets": "Set sayısı. Sayı. Örn: 4",
+          "reps": "Tekrar sayısı. String olarak yaz. Örn: '8-10' veya '12' veya '30sn'",
+          "rest_sec": "Set arası dinlenme süresi (saniye). Sayı. Örn: 90",
+          "rpe": "RPE (Effort algısı). 1-10. Opsiyonel.",
+          "tempo": "Tempo. '3-1-2-0' formatı (iniş-alt duraklama-çıkış-üst duraklama). Opsiyonel.",
+          "notes_tr": "O egzersiz için özel not. Opsiyonel."
+        }
+      }
+    }
+  },
+
+  "workouts": [
+
+    {
+      "id": "push-pull-legs-3day",
+      "name_tr": "Push Pull Legs — 3 Gün",
+      "branch": "fitness",
+      "days_per_week": 3,
+      "goal": ["bulk", "recomp"],
+      "difficulty": 2,
+      "duration_weeks": 8,
+      "description_tr": "Klasik Push-Pull-Legs split. Haftada 3 gün, her kas grubu haftada 2 kez çalışır. Orta-ileri seviye için idealdir.",
+      "progressive_overload": {
+        "rule": "Her egzersizde belirtilen tekrar sayısının üst sınırını 2 hafta üst üste tamamlarsan, bir sonraki haftada ağırlığı %5 artır.",
+        "minimum_reps_before_increase": 2
+      },
+      "days": [
+        {
+          "day": 1,
+          "name": "Push (Göğüs, Omuz, Triceps)",
+          "exercises": [
+            { "exercise_id": "bench-press",           "sets": 4, "reps": "6-8",  "rest_sec": 120, "rpe": 8 },
+            { "exercise_id": "incline-bench-press",    "sets": 3, "reps": "8-10", "rest_sec": 90  },
+            { "exercise_id": "overhead-press",         "sets": 3, "reps": "8-10", "rest_sec": 90  },
+            { "exercise_id": "lateral-raise",          "sets": 3, "reps": "12-15","rest_sec": 60  },
+            { "exercise_id": "dumbbell-flye",          "sets": 3, "reps": "12-15","rest_sec": 60  },
+            { "exercise_id": "tricep-pushdown",        "sets": 3, "reps": "12-15","rest_sec": 60  }
+          ]
+        },
+        {
+          "day": 2,
+          "name": "Pull (Sırt, Biceps)",
+          "exercises": [
+            { "exercise_id": "pull-up",               "sets": 4, "reps": "6-8",  "rest_sec": 120, "notes_tr": "Yapamıyorsan assisted pull-up veya lat pulldown ile değiştir." },
+            { "exercise_id": "bent-over-row",         "sets": 4, "reps": "6-8",  "rest_sec": 120 },
+            { "exercise_id": "lat-pulldown",          "sets": 3, "reps": "10-12","rest_sec": 90  },
+            { "exercise_id": "face-pull",             "sets": 3, "reps": "15-20","rest_sec": 60  },
+            { "exercise_id": "barbell-curl",          "sets": 3, "reps": "10-12","rest_sec": 60  }
+          ]
+        },
+        {
+          "day": 3,
+          "name": "Legs (Bacak, Kalça, Kalf)",
+          "exercises": [
+            { "exercise_id": "squat",                 "sets": 4, "reps": "6-8",  "rest_sec": 150 },
+            { "exercise_id": "romanian-deadlift",     "sets": 3, "reps": "8-10", "rest_sec": 120 },
+            { "exercise_id": "hip-thrust",            "sets": 3, "reps": "10-12","rest_sec": 90  },
+            { "exercise_id": "calf-raise",            "sets": 4, "reps": "15-20","rest_sec": 60  },
+            { "exercise_id": "plank",                 "sets": 3, "reps": "30-60sn","rest_sec": 60 }
+          ]
+        }
+      ]
+    },
+
+    {
+      "id": "full-body-3day-beginner",
+      "name_tr": "Tam Vücut Antrenmanı — Başlangıç (3 Gün)",
+      "branch": "fitness",
+      "days_per_week": 3,
+      "goal": ["recomp", "health", "bulk"],
+      "difficulty": 1,
+      "duration_weeks": 12,
+      "description_tr": "Başlangıç seviyesi için haftada 3 gün tam vücut antrenmanı. Her gün tüm ana kas grupları çalışır. Form öğrenmek ve temel güç inşa etmek için idealdir.",
+      "progressive_overload": {
+        "rule": "Her egzersizde belirtilen tekrar sayısının üst sınırını tamamlayabiliyorsan, bir sonraki haftada ağırlığı 2.5kg artır.",
+        "minimum_reps_before_increase": 1
+      },
+      "days": [
+        {
+          "day": 1,
+          "name": "Tam Vücut A",
+          "exercises": [
+            { "exercise_id": "squat",          "sets": 3, "reps": "8-10", "rest_sec": 120, "notes_tr": "Ağırlıksız veya çok hafif ağırlıkla form öğren." },
+            { "exercise_id": "push-up",        "sets": 3, "reps": "8-12", "rest_sec": 90  },
+            { "exercise_id": "lat-pulldown",   "sets": 3, "reps": "8-10", "rest_sec": 90  },
+            { "exercise_id": "dumbbell-shoulder-press","sets":3,"reps":"10-12","rest_sec":90},
+            { "exercise_id": "crunch",         "sets": 3, "reps": "15-20","rest_sec": 60  },
+            { "exercise_id": "calf-raise",     "sets": 3, "reps": "15-20","rest_sec": 60  }
+          ]
+        },
+        {
+          "day": 2,
+          "name": "Tam Vücut B",
+          "exercises": [
+            { "exercise_id": "romanian-deadlift","sets":3,"reps":"8-10","rest_sec":120 },
+            { "exercise_id": "bench-press",    "sets": 3, "reps": "8-10", "rest_sec": 90, "notes_tr": "Hafif ağırlıkla form önce." },
+            { "exercise_id": "bent-over-row",  "sets": 3, "reps": "8-10", "rest_sec": 90  },
+            { "exercise_id": "lateral-raise",  "sets": 3, "reps": "12-15","rest_sec": 60  },
+            { "exercise_id": "plank",          "sets": 3, "reps": "20-40sn","rest_sec":60 },
+            { "exercise_id": "hip-thrust",     "sets": 3, "reps": "12-15","rest_sec": 90  }
+          ]
+        },
+        {
+          "day": 3,
+          "name": "Tam Vücut C",
+          "exercises": [
+            { "exercise_id": "squat",          "sets": 3, "reps": "8-10", "rest_sec": 120 },
+            { "exercise_id": "dips",           "sets": 3, "reps": "6-10", "rest_sec": 90, "notes_tr": "Yapamıyorsan bench dip yapabilirsin." },
+            { "exercise_id": "pull-up",        "sets": 3, "reps": "3-6",  "rest_sec": 120, "notes_tr": "Assisted pull-up veya lat pulldown ile değiştirilebilir." },
+            { "exercise_id": "barbell-curl",   "sets": 3, "reps": "10-12","rest_sec": 60  },
+            { "exercise_id": "tricep-pushdown","sets": 3, "reps": "12-15","rest_sec": 60  },
+            { "exercise_id": "calf-raise",     "sets": 3, "reps": "15-20","rest_sec": 60  }
+          ]
+        }
+      ]
+    },
+
+    {
+      "id": "upper-lower-4day",
+      "name_tr": "Üst-Alt Split — 4 Gün",
+      "branch": "fitness",
+      "days_per_week": 4,
+      "goal": ["bulk", "cut", "recomp"],
+      "difficulty": 2,
+      "duration_weeks": 10,
+      "description_tr": "Haftada 4 gün üst/alt split. Her kas grubu haftada 2 kez çalışır. Hem güç hem hacim için dengeli bir program.",
+      "progressive_overload": {
+        "rule": "Ağır günlerde (Gün 1 ve 3) ağırlık odaklı, hafif günlerde (Gün 2 ve 4) tekrar ve hacim odaklı ilerleme yap.",
+        "minimum_reps_before_increase": 2
+      },
+      "days": [
+        {
+          "day": 1,
+          "name": "Üst Vücut — Güç",
+          "exercises": [
+            { "exercise_id": "bench-press",           "sets": 4, "reps": "5-6",  "rest_sec": 150 },
+            { "exercise_id": "bent-over-row",         "sets": 4, "reps": "5-6",  "rest_sec": 150 },
+            { "exercise_id": "overhead-press",        "sets": 3, "reps": "6-8",  "rest_sec": 120 },
+            { "exercise_id": "pull-up",               "sets": 3, "reps": "6-8",  "rest_sec": 120 },
+            { "exercise_id": "face-pull",             "sets": 3, "reps": "15-20","rest_sec": 60  }
+          ]
+        },
+        {
+          "day": 2,
+          "name": "Alt Vücut — Güç",
+          "exercises": [
+            { "exercise_id": "squat",                 "sets": 4, "reps": "5-6",  "rest_sec": 180 },
+            { "exercise_id": "romanian-deadlift",     "sets": 3, "reps": "6-8",  "rest_sec": 150 },
+            { "exercise_id": "hip-thrust",            "sets": 3, "reps": "8-10", "rest_sec": 120 },
+            { "exercise_id": "calf-raise",            "sets": 4, "reps": "12-15","rest_sec": 60  },
+            { "exercise_id": "plank",                 "sets": 3, "reps": "45-60sn","rest_sec":60 }
+          ]
+        },
+        {
+          "day": 3,
+          "name": "Üst Vücut — Hacim",
+          "exercises": [
+            { "exercise_id": "incline-bench-press",   "sets": 3, "reps": "10-12","rest_sec": 90  },
+            { "exercise_id": "lat-pulldown",          "sets": 3, "reps": "10-12","rest_sec": 90  },
+            { "exercise_id": "dumbbell-shoulder-press","sets":3,"reps":"10-12","rest_sec":90 },
+            { "exercise_id": "dumbbell-flye",         "sets": 3, "reps": "12-15","rest_sec": 60  },
+            { "exercise_id": "barbell-curl",          "sets": 3, "reps": "12-15","rest_sec": 60  },
+            { "exercise_id": "tricep-pushdown",       "sets": 3, "reps": "12-15","rest_sec": 60  },
+            { "exercise_id": "lateral-raise",         "sets": 3, "reps": "15-20","rest_sec": 60  }
+          ]
+        },
+        {
+          "day": 4,
+          "name": "Alt Vücut — Hacim",
+          "exercises": [
+            { "exercise_id": "hip-thrust",            "sets": 4, "reps": "12-15","rest_sec": 90  },
+            { "exercise_id": "romanian-deadlift",     "sets": 3, "reps": "10-12","rest_sec": 90  },
+            { "exercise_id": "squat",                 "sets": 3, "reps": "10-12","rest_sec": 120 },
+            { "exercise_id": "calf-raise",            "sets": 4, "reps": "20-25","rest_sec": 60  },
+            { "exercise_id": "crunch",                "sets": 3, "reps": "20-25","rest_sec": 60  }
+          ]
+        }
+      ]
+    }
+
+  ]
+}
