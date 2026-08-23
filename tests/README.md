@@ -1,36 +1,23 @@
 # Test Araçları
 
-Bu klasör geliştirme içindir — yayına yüklemek zorunda değilsin.
+## 🌐 Tarayıcıda test (program kurmaya gerek yok)
 
-## 1. Tarayıcıda hesaplama testi
+Uygulamayı aç → F12 → Console sekmesi → şunu yapıştır:
 
-Uygulamayı aç, konsola yaz:
+    fetch('tests/browser-test.js').then(r=>r.text()).then(eval)
 
-```
-_ravenfitSelfTest()
-```
+23 kontrol çalışır: modüller yüklü mü, JSON'lar çift yükleniyor mu,
+set sayacı çalışıyor mu, logo yolu doğru mu, kronometre temiz mi.
 
-38 test çalışır. Yağ oranı, FFMI, BMR, kalori hedefleri, makrolar, RED-S
-riski ve girdi sınırlamalarını doğrular. Matematik bozulursa hemen yakalar.
+Sonra hesaplama testini çalıştır:
 
-## 2. Regresyon testi (Node.js gerekir)
+    _ravenfitSelfTest()
 
-Düzeltilen hataların geri gelmediğini doğrular.
+38 test: yağ oranı, FFMI, BMR, kalori hedefleri, makrolar, RED-S riski.
 
-```
-node tests/regression.js
-```
+## 💻 Bilgisayarda test (Node.js / Python gerekir)
 
-Kontrol ettikleri:
-- Başlatma kodu tek kez çalışıyor mu (çift fetch var mı)
-- Set sayacı +/− butonları çalışıyor mu
-- PR ekranı logo yolu doğru mu
-- Kronometre gereksiz timer kuruyor mu
+Geliştirici araçları — zorunlu değil.
 
-## 3. Ölü kod taraması
-
-```
-python3 tests/deadcode-check.py
-```
-
-Kök kümeden (inline onclick + app.js) erişilemeyen fonksiyonları listeler.
+    sh tests/run.sh                    # regresyon testi
+    python3 tests/deadcode-check.py    # ölü kod taraması

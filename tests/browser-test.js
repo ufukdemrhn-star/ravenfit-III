@@ -1,0 +1,207 @@
+/* ══════════════════════════════════════════════════════════════
+   RavenFit — TARAYICI TESTİ
+   Hiçbir program kurmadan, doğrudan tarayıcı konsolunda çalışır.
+
+   KULLANIM:
+     Konsola şunu yapıştır ve Enter'a bas:
+
+     fetch('tests/browser-test.js').then(r=>r.text()).then(eval)
+
+   ══════════════════════════════════════════════════════════════ */
+
+(function () {
+  var pass = 0, fail = 0, warn = 0;
+  var C = {
+    ok:   'color:#2EC4B6;font-weight:bold',
+    no:   'color:#E63946;font-weight:bold',
+    wr:   'color:#FF9F1C;font-weight:bold',
+    head: 'color:#9B72FF;font-weight:bold;font-size:13px',
+    dim:  'color:#909090'
+  };
+
+  function t(label, cond, detail) {
+    if (cond) { pass++; console.log('%c  ✅ ' + label, C.ok); }
+    else { fail++; console.log('%c  ❌ ' + label + (detail ? '  → ' + detail : ''), C.no); }
+  }
+  function w(label, detail) {
+    warn++; console.log('%c  ⚠️  ' + label + (detail ? '  → ' + detail : ''), C.wr);
+  }
+  function head(txt) { console.log('%c\n▸ ' + txt, C.head); }
+
+  /* Fonksiyon kaynağındaki yorumları siler — yorumlardaki kelimeler
+     yanlış alarma yol açmasın diye. */
+  function kod(fn) {
+    return fn.toString()
+      .replace(/\/\*[\s\S]*?\*\//g, ' ')
+      .replace(/\/\/[^\n]*/g, ' ');
+  }
+
+  /* Bir ismin global olarak tanımlı olup olmadığını güvenle kontrol eder */
+  function varMi(isim) {
+    try { return typeof eval(isim) === 'function'; } catch (e) { return false; }
+  }
+
+  console.log('%c╔══════════════════════════════════════════════════╗', C.head);
+  console.log('%c║   RAVENFIT — TARAYICI SAĞLIK TESTİ               ║', C.head);
+  console.log('%c╚══════════════════════════════════════════════════╝', C.head);
+
+  /* ═══════════════════════════════════════════════════
+     1. MODÜLLER YÜKLENDİ Mİ?
+     ═══════════════════════════════════════════════════ */
+  head('1 — Modüller yüklendi mi?');
+
+  var gerekli = {
+    'core/state':        'saveData',
+    'core/utils':        'clamp',
+    'core/theme':        'applyTheme',
+    'core/storage':      'getEntries',
+    'ui/screens':        'showScreen',
+    'ui/wizard':         'nextStep',
+    'health/calc':       'calcAll',
+    'health/reds':       '_checkRedsRisk',
+    'nutrition/supp':    'calcSuppScores',
+    'nutrition/water':   '_calcWaterTarget',
+    'workout/engine':    '_doStartSession',
+    'workout/tools':     'adjustRestTime',
+    'calculators/pr':    '_prFeelSlider',
+    'badges':            'checkAndAwardBadges',
+    'auth/firebase':     'initFirebase',
+    'admin/self-test':   '_ravenfitSelfTest'
+  };
+  var eksikModul = [];
+  for (var k in gerekli) {
+    if (!varMi(gerekli[k])) eksikModul.push(k);
+  }
+  t('16 modülün tamamı yüklü', eksikModul.length === 0, eksikModul.join(', '));
+
+  /* ═══════════════════════════════════════════════════
+     2. ÇİFT YÜKLEME KONTROLÜ  (A1)
+     ═══════════════════════════════════════════════════ */
+  head('2 — JSON dosyaları çift yükleniyor mu?  (A1 düzeltmesi)');
+
+  try {
+    var res = performance.getEntriesByType('resource');
+    var sayac = {};
+    res.forEach(function (r) {
+      var m = r.name.match(/\/data\/([\w-]+\.json)/);
+      if (m) sayac[m[1]] = (sayac[m[1]] || 0) + 1;
+    });
+    var isimler = Object.keys(sayac);
+    if (isimler.length === 0) {
+      w('Henüz JSON yüklenmemiş', 'sayfayı yenileyip tekrar dene');
+    } else {
+      var cift = isimler.filter(function (n) { return sayac[n] > 1; });
+      t(isimler.length + ' JSON dosyası tek kez yüklendi', cift.length === 0,
+        cift.map(function (n) { return n + ' ×' + sayac[n]; }).join(', '));
+      console.log('%c     Yüklenen: ' + isimler.join(', '), C.dim);
+    }
+  } catch (e) { w('Performance API okunamadı', e.message); }
+
+  /* ═══════════════════════════════════════════════════
+     3. SET SAYACI  (A2)
+     ═══════════════════════════════════════════════════ */
+  head('3 — Set sayacı +/− butonları  (A2 düzeltmesi)');
+
+  var src = kod(adjustRestTime);
+  t('Doğru element ID kullanılıyor', src.indexOf('tools-rest-time-val') > -1);
+  t('Eski bozuk ID kaldırıldı', src.indexOf("getElementById('rest-time-val')") === -1);
+  t('Null koruması var', src.indexOf('if(el)') > -1 || src.indexOf('if (el)') > -1);
+
+  /* Canlı test */
+  var eski = _restTime;
+  var hata = null;
+  try {
+    _restTime = 60; adjustRestTime(15);
+    t('_restTime 60 → 75 oldu', _restTime === 75, 'değer: ' + _restTime);
+    adjustRestTime(-15);
+    t('_restTime 75 → 60 oldu', _restTime === 60, 'değer: ' + _restTime);
+    _restTime = 20; adjustRestTime(-15);
+    t('Alt sınır 15sn korunuyor', _restTime === 15, 'değer: ' + _restTime);
+    _restTime = 295; adjustRestTime(15);
+    t('Üst sınır 300sn korunuyor', _restTime === 300, 'değer: ' + _restTime);
+  } catch (e) { hata = e.message; }
+  t('Hiç hata fırlatmadı', hata === null, hata);
+  _restTime = eski;
+
+  /* ═══════════════════════════════════════════════════
+     4. PR EKRANI LOGO YOLU  (A3)
+     ═══════════════════════════════════════════════════ */
+  head('4 — PR ekranı logo yolu  (A3 düzeltmesi)');
+
+  var prSrc = kod(_prFeelSlider);
+  t('assets/icons/logo.png kullanılıyor', prSrc.indexOf('assets/icons/logo.png') > -1);
+  t('Kırık "logo.png" yolu kalmadı', !/url\(["']?logo\.png/.test(prSrc));
+
+  /* Dosya gerçekten var mı? */
+  var img = new Image();
+  img.onload = function () { console.log('%c  ✅ assets/icons/logo.png dosyası erişilebilir', C.ok); };
+  img.onerror = function () { console.log('%c  ❌ assets/icons/logo.png BULUNAMADI', C.no); };
+  img.src = 'assets/icons/logo.png';
+
+  /* ═══════════════════════════════════════════════════
+     5. KRONOMETRE TIMER  (A4)
+     ═══════════════════════════════════════════════════ */
+  head('5 — Kronometre gereksiz timer kuruyor mu?  (A4 düzeltmesi)');
+
+  var chSrc = kod(_toolsChronoToggle);
+  t('Ölü "chrono-display" araması kaldırıldı', chSrc.indexOf('chrono-display') === -1);
+  t('Tek timer kuruluyor', (chSrc.match(/setInterval/g) || []).length === 1,
+    (chSrc.match(/setInterval/g) || []).length + ' adet bulundu');
+
+  var rsSrc = kod(_toolsChronoReset);
+  t('Reset ölü ID aramıyor',
+    rsSrc.indexOf("getElementById('chrono-display')") === -1 &&
+    rsSrc.indexOf("getElementById('chrono-toggle')") === -1);
+
+  /* ═══════════════════════════════════════════════════
+     6. VERİ DOSYALARI
+     ═══════════════════════════════════════════════════ */
+  head('6 — Veri dosyaları yüklendi mi?');
+
+  var veri = {
+    'Fitness egzersizleri': EXERCISES_DATA && EXERCISES_DATA.exercises,
+    'Fitness programları':  WORKOUTS_DATA && WORKOUTS_DATA.workouts,
+    'Yüzme egzersizleri':   EXERCISES_SWIM && EXERCISES_SWIM.exercises,
+    'Yüzme programları':    WORKOUTS_SWIM && WORKOUTS_SWIM.workouts,
+    'Postür egzersizleri':  EXERCISES_POST && EXERCISES_POST.exercises,
+    'Postür programları':   WORKOUTS_POST && WORKOUTS_POST.workouts,
+    'Özel durumlar':        CONDITIONS_DATA && CONDITIONS_DATA.conditions,
+    'Rozetler':             BADGES_DATA && BADGES_DATA.badges
+  };
+  for (var v in veri) {
+    var arr = veri[v];
+    t(v + (arr ? ' (' + arr.length + ' kayıt)' : ''), !!arr && arr.length > 0);
+  }
+
+  /* ═══════════════════════════════════════════════════
+     7. GÖRSEL DOSYALAR
+     ═══════════════════════════════════════════════════ */
+  head('7 — Görseller erişilebilir mi?');
+  ['assets/icons/logo.png', 'assets/icons/favicon.png',
+   'assets/icons/icon-192.png', 'assets/icons/icon-512.png'].forEach(function (p) {
+    var i = new Image();
+    i.onload = function () { console.log('%c  ✅ ' + p, C.ok); };
+    i.onerror = function () { console.log('%c  ❌ ' + p + ' BULUNAMADI', C.no); };
+    i.src = p;
+  });
+
+  /* ═══════════════════════════════════════════════════
+     ÖZET
+     ═══════════════════════════════════════════════════ */
+  setTimeout(function () {
+    console.log('%c\n' + '─'.repeat(52), C.dim);
+    var toplam = pass + fail;
+    var yuzde = toplam ? Math.round(pass / toplam * 100) : 0;
+    console.log('%c📊 SONUÇ: ' + pass + '/' + toplam + ' test geçti (%' + yuzde + ')',
+      fail === 0 ? C.ok : C.no);
+    if (warn) console.log('%c⚠️  ' + warn + ' uyarı', C.wr);
+    if (fail === 0) {
+      console.log('%c🎉 Faz A düzeltmeleri doğrulandı — sistem sağlıklı!', C.ok);
+      console.log('%c\n👉 Şimdi hesaplama testini de çalıştır:  _ravenfitSelfTest()', C.head);
+    } else {
+      console.log('%c⚠️  Yukarıdaki ❌ satırlara bak', C.no);
+    }
+    console.log('%c' + '─'.repeat(52), C.dim);
+  }, 400);
+
+})();
