@@ -197,18 +197,6 @@ function _buildDietAdviceInline(){
   return html;
 }
 
-function renderMealSuggestions(){
-  /* Artık panel içinde — eski standalone container'a yazmak gerekmiyor */
-}
-
-function renderDietAdvice(){
-  /* Artık panel içinde — eski standalone container kullanılmıyor */
-}
-
-function renderHiddenCalCalc(){
-  /* Artık panel içinde */
-}
-
 /* ── DİYET ÖNERİLERİ YARDIMCILARI ────────────────────── */
 
 var HIDDEN_CALS=[{name:'Cola (330ml)',kcal:140},{name:'Ice Tea (330ml)',kcal:130},{name:'Ayran (200ml)',kcal:77},{name:'Limonata (250ml)',kcal:120},{name:'Portakal Suyu (250ml)',kcal:110},{name:'Cappuccino (200ml)',kcal:80},{name:'Şekerli Çay (200ml)',kcal:30}];

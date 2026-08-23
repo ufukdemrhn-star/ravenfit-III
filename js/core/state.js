@@ -27,11 +27,6 @@ function setUnit(u){
   showToast('⚖️ Birim: '+u.toUpperCase(),'success');
 }
 
-function kgToUnit(kg){
-  if(kg==null||kg==='')return '';
-  return getUnit()==='lb'?(kg*2.20462).toFixed(1):parseFloat(kg).toFixed(1);
-}
-
 function unitToKg(val){
   if(val==null||val==='')return null;
   var v=parseFloat(val);if(isNaN(v))return null;

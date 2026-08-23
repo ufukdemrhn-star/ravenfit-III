@@ -1,57 +1,3 @@
-/* ══════════════════════════════════════════════════════════
-   RavenFit — tools.js
-   Kronometre ve set sayacı
-   ══════════════════════════════════════════════════════════ */
-
-function chronoToggle(){
-  if(_chronoRunning){clearInterval(_chronoInterval);_chronoMs+=Date.now()-_chronoStart;_chronoRunning=false;
-    document.getElementById('chrono-toggle').innerHTML='▶ Devam';
-  }else{_chronoStart=Date.now();_chronoRunning=true;
-    _chronoInterval=setInterval(updateChronoDisplay,30);
-    document.getElementById('chrono-toggle').innerHTML='⏸ Durdur';
-  }
-}
-
-function chronoReset(){clearInterval(_chronoInterval);_chronoRunning=false;_chronoMs=0;_chronoStart=0;
-  document.getElementById('chrono-display').textContent='00:00.00';
-  document.getElementById('chrono-toggle').innerHTML='▶ Başlat';
-}
-
-function updateChronoDisplay(){
-  var ms=_chronoMs+(Date.now()-_chronoStart);
-  var s=Math.floor(ms/1000),m=Math.floor(s/60),cs=Math.floor((ms%1000)/10);
-  s=s%60;
-  document.getElementById('chrono-display').textContent=pad2(m)+':'+pad2(s)+'.'+pad2(cs);
-}
-
-function setDone(){
-  if(_restActive){skipRest();return;}
-  _setCount++;document.getElementById('set-count').textContent=_setCount;
-  startRestTimer();
-  showToast('Set #'+_setCount+' tamamlandı! Dinlenme başlıyor...','success');
-}
-
-function startRestTimer(){
-  _restActive=true;_restRemain=_restTime;
-  document.getElementById('btn-set-done').innerHTML='⏭ Dinlenmeyi Atla';
-  var rd=document.getElementById('rest-display');rd.classList.add('rest-active');
-  rd.textContent=_restRemain+'s';
-  _restInterval=setInterval(function(){
-    _restRemain--;
-    if(_restRemain<=0){clearInterval(_restInterval);_restActive=false;_suppStep=0;_suppAnswers={};
-      rd.classList.remove('rest-active');rd.textContent='Hazırsın!';
-      document.getElementById('btn-set-done').innerHTML='✅ Seti Bitir';
-      playBeep();showToast('⏰ Dinlenme bitti! Hazırsın!','success');
-    }else{rd.textContent=_restRemain+'s';}
-  },1000);
-}
-
-function skipRest(){clearInterval(_restInterval);_restActive=false;_suppStep=0;_suppAnswers={};
-  document.getElementById('rest-display').classList.remove('rest-active');
-  document.getElementById('rest-display').textContent='—';
-  document.getElementById('btn-set-done').innerHTML='✅ Seti Bitir';
-}
-
 /* Dinlenme süresini 15sn adımlarla ayarlar (15–300sn arası).
    Araçlar ekranındaki  −/+  butonlarına bağlıdır. */
 function adjustRestTime(delta){
@@ -60,8 +6,6 @@ function adjustRestTime(delta){
   var el=document.getElementById('tools-rest-time-val');
   if(el) el.textContent=_restTime+'s';
 }
-
-function resetSets(){_setCount=0;document.getElementById('set-count').textContent='0';skipRest();}
 
 function playBeep(){try{var ctx=new(window.AudioContext||window.webkitAudioContext)();var o=ctx.createOscillator();var g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=880;g.gain.value=0.3;o.start();o.stop(ctx.currentTime+0.15);}catch(e){}
   if(navigator.vibrate)try{navigator.vibrate([200,100,200]);}catch(e){}}

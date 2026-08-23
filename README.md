@@ -79,3 +79,24 @@ Değişiklik yaptıktan sonra üç kontrolü çalıştır:
 **3. Ölü kod taraması** — erişilemeyen fonksiyon var mı
 
     python3 tests/deadcode-check.py
+
+---
+
+## Değişiklik Geçmişi
+
+### Faz A — Kırık işlevler
+- Başlatma kodu iki yerde çalışıyordu → JSON'lar çift yükleniyordu (16 istek → 8)
+- Set sayacı `+/−` butonları olmayan bir element arıyordu → çalışmıyordu
+- PR ekranı logo yolu modülerleşmede kırılmıştı
+- Kronometre boşa çalışan ikinci bir timer kuruyordu
+
+### Faz B — Ölü kod temizliği
+- 16 erişilemeyen fonksiyon silindi (eski kronometre nesli, boş stub'lar, kullanılmayan yardımcılar)
+- 3 ölü durum değişkeni silindi
+- `closeWarmup` içindeki aynı işi yapan iki dal birleştirildi
+- `_safeRound` / `_safeDiv` güvenlik yardımcıları hesaplamalara bağlandı:
+  - `calcBF` — Navy formülünde `log10` negatif argüman koruması (bel ≤ boyun durumu)
+  - `calcFFMI` — boy 0 olduğunda `Infinity` koruması
+  - `calcBT`, BMI, yağ kütlesi — sıfıra bölme ve yuvarlama hassasiyeti
+
+**Sonuç:** 326 fonksiyonun tamamı erişilebilir, ölü kod yok.

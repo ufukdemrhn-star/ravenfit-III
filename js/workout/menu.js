@@ -7,13 +7,10 @@
 
 /* Antrenman menüsü görünümü: 'home' | 'browse' | 'detail' | 'active' */
 
-var _wrkView='home';
 
-var _wrkSelectedProgram=null;
 
  /* Aktif program id */
 
-var _wrkActiveSession=null;
 
 /* ══════════════════════════════════════════════════════════
    KATMAN 1 — ANA EKRAN
@@ -241,11 +238,3 @@ function _startBranchWorkout(branchId){
   showWarmup('warmup',function(){ _doStartSession(prog); });
 }
 
-/* ══════════════════════════════════════════════════════════
-   ARAÇ: showWorkoutTool (mevcut uyumluluk)
-   ══════════════════════════════════════════════════════════ */
-
-function showWorkoutTool(type){
-  /* Araçlar sayfasına yönlendir */
-  renderWorkoutTools();
-}

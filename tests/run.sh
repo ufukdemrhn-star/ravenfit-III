@@ -13,4 +13,7 @@ echo "▸ Sözdizimi kontrolü..."
 node --check tests/_combined.tmp.js && echo "  ✅ geçerli"
 echo "▸ Regresyon testi..."
 node tests/regression.js
+echo ""
+echo "▸ Uç durum testi..."
+node tests/edge-cases.js
 rm -f tests/_combined.tmp.js

@@ -183,6 +183,3 @@ function _calcSleepUpdate(){
   el.innerHTML=html;
 }
 
-/* Eski isim uyumu */
-
-function _calcSleepRender(){_calcSleepRerender();}

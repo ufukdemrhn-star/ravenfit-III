@@ -42,32 +42,13 @@ function showWarmup(type,callback){
   overlay.classList.add('active');
 }
 
+/* Isınma/soğuma ekranını kapatır.
+   'Geç' ve 'Başlat' butonlarının ikisi de akışı devam ettirir —
+   fark yalnızca kullanıcının hareketleri yapıp yapmamasıdır. */
 function closeWarmup(skip){
   document.getElementById('warmup-overlay').classList.remove('active');
-  if(!skip&&typeof _warmupCallback==='function')_warmupCallback();
-  else if(skip&&typeof _warmupCallback==='function')_warmupCallback();
+  if(typeof _warmupCallback==='function') _warmupCallback();
   _warmupCallback=null;
-}
-
-/* ── startWorkoutSession: branş-destekli ─────────────────── */
-
-function startWorkoutSession(){
-  /* _startBranchWorkout üzerinden çağrılmışsa window._wsBranch set edilmiştir */
-  var branch=window._wsBranch||'fitness';
-  var activeKey='active_workout_'+branch;
-  var activeId=U[activeKey]||U.active_workout_fitness||null;
-
-  if(!activeId){showToast('Önce bir program seç.','warn');return;}
-
-  var prog=_findProgram(activeId);
-  if(!prog){showToast('Program bulunamadı.','error');return;}
-
-  var exData=_getBranchExercises(branch);
-  if(!exData&&!prog._isCustom){
-    showToast('❌ Egzersiz verileri yüklenemedi.','error');return;
-  }
-
-  showWarmup('warmup',function(){_doStartSession(prog);});
 }
 
 function _doStartSession(prog){

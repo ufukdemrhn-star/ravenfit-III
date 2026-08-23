@@ -202,16 +202,6 @@ function _weeklyChangeRange(gl){
   return {min:0, max:0};
 }
 
-/* Eski goalAdj geri uyumluluk için — eski 3'lü hedef geldi mi yeni'ye map et */
-
-function goalAdj(g){
-  /* Eski isimler: yag/idame/kutle → cut/maintain/bulk */
-  var map={yag:'cut', idame:'maintain', kutle:'bulk'};
-  if(map[g]) g=map[g];
-  var bf=R.bf||20, male=U.gender==='male';
-  return calcGoalCalories(R.tdee||2000, g, bf, male) - (R.tdee||2000);
-}
-
 /* ── GOAL STEP ────────────────────────────────────────── */
 
 function renderGoalStep(){

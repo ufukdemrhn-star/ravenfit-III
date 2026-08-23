@@ -154,6 +154,46 @@
     rsSrc.indexOf("getElementById('chrono-toggle')") === -1);
 
   /* ═══════════════════════════════════════════════════
+     5b. ÖLÜ KOD TEMİZLİĞİ  (Faz B)
+     ═══════════════════════════════════════════════════ */
+  head('5b — Ölü kod temizlendi mi?  (Faz B)');
+
+  var silinmesiGereken = [
+    'chronoToggle','chronoReset','updateChronoDisplay','setDone',
+    'startRestTimer','skipRest','resetSets',
+    'renderMealSuggestions','renderDietAdvice','renderHiddenCalCalc',
+    'toggleAcc','kgToUnit','goalAdj','showWorkoutTool',
+    'startWorkoutSession','_calcSleepRender'
+  ];
+  var halaVar = silinmesiGereken.filter(varMi);
+  t(silinmesiGereken.length + ' ölü fonksiyon silindi', halaVar.length === 0,
+    halaVar.join(', '));
+
+  /* Güvenlik yardımcıları artık KULLANILIYOR olmalı */
+  t('_safeRound hesaplamalara bağlandı',
+    kod(calcFFMI).indexOf('_safeRound') > -1);
+  t('_safeDiv hesaplamalara bağlandı',
+    kod(calcFFMI).indexOf('_safeDiv') > -1);
+  t('calcBF log10 koruması var',
+    kod(calcBF).indexOf('Math.max(1') > -1);
+
+  /* Canlı uç durum testi */
+  var yedekU = JSON.parse(JSON.stringify(U || {}));
+  try {
+    U = {gender:'male', height:175, neck:40, waist:40, weight:80};
+    var ucBf = calcBF();
+    t('Bel = boyun → NaN üretmiyor', isFinite(ucBf) && !isNaN(ucBf), 'sonuç: ' + ucBf);
+    U = {gender:'male', height:0, weight:80};
+    var ucF = calcFFMI(20);
+    t('Boy 0 → Infinity üretmiyor', isFinite(ucF.ffmi), 'ffmi: ' + ucF.ffmi);
+  } catch (e) { t('Uç durum testi', false, e.message); }
+  U = yedekU;
+
+  t('_safeRound(1.005,2) = 1.01 (IEEE 754 düzeltmesi)',
+    _safeRound(1.005, 2) === 1.01, 'sonuç: ' + _safeRound(1.005, 2));
+  t('_safeDiv(10,0) = 0 (sıfıra bölme koruması)', _safeDiv(10, 0) === 0);
+
+  /* ═══════════════════════════════════════════════════
      6. VERİ DOSYALARI
      ═══════════════════════════════════════════════════ */
   head('6 — Veri dosyaları yüklendi mi?');

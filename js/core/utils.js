@@ -35,22 +35,15 @@ function pad2(n){return(n<10?'0':'')+n;}
 
 function todayStr(){var d=new Date();return d.toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit',year:'numeric'});}
 
-console.log('%c💡 RavenFit Self-Test: konsola  _ravenfitSelfTest()  yaz', 'color:#9B72FF;font-style:italic;font-size:11px');
+/* ── Geliştirici ipuçları — konsolda görünür ────────────── */
+console.log('%c💡 RavenFit Sağlık Testi: konsola  fetch(\'tests/browser-test.js\').then(r=>r.text()).then(eval)  yaz',
+  'color:#2EC4B6;font-style:italic;font-size:11px');
+console.log('%c💡 RavenFit Self-Test: konsola  _ravenfitSelfTest()  yaz',
+  'color:#9B72FF;font-style:italic;font-size:11px');
 
 /* ── UTILS ────────────────────────────────────────────── */
 
 function clamp(v,lo,hi){return Math.min(hi,Math.max(lo,v));}
-
-/* Accordion toggle */
-
-function toggleAcc(header){
-  var body=header.nextElementSibling;
-  var arrow=header.querySelector('.acc-arrow');
-  if(!body)return;
-  var isOpen=body.classList.contains('open');
-  body.classList.toggle('open',!isOpen);
-  if(arrow)arrow.classList.toggle('open',!isOpen);
-}
 
 /* Sayı animasyonu — değer sıfırdan hedef değere sayarak gelir */
 

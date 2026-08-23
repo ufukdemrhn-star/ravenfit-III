@@ -76,21 +76,36 @@ function _sanitizeUserInputs(){
 
 /* ── CALCULATIONS ─────────────────────────────────────── */
 
+/* Navy (ABD Donanması) yağ oranı formülü.
+   Not: log10 negatif/sıfır argümanla NaN döndürür. Bel ≤ boyun gibi
+   fiziksel olarak imkânsız girdilerde bu yaşanabileceği için
+   argümanlar alt sınırla korunur, bölme _safeDiv ile yapılır. */
 function calcBF(){
   var h=U.height,nk=U.neck,wst=U.waist,hip=U.hip;
-  var bf;
+  var bf, payda;
   if(U.gender==='male'){
-    bf=495/(1.0324-0.19077*Math.log10(wst-nk)+0.15456*Math.log10(h))-450;
+    /* Bel çevresi boyun çevresinden büyük olmalı — değilse 1 cm'e sabitle */
+    var cevreE=Math.max(1, wst-nk);
+    payda=1.0324-0.19077*Math.log10(cevreE)+0.15456*Math.log10(Math.max(1,h));
   } else {
-    bf=495/(1.29579-0.35004*Math.log10(wst+hip-nk)+0.22100*Math.log10(h))-450;
+    var cevreK=Math.max(1, wst+hip-nk);
+    payda=1.29579-0.35004*Math.log10(cevreK)+0.22100*Math.log10(Math.max(1,h));
   }
-  return Math.max(2,Math.round(bf*100)/100);
+  bf=_safeDiv(495, payda, 0)-450;
+  return Math.max(2, Math.min(70, _safeRound(bf, 2)));
 }
 
 function calcFFMI(bf){
-  var hm=U.height/100,ffm=U.weight*(1-bf/100),ffmi=ffm/(hm*hm);
+  var hm=U.height/100;
+  var ffm=U.weight*(1-bf/100);
+  /* Boy 0 gelirse bölme Infinity üretir — _safeDiv 0 döndürür */
+  var ffmi=_safeDiv(ffm, hm*hm, 0);
   var norm=ffmi+6.1*(1.8-hm);
-  return{ffmi:Math.round(ffmi*100)/100,norm:Math.round(norm*100)/100,ffm:Math.round(ffm*100)/100};
+  return{
+    ffmi: _safeRound(ffmi, 2),
+    norm: _safeRound(norm, 2),
+    ffm:  _safeRound(ffm, 2)
+  };
 }
 
 function calcBMR(lm){return Math.round(370+21.6*lm);}
@@ -108,9 +123,9 @@ function calcBT(){
   });
   var t=ec+me+en||1;
   return{
-    ecto: Math.round(ec/t*10000)/100,
-    meso: Math.round(me/t*10000)/100,
-    endo: Math.round(en/t*10000)/100
+    ecto: _safeRound(_safeDiv(ec, t, 0)*100, 2),
+    meso: _safeRound(_safeDiv(me, t, 0)*100, 2),
+    endo: _safeRound(_safeDiv(en, t, 0)*100, 2)
   };
 }
 
@@ -319,8 +334,8 @@ function calcAll(){
     if(!R.bf || isNaN(R.bf)) R.bf=20; /* fallback */
     var fd=calcFFMI(R.bf);
     R.ffmi=fd.ffmi; R.norm_ffmi=fd.norm; R.lm=fd.ffm;
-    R.fm=Math.round((U.weight-R.lm)*100)/100;
-    R.bmi=Math.round(U.weight/Math.pow(U.height/100,2)*10)/10;
+    R.fm=_safeRound(U.weight-R.lm, 2);
+    R.bmi=_safeRound(_safeDiv(U.weight, Math.pow(U.height/100,2), 0), 1);
     R.bmr=calcBMR(R.lm);
     var am=calcAct();
     R.actMult=am.m; R.actLbl=am.lbl;
