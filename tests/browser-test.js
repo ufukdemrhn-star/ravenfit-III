@@ -46,6 +46,51 @@
   console.log('%c╚══════════════════════════════════════════════════╝', C.head);
 
   /* ═══════════════════════════════════════════════════
+     0. EKRAN YAPISI  — en kritik kontrol
+     Bir </div> eksikliği ekranları iç içe geçirir ve
+     uygulama sessizce açılmaz. Konsolda hata çıkmaz.
+     ═══════════════════════════════════════════════════ */
+  head('0 — Ekran yapısı sağlam mı?');
+
+  var authEl   = document.getElementById('auth-screen');
+  var appEl    = document.getElementById('app-main');
+  var splashEl = document.getElementById('splash');
+  var wizEl    = document.getElementById('wizard');
+  var resEl    = document.getElementById('results');
+
+  t('Tüm ana ekranlar mevcut',
+    !!(authEl && appEl && splashEl && wizEl && resEl));
+
+  if (authEl && appEl) {
+    t('auth-screen, app-main dışında', !appEl.contains(authEl),
+      'iç içe geçmiş — </div> eksik olabilir');
+  }
+  if (appEl && splashEl && wizEl && resEl) {
+    t('splash app-main içinde', appEl.contains(splashEl));
+    t('wizard app-main içinde', appEl.contains(wizEl));
+    t('results app-main içinde', appEl.contains(resEl));
+    /* Ekranlar birbirinin İÇİNDE olmamalı — kardeş olmalılar */
+    t('splash ve wizard iç içe değil',
+      !splashEl.contains(wizEl) && !wizEl.contains(splashEl),
+      'iç içe geçmiş — HTML yapısı bozuk');
+    t('wizard ve results iç içe değil',
+      !wizEl.contains(resEl) && !resEl.contains(wizEl));
+  }
+
+  /* Aynı anda yalnızca bir ekran aktif olmalı */
+  var aktifSayisi = document.querySelectorAll('.screen.active').length;
+  t('Tek ekran aktif', aktifSayisi === 1, aktifSayisi + ' ekran aktif');
+
+  /* Kritik overlay'ler body seviyesinde mi? */
+  ['ws-screen','warmup-overlay','settings-drawer','supp-modal'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el && appEl) {
+      t(id + ' doğru seviyede', !splashEl || !splashEl.contains(el),
+        'bir ekranın içine hapsolmuş');
+    }
+  });
+
+  /* ═══════════════════════════════════════════════════
      1. MODÜLLER YÜKLENDİ Mİ?
      ═══════════════════════════════════════════════════ */
   head('1 — Modüller yüklendi mi?');

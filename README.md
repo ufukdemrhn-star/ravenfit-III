@@ -210,3 +210,23 @@ Ayrıca 3 Firestore çağrısına `.catch` eklendi (yakalanmamış promise reddi
 **Yan bulgu:** FFMI rozeti ile skala farklı etiketler gösteriyordu (skala "İyi" derken
 rozet "Atletik" diyordu). Bantlar `_ffmiBands()` altında tek kaynağa taşındı —
 skala, rozet ve detay tablosu artık aynı eşikleri kullanıyor.
+
+### v0.4.2.2 — Kritik düzeltme
+
+**Sorun:** v0.4.2.1'de giriş ekranını düzenlerken bir `</div>` eksik kaldı.
+`auth-screen` kapanmadığı için `app-main` ve tüm ekranlar onun *içine* girdi.
+Uygulama açılmadı — ama tarayıcı hata vermedi, konsol tertemizdi ve
+o zamanki testlerin **hepsi geçti**. Sessiz bozulmaydı.
+
+**Kalıcı çözüm:** `tests/html-check.py` eklendi. Denetim listesinin en başında
+çalışır ve şunları kontrol eder:
+- Etiket açma/kapama dengesi (div, button, span, label…)
+- Kritik kapsayıcıların kendi içinde dengeli kapanması
+- Ekranların iç içe geçmemesi (`auth-screen` ile `app-main` ayrı olmalı)
+- id tekrarı
+- Inline handler parantez dengesi
+
+Ayrıca `tests/guest-flow.js` eklendi — misafir akışının tamamını sahte DOM'da
+adım adım yürütür (misafir → splash → wizard → sonuç → giriş ekranına dönüş).
+
+Tarayıcı testine de aynı yapı kontrolü **en başa** eklendi.

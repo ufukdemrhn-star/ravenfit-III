@@ -16,6 +16,13 @@ printf "${MOR}╔═════════════════════
 printf "${MOR}║   RAVENFIT — TAM DENETİM                             ║${SIFIR}\n"
 printf "${MOR}╚══════════════════════════════════════════════════════╝${SIFIR}\n"
 
+# ── 0. HTML yapısı ─────────────────────────────────────────
+baslik "0. HTML yapısı"
+python3 tests/html-check.py > /tmp/rf_html.log 2>&1
+! grep -q "❌" /tmp/rf_html.log
+sonuc $? "$(grep -o '[0-9]*/[0-9]* geçti' /tmp/rf_html.log | head -1)"
+grep "❌" /tmp/rf_html.log | head -6
+
 # ── 1. JS sözdizimi ────────────────────────────────────────
 baslik "1. JavaScript sözdizimi"
 GECERLI=0; TOPLAM=0
@@ -64,6 +71,13 @@ node tests/backup-restore.js > /tmp/rf_backup.log 2>&1
 ! grep -q "❌" /tmp/rf_backup.log
 sonuc $? "$(grep -o '[0-9]*/[0-9]* geçti' /tmp/rf_backup.log | head -1)"
 grep "❌" /tmp/rf_backup.log | head -5
+
+# ── 4d. Misafir akışı ──────────────────────────────────────
+baslik "4d. Misafir akışı"
+node tests/guest-flow.js > /tmp/rf_guest.log 2>&1
+! grep -q "❌" /tmp/rf_guest.log
+sonuc $? "$(grep -o '[0-9]*/[0-9]* geçti' /tmp/rf_guest.log | head -1)"
+grep "❌" /tmp/rf_guest.log | head -5
 
 # ── 5. DOM ID denetimi ─────────────────────────────────────
 baslik "5. DOM ID denetimi"
