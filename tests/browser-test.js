@@ -129,8 +129,28 @@
   head('4 — PR ekranı logo yolu  (A3 düzeltmesi)');
 
   var prSrc = kod(_prFeelSlider);
-  t('assets/icons/logo.png kullanılıyor', prSrc.indexOf('assets/icons/logo.png') > -1);
-  t('Kırık "logo.png" yolu kalmadı', !/url\(["']?logo\.png/.test(prSrc));
+  t('JS artık <style> enjekte etmiyor', prSrc.indexOf('<style>') === -1);
+
+  /* Stil artık CSS dosyasında — gerçek stylesheet'ten oku */
+  var prKuralVar = false, logoYolu = '';
+  try {
+    for (var i = 0; i < document.styleSheets.length; i++) {
+      var rules;
+      try { rules = document.styleSheets[i].cssRules; } catch (e) { continue; }
+      if (!rules) continue;
+      for (var j = 0; j < rules.length; j++) {
+        var txt = rules[j].cssText || '';
+        if (txt.indexOf('pr-feel-bg') > -1) {
+          prKuralVar = true;
+          if (txt.indexOf('logo.png') > -1) logoYolu = txt;
+        }
+      }
+    }
+  } catch (e) {}
+  t('.pr-feel-* kuralları stylesheet\'te yüklü', prKuralVar);
+  t('Logo yolu assets/icons/ altında',
+    logoYolu === '' || logoYolu.indexOf('assets/icons/logo.png') > -1,
+    logoYolu.slice(0, 80));
 
   /* Dosya gerçekten var mı? */
   var img = new Image();
@@ -194,6 +214,29 @@
   t('_safeDiv(10,0) = 0 (sıfıra bölme koruması)', _safeDiv(10, 0) === 0);
 
   /* ═══════════════════════════════════════════════════
+     5c. CSS DÜZENİ  (Faz C)
+     ═══════════════════════════════════════════════════ */
+  head('5c — CSS düzeni  (Faz C)');
+
+  /* Duplicate .mlist-* kaldırıldı mı? */
+  var mlistSayisi = 0;
+  try {
+    for (var si = 0; si < document.styleSheets.length; si++) {
+      var rs;
+      try { rs = document.styleSheets[si].cssRules; } catch (e) { continue; }
+      if (!rs) continue;
+      for (var rj = 0; rj < rs.length; rj++) {
+        if ((rs[rj].selectorText || '') === '.mlist-row') mlistSayisi++;
+      }
+    }
+  } catch (e) {}
+  t('.mlist-row tek kez tanımlı', mlistSayisi === 1, mlistSayisi + ' kez bulundu');
+
+  /* Yüklenen CSS dosyası sayısı */
+  var cssLink = document.querySelectorAll('link[rel="stylesheet"][href^="css/"]');
+  t('8 CSS modülü yüklü', cssLink.length === 8, cssLink.length + ' bulundu');
+
+  /* ═══════════════════════════════════════════════════
      6. VERİ DOSYALARI
      ═══════════════════════════════════════════════════ */
   head('6 — Veri dosyaları yüklendi mi?');
@@ -236,7 +279,7 @@
       fail === 0 ? C.ok : C.no);
     if (warn) console.log('%c⚠️  ' + warn + ' uyarı', C.wr);
     if (fail === 0) {
-      console.log('%c🎉 Faz A düzeltmeleri doğrulandı — sistem sağlıklı!', C.ok);
+      console.log('%c🎉 Tüm düzeltmeler doğrulandı — sistem sağlıklı!', C.ok);
       console.log('%c\n👉 Şimdi hesaplama testini de çalıştır:  _ravenfitSelfTest()', C.head);
     } else {
       console.log('%c⚠️  Yukarıdaki ❌ satırlara bak', C.no);

@@ -100,3 +100,12 @@ Değişiklik yaptıktan sonra üç kontrolü çalıştır:
   - `calcBT`, BMI, yağ kütlesi — sıfıra bölme ve yuvarlama hassasiyeti
 
 **Sonuç:** 326 fonksiyonun tamamı erişilebilir, ölü kod yok.
+
+### Faz C — CSS düzeni
+- `.mlist-*` kuralları iki dosyada birebir tekrarlanıyordu → `components.css`'te tek kaldı
+- PR testi "nasıl hissettirdi" ekranının 20 stil kuralı `pr-test.js` içinde çalışma
+  anında `<style>` olarak enjekte ediliyordu → `calculators.css`'e taşındı
+- Tam CSS taraması yapıldı: başka birebir tekrar yok
+  (13 "aynı seçici" bulgusu `@media` override'ı ve keyframe yüzdesi — kasıtlı)
+
+**Sonuç:** JavaScript artık hiç `<style>` enjekte etmiyor, tüm stiller `css/` altında.

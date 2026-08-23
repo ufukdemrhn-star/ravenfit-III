@@ -108,9 +108,14 @@ t('Eski "rest-time-val" ID\'si aranmıyor', !missingIdAccess.includes('rest-time
 
 // ═══ A3: logo yolu ═══
 console.log('\n▸ A3 — PR ekranı logo yolu');
-const prSrc = require('fs').readFileSync(__dirname+'/../js/calculators/pr-test.js','utf8');
-t('assets/icons/logo.png kullanılıyor', prSrc.includes('url("assets/icons/logo.png")'));
-t('Çıplak "logo.png" kalmadı', !/url\(["']?logo\.png/.test(prSrc));
+const fs = require('fs');
+const prJs  = fs.readFileSync(__dirname+'/../js/calculators/pr-test.js','utf8');
+const calcCss = fs.readFileSync(__dirname+'/../css/calculators.css','utf8');
+// Faz C: stil kuralları JS'ten CSS'e taşındı
+t('PR stilleri CSS dosyasında', calcCss.includes('.pr-feel-bg::before'));
+t('assets/icons/logo.png kullanılıyor', calcCss.includes('url("assets/icons/logo.png")'));
+t('Çıplak "logo.png" kalmadı (CSS)', !/url\(["']?logo\.png/.test(calcCss));
+t('JS artık <style> enjekte etmiyor', !prJs.includes('<style>'));
 
 // ═══ A4: ölü timer ═══
 console.log('\n▸ A4 — Kronometre tek timer kullanmalı');
