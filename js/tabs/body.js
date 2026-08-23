@@ -95,7 +95,13 @@ function renderVucudum(){
         '<div style="font-size:12px;color:var(--text2)">'+descs[dom]+'</div>'+
       '</div>'+
       '<button class="chart-toggle" onclick="toggleBtChart()" '+
-        'title="Grafik türünü değiştir" aria-label="Grafik türünü değiştir">🔄</button>'+
+        'title="Grafik türünü değiştir" aria-label="Grafik türünü değiştir">'+
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" '+
+          'stroke-linecap="round" stroke-linejoin="round">'+
+          '<polyline points="23 4 23 10 17 10"></polyline>'+
+          '<polyline points="1 20 1 14 7 14"></polyline>'+
+          '<path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>'+
+        '</svg></button>'+
     '</div>'+
     '<div id="bt-chart">'+_btChartHTML(bt,grafikTur)+'</div>';
   if(grafikTur==='bar'){

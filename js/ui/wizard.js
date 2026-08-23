@@ -167,14 +167,10 @@ function updS5GenderUI(){
   var male=U.gender==='male';
   var lSpe=document.getElementById('s5-lbl-spe');
   var lHip=document.getElementById('s5-lbl-hip');
-  if(lSpe){
-    lSpe.textContent='Omuz';
-    lSpe.style.color = male ? 'var(--accent)' : '';
-  }
-  if(lHip){
-    lHip.textContent='Kalça';
-    lHip.style.color = male ? '' : 'var(--accent)';
-  }
+  /* Etiketler sade tutulur — renk vurgusu tabloda dikkat dağıtıyordu.
+     Hangi alanın kullanıldığı zaten hesaplamada belli oluyor. */
+  if(lSpe){ lSpe.textContent='Omuz';  lSpe.style.removeProperty('color'); }
+  if(lHip){ lHip.textContent='Kalça'; lHip.style.removeProperty('color'); }
 }
 
 function selOpt(el,grp){

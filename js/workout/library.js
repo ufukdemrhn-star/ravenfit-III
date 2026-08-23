@@ -1,3 +1,19 @@
+/* Egzersiz havuzunu açar ve geri dönüş hedefini kaydeder.
+   Doğrudan inline onclick içinde tırnak kaçışıyla uğraşmak yerine
+   bu fonksiyon çağrılır — okunabilir ve hataya kapalı.
+     nereden: 'tools'  → Araçlar menüsüne döner
+              'branch' → İlgili branş detayına döner  */
+function openExerciseLibraryFrom(branchId, nereden){
+  window._exCat = 'all';
+  window._exSearch = '';
+  window._exBranch = branchId;
+  window._cwReturnToBuilder = false;
+  window._exReturnTo = (nereden === 'tools')
+    ? 'renderWorkoutTools()'
+    : "renderBranchDetail('" + branchId + "')";
+  renderExerciseLibrary();
+}
+
 /* ══════════════════════════════════════════════════════════
    RavenFit — library.js
    Egzersiz havuzu ve filtreler
@@ -91,8 +107,11 @@ function renderExerciseLibrary(){
     });
   }
 
-  /* Geri butonu — özel builder'dan mı geliyoruz? */
-  var backFn=window._cwReturnToBuilder?'renderCustomWorkoutBuilder()':'renderWorkoutHome()';
+  /* Geri butonu — nereden gelindiyse oraya döner.
+     window._exReturnTo, havuzu açan ekran tarafından set edilir. */
+  var backFn = window._cwReturnToBuilder
+    ? 'renderCustomWorkoutBuilder()'
+    : (window._exReturnTo || 'renderWorkoutHome()');
 
   var html='<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">';
   html+='<button class="btn btn-s" onclick="'+backFn+'" style="padding:8px 12px;font-size:12px;flex-shrink:0">← Geri</button>';

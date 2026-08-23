@@ -230,3 +230,18 @@ Ayrıca `tests/guest-flow.js` eklendi — misafir akışının tamamını sahte 
 adım adım yürütür (misafir → splash → wizard → sonuç → giriş ekranına dönüş).
 
 Tarayıcı testine de aynı yapı kontrolü **en başa** eklendi.
+
+### v0.4.2.3 — Görsel düzeltmeler
+
+- **FFMI barı** yağ oranı barıyla aynı görsel dile getirildi: 6px yükseklik,
+  3px köşe, 13px accent renkli işaretçi. Nokta artık tam ortada.
+  (Eski `.ffmi-scale` kuralı dosyada kalmıştı ve `gap:2px` ile bantları
+  ayırıyordu — temizlendi.)
+- **Grafik değiştirme butonu** emoji yerine SVG ikon kullanıyor. Emoji'ye
+  filtre uygulandığında beyaza dönüyordu; SVG `currentColor` ile temanın
+  accent rengini doğrudan miras alıyor.
+- **Egzersiz havuzu geri butonu** geldiği yeri hatırlıyor:
+  Araçlar → Araçlar'a, Branş detayı → Branş detayına, Özel program → oluşturucuya.
+  Inline `onclick` içindeki kırılgan tırnak kaçışı yerine
+  `openExerciseLibraryFrom(branş, nereden)` yardımcısı kullanıldı.
+- **Wizard ölçü etiketlerindeki** renk vurgusu kaldırıldı (Omuz/Kalça artık sade).

@@ -47,7 +47,7 @@ function renderWorkoutTools(){
     if(d&&d.exercises) exCount+=d.exercises.length;
   });
   html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">';
-  html+='<div class="wh-card" onclick="window._exCat=\'all\';window._exSearch=\'\';window._exBranch=\''+branches[0]+'\';renderExerciseLibrary()" style="padding:14px 10px;text-align:center">';
+  html+='<div class="wh-card" onclick="openExerciseLibraryFrom(\''+branches[0]+'\',\'tools\')" style="padding:14px 10px;text-align:center">';
   html+='<div style="font-size:28px;margin-bottom:4px">📚</div>';
   html+='<div class="wh-card-label" style="font-size:13px">Egzersiz Havuzu</div>';
   html+='<div style="font-size:10px;color:var(--text2);margin-top:2px">'+(exCount>0?exCount+' egzersiz':'Yükleniyor...')+'</div>';

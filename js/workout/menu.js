@@ -193,7 +193,7 @@ function renderBranchDetail(branchId){
   html+='</div></div>';
 
   /* Egzersizleri Gör */
-  html+='<div class="rc" style="cursor:pointer;padding:14px" onclick="window._exCat=\'all\';window._exSearch=\'\';window._exBranch=\''+branchId+'\';renderExerciseLibrary()">';
+  html+='<div class="rc" style="cursor:pointer;padding:14px" onclick="openExerciseLibraryFrom(\''+branchId+'\',\'branch\')">';
   html+='<div style="display:flex;align-items:center;gap:12px">';
   html+='<div style="font-size:18px">📚</div>';
   html+='<div style="flex:1;font-size:13px;font-weight:700">Egzersizleri Gör</div>';
