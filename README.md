@@ -109,3 +109,9 @@ Değişiklik yaptıktan sonra üç kontrolü çalıştır:
   (13 "aynı seçici" bulgusu `@media` override'ı ve keyframe yüzdesi — kasıtlı)
 
 **Sonuç:** JavaScript artık hiç `<style>` enjekte etmiyor, tüm stiller `css/` altında.
+
+> ⚠️ **CSS yol kuralı:** CSS içindeki `url()` yolları **CSS dosyasının** konumuna
+> göre çözülür, HTML sayfasına göre değil. `css/calculators.css` içinden logoya
+> ulaşmak için `../assets/icons/logo.png` yazılmalı. Bu kural taşıma sırasında
+> gözden kaçtı ve arka plan logosu kırıldı; düzeltildi ve `tests/path-check.py`
+> ile artık otomatik doğrulanıyor.

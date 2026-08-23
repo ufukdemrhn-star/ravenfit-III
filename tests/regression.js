@@ -113,7 +113,9 @@ const prJs  = fs.readFileSync(__dirname+'/../js/calculators/pr-test.js','utf8');
 const calcCss = fs.readFileSync(__dirname+'/../css/calculators.css','utf8');
 // Faz C: stil kuralları JS'ten CSS'e taşındı
 t('PR stilleri CSS dosyasında', calcCss.includes('.pr-feel-bg::before'));
-t('assets/icons/logo.png kullanılıyor', calcCss.includes('url("assets/icons/logo.png")'));
+// CSS'teki url() CSS dosyasının konumuna göre çözülür → ../assets/ olmalı
+t('Logo yolu CSS-göreli (../assets/)', calcCss.includes('url("../assets/icons/logo.png")'));
+t('Kök-göreli yanlış yol kullanılmıyor', !calcCss.includes('url("assets/icons/logo.png")'));
 t('Çıplak "logo.png" kalmadı (CSS)', !/url\(["']?logo\.png/.test(calcCss));
 t('JS artık <style> enjekte etmiyor', !prJs.includes('<style>'));
 

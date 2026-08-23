@@ -148,9 +148,40 @@
     }
   } catch (e) {}
   t('.pr-feel-* kuralları stylesheet\'te yüklü', prKuralVar);
-  t('Logo yolu assets/icons/ altında',
-    logoYolu === '' || logoYolu.indexOf('assets/icons/logo.png') > -1,
-    logoYolu.slice(0, 80));
+  /* CSS içindeki url() CSS DOSYASININ konumuna göre çözülür.
+     css/calculators.css'ten bakınca doğru yol ../assets/icons/logo.png */
+  t('Logo yolu ../assets/ ile başlıyor (CSS göreli yol)',
+    logoYolu === '' || logoYolu.indexOf('../assets/icons/logo.png') > -1 ||
+    logoYolu.indexOf('/assets/icons/logo.png') > -1,
+    logoYolu.slice(0, 100));
+
+  /* Asıl kanıt: tarayıcı görseli gerçekten indirebiliyor mu? */
+  var prLogo = new Image();
+  prLogo.onload = function () {
+    console.log('%c  ✅ PR arka plan logosu yükleniyor (' + prLogo.width + '×' + prLogo.height + ')', C.ok);
+  };
+  prLogo.onerror = function () {
+    console.log('%c  ❌ PR arka plan logosu YÜKLENEMİYOR — yol kırık', C.no);
+  };
+  prLogo.src = 'assets/icons/logo.png';
+
+  /* Animasyon keyframe'leri tanımlı mı? */
+  var kfBulunan = [];
+  try {
+    for (var ki = 0; ki < document.styleSheets.length; ki++) {
+      var kr;
+      try { kr = document.styleSheets[ki].cssRules; } catch (e) { continue; }
+      if (!kr) continue;
+      for (var kj = 0; kj < kr.length; kj++) {
+        if (kr[kj].type === 7 || (kr[kj].cssText || '').indexOf('@keyframes') === 0) {
+          var nm = kr[kj].name || (kr[kj].cssText.match(/@keyframes\s+(\w+)/) || [])[1];
+          if (nm && nm.indexOf('prFeel') === 0) kfBulunan.push(nm);
+        }
+      }
+    }
+  } catch (e) {}
+  t('prFeel animasyonları tanımlı', kfBulunan.length >= 2,
+    'bulunan: ' + (kfBulunan.join(', ') || 'yok'));
 
   /* Dosya gerçekten var mı? */
   var img = new Image();

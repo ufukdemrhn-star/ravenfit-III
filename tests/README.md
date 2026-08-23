@@ -4,7 +4,7 @@
 
 Uygulamayı aç → **F12** → **Console** sekmesi.
 
-### 1. Sağlık Testi (34 kontrol)
+### 1. Sağlık Testi (35 kontrol)
 
     fetch('tests/browser-test.js').then(r=>r.text()).then(eval)
 
@@ -25,7 +25,7 @@ Kontrol ettikleri:
 Yağ oranı, FFMI, BMR, TDEE, kalori hedefleri, makrolar,
 girdi sınırlaması, RED-S ve Bulk risk kontrolü.
 
-**Toplam 72 otomatik kontrol — hepsi tarayıcıda.**
+**Toplam 73 otomatik kontrol — hepsi tarayıcıda.**
 
 ---
 
@@ -34,8 +34,9 @@ girdi sınırlaması, RED-S ve Bulk risk kontrolü.
 Zorunlu değil, tarayıcı testleri aynı alanları kapsar.
 Bunlar geliştirme sırasında dosya bazlı derin kontrol içindir.
 
-    sh tests/run.sh                    # 18 regresyon + 23 uç durum testi
+    sh tests/run.sh                    # 19 regresyon + 23 uç durum + 85 yol testi
     python3 tests/deadcode-check.py    # erişilemeyen fonksiyon taraması
+    python3 tests/path-check.py        # kırık dosya yolu taraması
 
 **Uç durum testi** özellikle değerli: bel ≤ boyun, boy 0 gibi
 imkânsız girdilerde hesaplamaların NaN/Infinity üretmediğini doğrular.

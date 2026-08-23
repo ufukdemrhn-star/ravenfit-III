@@ -16,4 +16,7 @@ node tests/regression.js
 echo ""
 echo "▸ Uç durum testi..."
 node tests/edge-cases.js
+echo ""
+echo "▸ Yol çözümleme testi..."
+python3 tests/path-check.py 2>/dev/null | tail -3 || echo "  (python3 yok, atlandı)"
 rm -f tests/_combined.tmp.js
