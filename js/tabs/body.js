@@ -140,9 +140,9 @@ function _btChartHTML(bt, tur){
    dilim uzunluğu = çevre × (yüzde/100), kalan boşluk bırakılır. */
 function _btPieHTML(bt){
   var dilimler = [
-    {ad:'Ektomorf', pct:bt.ecto, renk:'#4895EF'},
-    {ad:'Mezomorf', pct:bt.meso, renk:'#2EC4B6'},
-    {ad:'Endomorf', pct:bt.endo, renk:'#FF9F1C'}
+    {ad:'Ektomorf', pct:bt.ecto, renk:'var(--info)'},
+    {ad:'Mezomorf', pct:bt.meso, renk:'var(--success)'},
+    {ad:'Endomorf', pct:bt.endo, renk:'var(--warn)'}
   ];
   var R_ = 54, KALINLIK = 22;
   var cevre = 2 * Math.PI * R_;

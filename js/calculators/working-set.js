@@ -50,7 +50,7 @@ function _calcWorkingSet(){
   html+='<div style="font-size:10px;color:var(--text2);margin-top:2px">Açık: tüm setler aynı kg · Kapalı: piramit artış</div>';
   html+='</div>';
   html+='<div style="width:46px;height:26px;border-radius:13px;background:'+(fixed?'var(--accent)':'var(--border)')+';position:relative;flex-shrink:0;transition:background .2s">';
-  html+='<div style="position:absolute;top:3px;left:'+(fixed?'23px':'3px')+';width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s"></div>';
+  html+='<div style="position:absolute;top:3px;left:'+(fixed?'23px':'3px')+';width:20px;height:20px;border-radius:50%;background:var(--on-accent);transition:left .2s"></div>';
   html+='</div></div>';
   html+='</div>';
 

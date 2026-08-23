@@ -452,7 +452,7 @@ function renderExerciseDetail(exId){
     }
     /* Dikkat notu */
     if(ex.caution_tr){
-      html+='<div style="background:rgba(255,159,28,.08);border:1px solid rgba(255,159,28,.3);border-radius:11px;padding:10px 14px;margin-bottom:8px">'+
+      html+='<div style="background:color-mix(in srgb, var(--warn) 8%, transparent);border:1px solid color-mix(in srgb, var(--warn) 30%, transparent);border-radius:11px;padding:10px 14px;margin-bottom:8px">'+
         '<div style="font-size:12px;color:var(--warn);font-weight:700;margin-bottom:3px">⚠️ Dikkat</div>'+
         '<div style="font-size:11px;color:var(--text2);line-height:1.5">'+ex.caution_tr+'</div></div>';
     }
@@ -500,8 +500,8 @@ function renderExerciseDetail(exId){
       return h;
     };
 
-    html+=renderGroup('Birincil (Primary)',  '#e63946', 'rgba(230,57,70,.08)',  primary);
-    html+=renderGroup('İkincil (Secondary)', '#ff9f1c', 'rgba(255,159,28,.08)', secondary);
+    html+=renderGroup('Birincil (Primary)',  'var(--accent)', 'color-mix(in srgb, var(--accent) 8%, transparent)',  primary);
+    html+=renderGroup('İkincil (Secondary)', 'var(--warn)', 'color-mix(in srgb, var(--warn) 8%, transparent)', secondary);
     html+=renderGroup('Destekleyici',        'var(--text3)', 'rgba(255,255,255,.03)', tertiary);
 
     html+='</div>';
@@ -513,7 +513,7 @@ function renderExerciseDetail(exId){
     html+='<div class="rct">📋 Nasıl Yapılır</div>';
     ex.instructions_tr.forEach(function(step,i){
       html+='<div style="display:flex;gap:8px;margin-bottom:7px;font-size:12px;color:var(--text)">'+
-        '<div style="background:var(--accent);color:#fff;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;margin-top:1px">'+(i+1)+'</div>'+
+        '<div style="background:var(--accent);color:var(--on-accent);border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;margin-top:1px">'+(i+1)+'</div>'+
         '<div>'+step+'</div></div>';
     });
     html+='</div>';
@@ -576,9 +576,9 @@ function renderExerciseDetail(exId){
       var maxSev='low';
       matches.forEach(function(m){ if(sevOrder[m.severity]>sevOrder[maxSev]) maxSev=m.severity; });
       var sevColors={
-        low:    {bg:'rgba(76,201,240,.08)',  border:'#4cc9f0', text:'#4cc9f0', label:'Dikkat'},
-        medium: {bg:'rgba(255,159,28,.08)',  border:'#ff9f1c', text:'#ff9f1c', label:'Uyarı'},
-        high:   {bg:'rgba(230,57,70,.12)',   border:'#e63946', text:'#e63946', label:'Yüksek Risk'}
+        low:    {bg:'color-mix(in srgb, var(--info) 8%, transparent)',  border:'var(--info)', text:'var(--info)', label:'Dikkat'},
+        medium: {bg:'color-mix(in srgb, var(--warn) 8%, transparent)',  border:'var(--warn)', text:'var(--warn)', label:'Uyarı'},
+        high:   {bg:'color-mix(in srgb, var(--accent) 12%, transparent)',   border:'var(--accent)', text:'var(--accent)', label:'Yüksek Risk'}
       };
       var sevIcons={low:'ℹ️', medium:'⚠️', high:'🚨'};
       var mainCol=sevColors[maxSev];
@@ -605,7 +605,7 @@ function renderExerciseDetail(exId){
         html+='<div style="font-size:11px;color:var(--text2);line-height:1.5;margin-bottom:6px"><strong style="color:var(--text)">Neden riskli?</strong> '+m.reason+'</div>';
         /* Alternatif */
         if(m.alternative){
-          html+='<div style="font-size:11px;color:var(--text2);line-height:1.5;padding:6px 8px;background:rgba(46,196,182,.06);border-radius:6px;border-left:2px solid var(--success)">';
+          html+='<div style="font-size:11px;color:var(--text2);line-height:1.5;padding:6px 8px;background:color-mix(in srgb, var(--success) 6%, transparent);border-radius:6px;border-left:2px solid var(--success)">';
           html+='<strong style="color:var(--success)">💡 Alternatif:</strong> '+m.alternative;
           html+='</div>';
         }

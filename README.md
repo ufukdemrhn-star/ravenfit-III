@@ -245,3 +245,56 @@ Tarayıcı testine de aynı yapı kontrolü **en başa** eklendi.
   Inline `onclick` içindeki kırılgan tırnak kaçışı yerine
   `openExerciseLibraryFrom(branş, nereden)` yardımcısı kullanıldı.
 - **Wizard ölçü etiketlerindeki** renk vurgusu kaldırıldı (Omuz/Kalça artık sade).
+
+---
+
+## v0.5.0.0 — Tema sistemi yeniden kuruldu
+
+### Sorun
+
+- **297 sabit renk** tema değişkenlerini bypass ediyordu. Tema değiştirince
+  kartların yarısı eski renkte kalıyordu.
+- **Tüm temalarda `--text3` WCAG'i geçmiyordu** (1.7–2.25, gereken ≥3.0).
+- **Aydınlık tema bej zeminliydi** (`#E8E4DC`) — kirli görünüyor, kartlar
+  zeminden ayrışmıyordu.
+- Taban renkleri neredeyse saf siyahtı (`#080809`) — araştırmaya göre
+  halation ve göz yorgunluğu yapar.
+
+### Çözüm
+
+Temalar `tools/theme_gen.py` ile **hesaplanarak** üretildi. Her renk,
+hedef kontrast oranını sağlayana kadar ikili aramayla bulunur.
+
+**Uygulanan kurallar** (Material Design + WCAG 2.2 araştırması):
+
+| Kural | Uygulama |
+|---|---|
+| Saf siyah kullanma | Tabanlar `#0C`–`#10` aralığında, tema tonuyla renklendirilmiş |
+| Saf beyaz metin kullanma | `#EE`–`#F1` aralığı — "beyaz" okunur, parlamaz |
+| Yükseklik gölgeyle değil yüzeyle | `bg → bg2 → card → card2` açıklık merdiveni |
+| Koyu temada açık anlam renkleri | Material 200-50 aralığı, doygun koyu tonlar değil |
+| Metin en açık yüzeye göre ölçülür | `card2` referans alınır — yoksa iç kartlarda kontrast düşüyordu |
+
+**7 tema:** Gece · Kızıl · Menekşe · Orman · Gül · **Okyanus (yeni)** · Aydınlık
+
+Marka renkleri korundu — hepsi zaten kontrastı geçiyordu. Yalnızca dolu
+butonlar için `--accent-btn` türetildi (beyaz metinle 4.6:1).
+
+**Yeni değişkenler:** `--accent-btn` `--on-accent` `--danger`
+`--shadow-sm/md/lg` `--overlay` `--shadow-sm-c/md-c`
+
+**`color-scheme`** ayarlanıyor — kaydırma çubuğu, tarih seçici ve otomatik
+doldurma da temaya uyuyor.
+
+### Tema seçici
+
+Küçük dairelerden **kare kartlara** geçildi. Her kart temanın gerçek zemin
+rengini ve marka rengini birlikte gösteriyor, altında adı yazıyor.
+Çekmece genişliğince 4 sütunlu ızgara (dar ekranda 3).
+
+### Doğrulama
+
+`tests/theme-check.py` — 7 tema × 20 kontrast kombinasyonu, yüzey merdiveni
+sıralaması ve sabit renk kaçağı taraması. Denetim listesinde otomatik çalışır.
+
+**Sabit renk: 297 → 29** (kalanlar rozet/dekoratif renkler).

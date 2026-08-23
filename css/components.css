@@ -5,7 +5,11 @@
 
 /* ── BUTTONS ─────────────────────────────────────────────────  */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:13px 24px;border-radius:11px;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;transition:all .25s;white-space:nowrap;-webkit-tap-highlight-color:transparent;touch-action:manipulation;position:relative;z-index:2}
-.btn-p{background:var(--accent);color:#fff;box-shadow:0 4px 16px var(--ag)}
+/* Dolu birincil buton — zemin olarak --accent-btn kullanılır.
+   --accent doğrudan kullanılınca beyaz metin WCAG AA'yı geçmiyordu
+   (marka kırmızısı orta tonda). --accent-btn aynı tonun beyaz metinle
+   4.6:1 sağlayan koyulaştırılmış hâlidir. */
+.btn-p{background:var(--accent-btn);color:var(--on-accent);box-shadow:0 4px 16px var(--ag)}
 .btn-p:hover{filter:brightness(1.1);transform:translateY(-1px)}
 .btn-p:active{transform:none}
 .icon-btn,.oc,.gbtn,.tb,.logo{touch-action:manipulation;-webkit-tap-highlight-color:transparent;position:relative;z-index:2}
@@ -67,7 +71,7 @@
 .oc.sel{border-color:var(--accent);background:var(--ag)}
 .oc.locked{opacity:.4;pointer-events:none}
 /* Riskli ama hala seçilebilir hedef (BF gate) */
-.oc.risky{border-color:var(--warn);background:rgba(255,159,28,.04);opacity:.65}
+.oc.risky{border-color:var(--warn);background:color-mix(in srgb, var(--warn) 4%, transparent);opacity:.65}
 .oc.risky:hover{border-color:var(--warn);opacity:.85}
 .oc.risky.sel{border-color:var(--accent);background:var(--ag);opacity:1}
 .oc.risky::before{content:'⚠️';position:absolute;top:-7px;right:8px;font-size:12px;background:var(--bg);padding:0 4px;border-radius:6px;line-height:1}
@@ -89,7 +93,7 @@
 .alert.v{display:block}
 
 /* ── GOAL STEP ───────────────────────────────────────────────  */
-.g-rec{background:rgba(46,196,182,.07);border:1px solid rgba(46,196,182,.25);border-radius:12px;padding:11px 14px;margin-bottom:8px}
+.g-rec{background:color-mix(in srgb, var(--success) 7%, transparent);border:1px solid color-mix(in srgb, var(--success) 25%, transparent);border-radius:12px;padding:11px 14px;margin-bottom:8px}
 .g-rec-lbl{font-size:10px;color:var(--success);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px}
 .g-rec-txt{font-size:12px;color:var(--text2);line-height:1.5}
 .seclbl{font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px;margin-top:4px}
@@ -109,7 +113,7 @@
 .tabs{padding:10px 16px 0;max-width:640px;width:100%;margin:0 auto}
 .tab-nav{display:flex;gap:2px;background:var(--card);border-radius:10px;padding:3px;border:1px solid var(--border)}
 .tb{flex:1;padding:7px 3px;border-radius:7px;border:none;background:transparent;color:var(--text2);font-family:'Outfit',sans-serif;font-size:10px;font-weight:500;cursor:pointer;transition:all .22s;white-space:nowrap;-webkit-tap-highlight-color:transparent}
-.tb.act{background:var(--accent);color:#fff}
+.tb.act{background:var(--accent);color:var(--on-accent)}
 .tc{display:none}
 .tc.act{display:block;animation:fi .2s ease}
 @keyframes fi{from{opacity:0}to{opacity:1}}
@@ -124,11 +128,11 @@
 
 /* ── BADGES & UI ─────────────────────────────────────────────  */
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:600;margin-top:5px}
-.bg{background:rgba(46,196,182,.13);color:var(--success)}
-.by{background:rgba(255,159,28,.13);color:var(--warn)}
-.br{background:rgba(230,57,70,.13);color:var(--accent)}
-.bb{background:rgba(72,149,239,.13);color:var(--info)}
-.bp{background:rgba(155,114,255,.13);color:var(--purple)}
+.bg{background:color-mix(in srgb, var(--success) 13%, transparent);color:var(--success)}
+.by{background:color-mix(in srgb, var(--warn) 13%, transparent);color:var(--warn)}
+.br{background:color-mix(in srgb, var(--accent) 13%, transparent);color:var(--accent)}
+.bb{background:color-mix(in srgb, var(--info) 13%, transparent);color:var(--info)}
+.bp{background:color-mix(in srgb, var(--purple) 13%, transparent);color:var(--purple)}
 
 .mbar{margin-top:10px}
 .bar-lbls{display:flex;justify-content:space-between;margin-bottom:4px;font-size:9px;color:var(--text2)}

@@ -44,7 +44,7 @@ function renderBranchManager(){
     html+='<div style="font-size:26px;width:36px;text-align:center">'+b.icon+'</div>';
     html+='<div style="flex:1"><div style="font-size:14px;font-weight:700">'+b.label;
     if(b.coming) html+=' <span style="font-size:9px;background:var(--card2);border-radius:5px;padding:2px 6px;color:var(--text3)">Yakında</span>';
-    if(b.always) html+=' <span style="font-size:9px;background:rgba(46,196,182,.15);border-radius:5px;padding:2px 6px;color:var(--success)">Zorunlu</span>';
+    if(b.always) html+=' <span style="font-size:9px;background:color-mix(in srgb, var(--success) 15%, transparent);border-radius:5px;padding:2px 6px;color:var(--success)">Zorunlu</span>';
     html+='</div>';
     html+='<div style="font-size:11px;color:var(--text2)">'+b.desc+'</div></div>';
     html+='<div style="width:26px;height:26px;border-radius:50%;border:2px solid '+(isActive?'var(--accent)':'var(--border)')+';background:'+(isActive?'var(--accent)':'none')+';display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;flex-shrink:0">'+(isActive?'✓':'')+'</div>';

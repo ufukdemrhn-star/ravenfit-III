@@ -23,7 +23,7 @@ function renderBeslenmeToolsGrid(){
   var html='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:8px">';
   tools.forEach(function(t){
     var isActive=_activeBesPanel===t.id;
-    html+='<div onclick="toggleBeslenmePanel(\''+t.id+'\')" style="background:'+(isActive?'rgba(46,196,182,.1)':'var(--card)')+';border:1.5px solid '+(isActive?'var(--accent)':'var(--border)')+';border-radius:14px;padding:14px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;-webkit-tap-highlight-color:transparent;transition:all .18s">';
+    html+='<div onclick="toggleBeslenmePanel(\''+t.id+'\')" style="background:'+(isActive?'color-mix(in srgb, var(--success) 10%, transparent)':'var(--card)')+';border:1.5px solid '+(isActive?'var(--accent)':'var(--border)')+';border-radius:14px;padding:14px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;-webkit-tap-highlight-color:transparent;transition:all .18s">';
     html+='<div style="font-size:26px;line-height:1">'+t.icon+'</div>';
     html+='<div style="font-family:\'Bebas Neue\',cursive;font-size:14px;letter-spacing:.8px;color:'+(isActive?'var(--accent)':'var(--text)')+';line-height:1.1;text-align:center">'+t.label+'</div>';
     html+='<div style="font-size:9px;color:var(--text3);text-align:center">'+t.sub+'</div>';
@@ -75,7 +75,7 @@ function _buildSuppsPanel(){
   html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px" id="supps-used-grid">';
   SUPP_USED_LIST.forEach(function(s){
     var isUsed=used.indexOf(s.id)>=0;
-    html+='<div onclick="toggleSuppUsed(\''+s.id+'\')" style="display:flex;align-items:center;gap:6px;padding:7px 8px;background:'+(isUsed?'rgba(46,196,182,.1)':'var(--card2)')+';border:1.5px solid '+(isUsed?'var(--success)':'var(--border)')+';border-radius:8px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s">';
+    html+='<div onclick="toggleSuppUsed(\''+s.id+'\')" style="display:flex;align-items:center;gap:6px;padding:7px 8px;background:'+(isUsed?'color-mix(in srgb, var(--success) 10%, transparent)':'var(--card2)')+';border:1.5px solid '+(isUsed?'var(--success)':'var(--border)')+';border-radius:8px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s">';
     html+='<div style="width:18px;height:18px;border-radius:4px;border:2px solid '+(isUsed?'var(--success)':'var(--border)')+';background:'+(isUsed?'var(--success)':'none')+';display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;flex-shrink:0">'+(isUsed?'✓':'')+'</div>';
     html+='<div style="font-size:11px;font-weight:'+(isUsed?'600':'400')+';color:'+(isUsed?'var(--text)':'var(--text2)')+'">'+s.emoji+' '+s.label+'</div>';
     html+='</div>';

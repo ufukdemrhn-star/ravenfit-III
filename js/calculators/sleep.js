@@ -68,7 +68,7 @@ function _sleepToggle(key,val,title,sub){
     '<div style="font-size:10px;color:var(--text2);margin-top:2px">'+sub+'</div>'+
     '</div>'+
     '<div style="width:46px;height:26px;border-radius:13px;background:'+(val?'var(--accent)':'var(--border)')+';position:relative;flex-shrink:0;transition:background .2s">'+
-    '<div style="position:absolute;top:3px;left:'+(val?'23px':'3px')+';width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s"></div>'+
+    '<div style="position:absolute;top:3px;left:'+(val?'23px':'3px')+';width:20px;height:20px;border-radius:50%;background:var(--on-accent);transition:left .2s"></div>'+
     '</div></div>';
 }
 
@@ -170,7 +170,7 @@ function _calcSleepUpdate(){
   var recHours='7-9';
   if(age<18) recHours='8-10';
   else if(age>=65) recHours='7-8';
-  html+='<div class="calc-grid-card" style="background:rgba(46,196,182,.06);border-color:rgba(46,196,182,.2)">';
+  html+='<div class="calc-grid-card" style="background:color-mix(in srgb, var(--success) 6%, transparent);border-color:color-mix(in srgb, var(--success) 20%, transparent)">';
   html+='<div style="font-size:11px;color:var(--text2);line-height:1.5">';
   html+='<strong style="color:var(--success)">📊 Sana özel:</strong> '+age+' yaşında için önerilen uyku <strong>'+recHours+' saat</strong>.<br>';
   if(isWorkoutDay){

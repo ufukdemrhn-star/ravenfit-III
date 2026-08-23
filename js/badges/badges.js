@@ -165,7 +165,7 @@ function _spawnConfetti(){
   var container=document.getElementById('confetti-container');
   if(!container) return;
   container.innerHTML='';
-  var colors=['#e63946','#2ec4b6','#ff9f1c','#4cc9f0','#f72585','#7209b7','#4361ee','#06d6a0','#ffd166','#ef476f'];
+  var colors=['var(--accent)','var(--success)','var(--warn)','var(--info)','#f72585','#7209b7','#4361ee','var(--success)','#ffd166','#ef476f'];
   var count=35;
   for(var i=0;i<count;i++){
     var piece=document.createElement('div');

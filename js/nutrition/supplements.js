@@ -713,11 +713,11 @@ function renderSuppResults(){
     /* Geriye dönük uyum: s.desc yoksa s.purpose veya s.effect kullan */
     var summary = s.desc || s.purpose || s.effect || '';
     
-    html+='<div class="supp-result" style="border-left:3px solid '+s.color+(alreadyUsing?';background:rgba(46,196,182,.05)':'')+'">';
+    html+='<div class="supp-result" style="border-left:3px solid '+s.color+(alreadyUsing?';background:color-mix(in srgb, var(--success) 5%, transparent)':'')+'">';
     html+='<div class="supp-result-head"><span class="supp-result-ico">'+s.emoji+'</span>';
     html+='<div style="flex:1"><span class="supp-result-name">'+s.name+'</span>';
     if(alreadyUsing){
-      html+='<span style="display:inline-block;margin-left:6px;font-size:9px;font-weight:700;color:var(--success);background:rgba(46,196,182,.15);border-radius:5px;padding:2px 6px;vertical-align:middle">✓ Zaten Kullanıyorsun</span>';
+      html+='<span style="display:inline-block;margin-left:6px;font-size:9px;font-weight:700;color:var(--success);background:color-mix(in srgb, var(--success) 15%, transparent);border-radius:5px;padding:2px 6px;vertical-align:middle">✓ Zaten Kullanıyorsun</span>';
     }
     /* Doz + Kanıt rozet aynı satırda */
     html+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px">';
@@ -787,7 +787,7 @@ function renderSuppResults(){
   });
 
   /* MEDICO-LEGAL DISCLAIMER */
-  html+='<div style="margin-top:18px;padding:14px;background:rgba(230,57,70,.05);border:1px solid rgba(230,57,70,.25);border-left:4px solid var(--danger);border-radius:10px">';
+  html+='<div style="margin-top:18px;padding:14px;background:color-mix(in srgb, var(--accent) 5%, transparent);border:1px solid color-mix(in srgb, var(--accent) 25%, transparent);border-left:4px solid var(--danger);border-radius:10px">';
   html+='<div style="font-size:12px;font-weight:700;color:var(--danger);margin-bottom:6px;display:flex;align-items:center;gap:6px">⚕️ Önemli Sağlık Uyarısı</div>';
   html+='<div style="font-size:11px;color:var(--text2);line-height:1.55">';
   html+='Bu öneriler <strong style="color:var(--text)">genel bilgilendirme</strong> amacıyla sunulmuştur ve <strong style="color:var(--text)">tıbbi tavsiye yerine geçmez</strong>. Supplement kullanımı; mevcut sağlık durumun, kullandığın ilaçlar, gebelik/emzirme durumu ve bireysel ihtiyaçlar değerlendirilerek belirlenmelidir.';

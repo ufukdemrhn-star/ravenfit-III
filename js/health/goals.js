@@ -314,7 +314,7 @@ function renderGoalAdvice(goal) {
     try {
       var detail=recGoalDetailed();
       if(detail && detail.reason){
-        reasonHtml='<div style="margin-top:10px;padding:10px 12px;background:rgba(76,201,240,.08);border-left:3px solid var(--info);border-radius:8px"><div style="font-size:11px;font-weight:700;color:var(--info);margin-bottom:3px">🧠 Neden bu öneri?</div><div style="font-size:11px;color:var(--text2);line-height:1.5">'+detail.reason+'</div></div>';
+        reasonHtml='<div style="margin-top:10px;padding:10px 12px;background:color-mix(in srgb, var(--info) 8%, transparent);border-left:3px solid var(--info);border-radius:8px"><div style="font-size:11px;font-weight:700;color:var(--info);margin-bottom:3px">🧠 Neden bu öneri?</div><div style="font-size:11px;color:var(--text2);line-height:1.5">'+detail.reason+'</div></div>';
       }
     } catch(e){}
     elTxt.innerHTML='<strong>Hedef Analizi:</strong> ' + (rTexts[goal] || '') + changeHtml + adviceHtml + reasonHtml;
@@ -402,7 +402,7 @@ function _renderGoalQuickEdit(){
 
   /* Neden bu öneri */
   if(detail && detail.reason){
-    html+='<div style="margin-top:10px;padding:8px 10px;background:rgba(76,201,240,.08);border-left:3px solid var(--info);border-radius:6px">';
+    html+='<div style="margin-top:10px;padding:8px 10px;background:color-mix(in srgb, var(--info) 8%, transparent);border-left:3px solid var(--info);border-radius:6px">';
     html+='<div style="font-size:10px;font-weight:700;color:var(--info);margin-bottom:2px">🧠 Neden bu öneri?</div>';
     html+='<div style="font-size:10px;color:var(--text2);line-height:1.4">'+detail.reason+'</div>';
     html+='</div>';
@@ -432,7 +432,7 @@ function _renderGoalQuickEdit(){
 
   /* ── 4. SONUÇ ÖNİZLEMESİ ── */
   if(R.macros && R.goalCal){
-    html+='<div class="calc-grid-card" style="background:linear-gradient(135deg, rgba(230,57,70,.06), rgba(76,201,240,.04));border-color:var(--accent)">';
+    html+='<div class="calc-grid-card" style="background:linear-gradient(135deg, color-mix(in srgb, var(--accent) 6%, transparent), color-mix(in srgb, var(--info) 4%, transparent));border-color:var(--accent)">';
     html+='<div class="calc-label" style="margin-bottom:8px">📊 Güncel Değerler</div>';
     html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border)">';
     html+='<span style="font-size:11px;color:var(--text2)">Günlük Kalori</span>';

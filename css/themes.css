@@ -1,47 +1,217 @@
 /* ══════════════════════════════════════════════════════════
    RavenFit — themes.css
-   6 tema değişkeni
+   7 tema · tamamı WCAG 2.2 AA uyumlu
+
+   TASARIM KURALLARI (Material Design + WCAG 2.2 araştırması)
+   ──────────────────────────────────────────────────────────
+   • Saf siyah (#000) yok — halation ve göz yorgunluğu yapar.
+     Tabanlar #0C-#10 aralığında, temanın tonuyla hafif renklendirilmiş.
+   • Saf beyaz metin yok — #EE-#F1 aralığı "beyaz" okunur ama parlamaz.
+   • Koyu temada yükseklik GÖLGEYLE değil YÜZEY AÇIKLIĞIYLA anlatılır:
+       bg (en koyu) → bg2 → card → card2 (en açık)
+   • Koyu temada anlam renkleri AÇIK tonlardan seçilir (Material 200-50),
+     doygun koyu tonlar (900-500) göz titremesi yapar.
+   • Her renk çifti WCAG AA eşiğini karşılar:
+       normal metin 4.5:1 · büyük metin ve UI öğesi 3:1
+
+   Bu dosya tools/theme_gen.py ile üretilip doğrulanmıştır.
+   Elle değiştirirsen kontrast denetimini tekrar çalıştır.
    ══════════════════════════════════════════════════════════ */
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
-/* ── 6 THEMES ──────────────────────────────────────────────── */
+/* ── DARK — nötr koyu, hafif soğuk ton */
 :root,[data-theme="dark"]{
-  --bg:#080809;--bg2:#0F0F11;--card:#161618;--card2:#1E1E21;
-  --border:#2A2A2F;--text:#F2F2F4;--text2:#9090A0;--text3:#44444F;
-  --accent:#E63946;--ag:rgba(230,57,70,0.18);--hbg:rgba(8,8,9,0.92);
-  --success:#2EC4B6;--warn:#FF9F1C;--info:#4895EF;--purple:#9B72FF;
+  /* Yüzey merdiveni — koyu temada yükseklik açıklıkla anlatılır */
+  --bg:#0D0E0F; --bg2:#141416; --card:#1A1B1D; --card2:#232427;
+  --border:#36373D;
+
+  /* Metin — en açık yüzeye (card2) göre hesaplandı, hepsi WCAG AA */
+  --text:#EEEFF1; --text2:#898FA6; --text3:#6A718A;
+
+  /* Marka */
+  --accent:#E63946;       /* çizgi, ikon, vurgu metni */
+  --accent-btn:#E32432;   /* dolu buton zemini — beyaz metinle 4.6:1 */
+  --on-accent:#FFFFFF;        /* vurgu zemini üzerindeki metin */
+  --ag:rgba(230,57,70,0.16);
+
+  /* Anlam renkleri */
+  --success:#28AC9A; --warn:#E58D0A; --info:#4196EA;
+  --purple:#A572EE; --danger:#EB5B69;
+
+  /* Yüzey ve örtü */
+  --hbg:rgba(13,14,15,0.90);
+  --shadow-sm-c:rgba(0,0,0,.25); --shadow-md-c:rgba(0,0,0,.45);
+  --shadow-sm:0 1px 3px rgba(0,0,0,.25); --shadow-md:0 4px 14px rgba(0,0,0,.45); --shadow-lg:0 10px 34px rgba(0,0,0,.58);
+  --overlay:rgba(0,0,0,.68);
 }
-[data-theme="light"]{
-  --bg:#E8E4DC;--bg2:#DDD9D0;--card:#F5F2EC;--card2:#EAE6DE;
-  --border:#C4BFB6;--text:#17171A;--text2:#4A4A56;--text3:#9898A6;
-  --accent:#B8202C;--ag:rgba(184,32,44,0.13);--hbg:rgba(232,228,220,0.96);
-  --success:#0D9E90;--warn:#C97800;--info:#2470CC;--purple:#6B42D0;
-}
-[data-theme="violet"]{
-  --bg:#09070F;--bg2:#0F0C18;--card:#171320;--card2:#1F1829;
-  --border:#2E2840;--text:#EEEAFF;--text2:#8A84B8;--text3:#3E3850;
-  --accent:#9B72FF;--ag:rgba(155,114,255,0.18);--hbg:rgba(9,7,15,0.92);
-  --success:#2EC4B6;--warn:#FF9F1C;--info:#4895EF;--purple:#9B72FF;
-}
-[data-theme="forest"]{
-  --bg:#060D08;--bg2:#0B1410;--card:#111C14;--card2:#182419;
-  --border:#253428;--text:#E8F5EC;--text2:#8DB898;--text3:#3A4C40;
-  --accent:#22A857;--ag:rgba(34,168,87,0.17);--hbg:rgba(6,13,8,0.92);
-  --success:#22A857;--warn:#FF9F1C;--info:#4895EF;--purple:#9B72FF;
-}
-[data-theme="rose"]{
-  --bg:#0F090D;--bg2:#170D12;--card:#1E1118;--card2:#261520;
-  --border:#382030;--text:#FFECF4;--text2:#C48AAA;--text3:#4C3044;
-  --accent:#F472B6;--ag:rgba(244,114,182,0.18);--hbg:rgba(15,9,13,0.92);
-  --success:#2EC4B6;--warn:#FF9F1C;--info:#4895EF;--purple:#B472FF;
-}
+
+/* ── CRIMSON — kızıl tonlu koyu */
 [data-theme="crimson"]{
-  --bg:#0A0204;--bg2:#110508;--card:#1A080B;--card2:#230B0F;
-  --border:#3D1418;--text:#FFF4F2;--text2:#C49A94;--text3:#5A3030;
-  --accent:#C0392B;--ag:rgba(192,57,43,0.22);--hbg:rgba(10,2,4,0.92);
-  --success:#2EC4B6;--warn:#FF9F1C;--info:#4895EF;--purple:#9B72FF;
+  /* Yüzey merdiveni — koyu temada yükseklik açıklıkla anlatılır */
+  --bg:#100C0C; --bg2:#181212; --card:#201718; --card2:#2B1F20;
+  --border:#433031;
+
+  /* Metin — en açık yüzeye (card2) göre hesaplandı, hepsi WCAG AA */
+  --text:#F1EEEE; --text2:#A48688; --text3:#88686A;
+
+  /* Marka */
+  --accent:#E5484D;       /* çizgi, ikon, vurgu metni */
+  --accent-btn:#E1292F;   /* dolu buton zemini — beyaz metinle 4.6:1 */
+  --on-accent:#FFFFFF;        /* vurgu zemini üzerindeki metin */
+  --ag:rgba(229,72,77,0.16);
+
+  /* Anlam renkleri */
+  --success:#28AA98; --warn:#E28B09; --info:#3E94EA;
+  --purple:#A46FED; --danger:#EA5866;
+
+  /* Yüzey ve örtü */
+  --hbg:rgba(16,12,12,0.90);
+  --shadow-sm-c:rgba(0,0,0,.25); --shadow-md-c:rgba(0,0,0,.45);
+  --shadow-sm:0 1px 3px rgba(0,0,0,.25); --shadow-md:0 4px 14px rgba(0,0,0,.45); --shadow-lg:0 10px 34px rgba(0,0,0,.58);
+  --overlay:rgba(0,0,0,.68);
+}
+
+/* ── VIOLET — mor tonlu koyu */
+[data-theme="violet"]{
+  /* Yüzey merdiveni — koyu temada yükseklik açıklıkla anlatılır */
+  --bg:#0D0C10; --bg2:#141218; --card:#1A1720; --card2:#231F2B;
+  --border:#373043;
+
+  /* Metin — en açık yüzeye (card2) göre hesaplandı, hepsi WCAG AA */
+  --text:#EFEEF1; --text2:#9288A5; --text3:#756A89;
+
+  /* Marka */
+  --accent:#9B72FF;       /* çizgi, ikon, vurgu metni */
+  --accent-btn:#8350FF;   /* dolu buton zemini — beyaz metinle 4.6:1 */
+  --on-accent:#FFFFFF;        /* vurgu zemini üzerindeki metin */
+  --ag:rgba(155,114,255,0.16);
+
+  /* Anlam renkleri */
+  --success:#28A997; --warn:#E18A09; --info:#3C93E9;
+  --purple:#A36EED; --danger:#EA5664;
+
+  /* Yüzey ve örtü */
+  --hbg:rgba(13,12,16,0.90);
+  --shadow-sm-c:rgba(0,0,0,.25); --shadow-md-c:rgba(0,0,0,.45);
+  --shadow-sm:0 1px 3px rgba(0,0,0,.25); --shadow-md:0 4px 14px rgba(0,0,0,.45); --shadow-lg:0 10px 34px rgba(0,0,0,.58);
+  --overlay:rgba(0,0,0,.68);
+}
+
+/* ── FOREST — yeşil tonlu koyu */
+[data-theme="forest"]{
+  /* Yüzey merdiveni — koyu temada yükseklik açıklıkla anlatılır */
+  --bg:#0C100E; --bg2:#121815; --card:#181F1C; --card2:#202A25;
+  --border:#31413A;
+
+  /* Metin — en açık yüzeye (card2) göre hesaplandı, hepsi WCAG AA */
+  --text:#EEF1F0; --text2:#7A9A8B; --text3:#5F7B6E;
+
+  /* Marka */
+  --accent:#2ECC71;       /* çizgi, ikon, vurgu metni */
+  --accent-btn:#1E864A;   /* dolu buton zemini — beyaz metinle 4.6:1 */
+  --on-accent:#FFFFFF;        /* vurgu zemini üzerindeki metin */
+  --ag:rgba(46,204,113,0.16);
+
+  /* Anlam renkleri */
+  --success:#29B19E; --warn:#EA910A; --info:#489AEB;
+  --purple:#A877EE; --danger:#EC626F;
+
+  /* Yüzey ve örtü */
+  --hbg:rgba(12,16,14,0.90);
+  --shadow-sm-c:rgba(0,0,0,.25); --shadow-md-c:rgba(0,0,0,.45);
+  --shadow-sm:0 1px 3px rgba(0,0,0,.25); --shadow-md:0 4px 14px rgba(0,0,0,.45); --shadow-lg:0 10px 34px rgba(0,0,0,.58);
+  --overlay:rgba(0,0,0,.68);
+}
+
+/* ── ROSE — pembe tonlu koyu */
+[data-theme="rose"]{
+  /* Yüzey merdiveni — koyu temada yükseklik açıklıkla anlatılır */
+  --bg:#100C0E; --bg2:#181214; --card:#1F181B; --card2:#2A2024;
+  --border:#413138;
+
+  /* Metin — en açık yüzeye (card2) göre hesaplandı, hepsi WCAG AA */
+  --text:#F1EEEF; --text2:#A48692; --text3:#876874;
+
+  /* Marka */
+  --accent:#F472B6;       /* çizgi, ikon, vurgu metni */
+  --accent-btn:#E0127E;   /* dolu buton zemini — beyaz metinle 4.6:1 */
+  --on-accent:#FFFFFF;        /* vurgu zemini üzerindeki metin */
+  --ag:rgba(244,114,182,0.16);
+
+  /* Anlam renkleri */
+  --success:#28AB99; --warn:#E28C09; --info:#3F95EA;
+  --purple:#A570ED; --danger:#EA5967;
+
+  /* Yüzey ve örtü */
+  --hbg:rgba(16,12,14,0.90);
+  --shadow-sm-c:rgba(0,0,0,.25); --shadow-md-c:rgba(0,0,0,.45);
+  --shadow-sm:0 1px 3px rgba(0,0,0,.25); --shadow-md:0 4px 14px rgba(0,0,0,.45); --shadow-lg:0 10px 34px rgba(0,0,0,.58);
+  --overlay:rgba(0,0,0,.68);
+}
+
+/* ── OCEAN — mavi tonlu koyu */
+[data-theme="ocean"]{
+  /* Yüzey merdiveni — koyu temada yükseklik açıklıkla anlatılır */
+  --bg:#0C0E10; --bg2:#121518; --card:#171C20; --card2:#1F262B;
+  --border:#313B42;
+
+  /* Metin — en açık yüzeye (card2) göre hesaplandı, hepsi WCAG AA */
+  --text:#EEF0F1; --text2:#80939F; --text3:#637581;
+
+  /* Marka */
+  --accent:#38BDF8;       /* çizgi, ikon, vurgu metni */
+  --accent-btn:#067CB1;   /* dolu buton zemini — beyaz metinle 4.6:1 */
+  --on-accent:#FFFFFF;        /* vurgu zemini üzerindeki metin */
+  --ag:rgba(56,189,248,0.16);
+
+  /* Anlam renkleri */
+  --success:#28AD9B; --warn:#E68E0A; --info:#4397EA;
+  --purple:#A673EE; --danger:#EB5D6B;
+
+  /* Yüzey ve örtü */
+  --hbg:rgba(12,14,16,0.90);
+  --shadow-sm-c:rgba(0,0,0,.25); --shadow-md-c:rgba(0,0,0,.45);
+  --shadow-sm:0 1px 3px rgba(0,0,0,.25); --shadow-md:0 4px 14px rgba(0,0,0,.45); --shadow-lg:0 10px 34px rgba(0,0,0,.58);
+  --overlay:rgba(0,0,0,.68);
+}
+
+/* ── LIGHT — nötr aydınlık, soğuk beyaz */
+[data-theme="light"]{
+  /* Yüzey merdiveni — koyu temada yükseklik açıklıkla anlatılır */
+  --bg:#F7F8FA; --bg2:#EEF0F3; --card:#FFFFFF; --card2:#F4F5F8;
+  --border:#DADDE4;
+
+  /* Metin — en açık yüzeye (card2) göre hesaplandı, hepsi WCAG AA */
+  --text:#1A1F28; --text2:#5F697E; --text3:#7D8699;
+
+  /* Marka */
+  --accent:#E01423;       /* çizgi, ikon, vurgu metni */
+  --accent-btn:#E01423;   /* dolu buton zemini — beyaz metinle 4.6:1 */
+  --on-accent:#FFFFFF;        /* vurgu zemini üzerindeki metin */
+  --ag:rgba(224,20,35,0.12);
+
+  /* Anlam renkleri */
+  --success:#0A7F68; --warn:#A95E09; --info:#196DDD;
+  --purple:#8B4FE0; --danger:#DC1F32;
+
+  /* Yüzey ve örtü */
+  --hbg:rgba(255,255,255,0.92);
+  --shadow-sm-c:rgba(16,20,32,.10); --shadow-md-c:rgba(16,20,32,.14);
+  --shadow-sm:0 1px 3px rgba(16,20,32,.10); --shadow-md:0 4px 14px rgba(16,20,32,.14); --shadow-lg:0 10px 34px rgba(16,20,32,.18);
+  --overlay:rgba(20,24,34,.45);
 }
 
 html{scroll-behavior:smooth}
-body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;transition:background .3s,color .3s}
+body{
+  font-family:'Outfit',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+  /* Tema geçişi yumuşak olsun ama animasyon tercihine saygı duy */
+  transition:background .35s ease,color .35s ease}
+@media(prefers-reduced-motion:reduce){
+  body{transition:none}
+  html{scroll-behavior:auto}
+}

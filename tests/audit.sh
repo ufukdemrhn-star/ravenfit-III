@@ -23,6 +23,13 @@ python3 tests/html-check.py > /tmp/rf_html.log 2>&1
 sonuc $? "$(grep -o '[0-9]*/[0-9]* geçti' /tmp/rf_html.log | head -1)"
 grep "❌" /tmp/rf_html.log | head -6
 
+# ── 0b. Tema denetimi ──────────────────────────────────────
+baslik "0b. Tema denetimi (WCAG AA)"
+python3 tests/theme-check.py > /tmp/rf_theme.log 2>&1
+! grep -q "❌" /tmp/rf_theme.log
+sonuc $? "$(grep -o '[0-9]*/[0-9]* geçti' /tmp/rf_theme.log | head -1)"
+grep "❌\|✗" /tmp/rf_theme.log | head -8
+
 # ── 1. JS sözdizimi ────────────────────────────────────────
 baslik "1. JavaScript sözdizimi"
 GECERLI=0; TOPLAM=0

@@ -53,7 +53,7 @@ var YEDEK_ANAHTARLARI = [
 function exportData(){
   var data = {
     _format: 'ravenfit-backup',
-    version: '0.4.2.1',
+    version: '0.5.0.0',
     exported: new Date().toISOString()
   };
   var kayitli = 0;

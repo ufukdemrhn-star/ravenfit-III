@@ -41,8 +41,8 @@ function openSettingsDrawer(){
   var unit=getUnit();
   document.querySelectorAll('[data-unit-btn]').forEach(function(b){
     var isSel=b.dataset.unitBtn===unit;
-    b.style.background=isSel?'var(--accent)':'transparent';
-    b.style.color=isSel?'#fff':'var(--text2)';
+    b.style.background=isSel?'var(--accent-btn)':'transparent';
+    b.style.color=isSel?'var(--on-accent)':'var(--text2)';
   });
   refreshLevelButtons();
   _renderStorageUsage();
@@ -57,9 +57,9 @@ function refreshLevelButtons(){
   var mode=getUserLevelMode();
   document.querySelectorAll('[data-level-btn]').forEach(function(b){
     var isSel=b.dataset.levelBtn===mode;
-    b.style.background=isSel?'var(--accent)':'var(--card2)';
-    b.style.color=isSel?'#fff':'var(--text2)';
-    b.style.borderColor=isSel?'var(--accent)':'var(--border)';
+    b.style.background=isSel?'var(--accent-btn)':'var(--card2)';
+    b.style.color=isSel?'var(--on-accent)':'var(--text2)';
+    b.style.borderColor=isSel?'var(--accent-btn)':'var(--border)';
   });
   var info=document.getElementById('sdw-level-auto-info');
   if(info){

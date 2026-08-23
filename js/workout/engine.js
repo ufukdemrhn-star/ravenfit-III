@@ -256,7 +256,7 @@ function _ws_renderBody(){
     var durDef=set.duration_sec||ex.duration_sec||exData.duration_sec||30;
     html+='<div class="ws-input-row">';
     html+='<div class="ws-input-group"><div class="ws-input-label">Süre</div>';
-    html+='<div class="ws-input-big" style="cursor:'+(set.done?'default':'pointer')+';color:var(--accent);background:'+(set.done?'var(--card2)':'rgba(46,196,182,.08)')+'" '+(set.done?'':'onclick="_wsPostureTimer('+ei+','+si+','+durDef+')"')+'>'+durDef+'s</div></div>';
+    html+='<div class="ws-input-big" style="cursor:'+(set.done?'default':'pointer')+';color:var(--accent);background:'+(set.done?'var(--card2)':'color-mix(in srgb, var(--success) 8%, transparent)')+'" '+(set.done?'':'onclick="_wsPostureTimer('+ei+','+si+','+durDef+')"')+'>'+durDef+'s</div></div>';
     html+='<div class="ws-input-group"><div class="ws-input-label">Tekrar</div>';
     html+='<input class="ws-input-big" type="number" inputmode="numeric" placeholder="'+(ex.reps||'')+'" value="'+(set.reps||'')+'"'+(set.done?' disabled':'')+' onchange="_ws_setVal('+ei+','+si+',\'reps\',this.value)"></div>';
     html+='</div>';
@@ -276,7 +276,7 @@ function _ws_renderBody(){
   if(set.done){
     html+='<button class="ws-complete-btn" style="background:var(--success);color:#fff" onclick="_ws_toggleSet('+ei+','+si+')">✓ Tamamlandı — Geri Al</button>';
   } else {
-    html+='<button class="ws-complete-btn" style="background:var(--accent);color:#fff" onclick="_ws_toggleSet('+ei+','+si+')">✅ Seti Tamamla</button>';
+    html+='<button class="ws-complete-btn" style="background:var(--accent);color:var(--on-accent)" onclick="_ws_toggleSet('+ei+','+si+')">✅ Seti Tamamla</button>';
   }
   html+='</div>';
 

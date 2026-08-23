@@ -504,8 +504,8 @@ function saveToFirebase(){
 /* ── Auth sekme toggle ────────────────────────────────── */
 
 function showLoginTab(){
-  document.getElementById('auth-tab-login').style.background='var(--accent)';
-  document.getElementById('auth-tab-login').style.color='#fff';
+  document.getElementById('auth-tab-login').style.background='var(--accent-btn)';
+  document.getElementById('auth-tab-login').style.color='var(--on-accent)';
   document.getElementById('auth-tab-register').style.background='transparent';
   document.getElementById('auth-tab-register').style.color='var(--text2)';
   document.getElementById('auth-form-login').style.display='block';
@@ -514,8 +514,8 @@ function showLoginTab(){
 }
 
 function showRegisterTab(){
-  document.getElementById('auth-tab-register').style.background='var(--accent)';
-  document.getElementById('auth-tab-register').style.color='#fff';
+  document.getElementById('auth-tab-register').style.background='var(--accent-btn)';
+  document.getElementById('auth-tab-register').style.color='var(--on-accent)';
   document.getElementById('auth-tab-login').style.background='transparent';
   document.getElementById('auth-tab-login').style.color='var(--text2)';
   document.getElementById('auth-form-login').style.display='none';

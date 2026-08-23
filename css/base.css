@@ -32,7 +32,7 @@ body.wizard-mode .hdr{justify-content:center}
 
 /* Auth input class */
 .auth-inp{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-family:'Outfit',sans-serif;font-size:15px;outline:none;width:100%;transition:border-color .2s,box-shadow .2s;text-transform:none}
-.auth-inp.auth-err-field{border-color:var(--accent)!important;box-shadow:0 0 0 3px rgba(230,57,70,.18)!important;animation:authShake .35s}
+.auth-inp.auth-err-field{border-color:var(--accent)!important;box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent)!important;animation:authShake .35s}
 @keyframes authShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
 
 .splash-icon{width:148px;height:148px;margin:0 auto 18px;position:relative;z-index:3;filter:drop-shadow(0 8px 28px var(--ag))}
@@ -74,7 +74,7 @@ body.wizard-mode .hdr{justify-content:center}
   position:absolute;display:block;
   width:44vw;height:44vw;max-width:400px;max-height:400px;
   top:38%;left:58%;
-  background:radial-gradient(circle,var(--info,#4895EF) 0%,transparent 70%);
+  background:radial-gradient(circle,var(--info,var(--info)) 0%,transparent 70%);
   opacity:.10;filter:blur(80px);border-radius:50%;
   animation:authBlob3 26s ease-in-out infinite}
 

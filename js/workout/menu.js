@@ -39,7 +39,7 @@ function renderWorkoutHome(){
   /* ── Streak banner ── */
   if(streak>0){
     var sc=streak>=7?'var(--warn)':'var(--success)';
-    var sb=streak>=7?'rgba(255,159,28,.1)':'rgba(46,196,182,.08)';
+    var sb=streak>=7?'color-mix(in srgb, var(--warn) 10%, transparent)':'color-mix(in srgb, var(--success) 8%, transparent)';
     html+='<div class="wh-full" style="background:'+sb+';border:1px solid '+sc+';border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:10px">';
     html+='<div style="font-size:22px">'+(streak>=7?'🔥':'⚡')+'</div>';
     html+='<div style="flex:1"><div style="font-size:13px;font-weight:700;color:'+sc+'">'+streak+' Günlük Seri!</div>';
@@ -145,7 +145,7 @@ function renderBranchDetail(branchId){
     if(userConds.indexOf('knee-injury')>=0) postRecs.push({prog:'posture-general-mobility',label:'Genel Mobilite',icon:'🔄',reason:'Diz rahatsızlığın için mobilite önemli'});
     if(!postRecs.length&&userConds.length>0) postRecs.push({prog:'posture-general-mobility',label:'Genel Mobilite',icon:'🔄',reason:'Fiziksel sağlığın için önerilir'});
     if(postRecs.length){
-      html+='<div style="background:rgba(46,196,182,.06);border:1px solid rgba(46,196,182,.2);border-radius:12px;padding:12px 14px;margin-bottom:8px">';
+      html+='<div style="background:color-mix(in srgb, var(--success) 6%, transparent);border:1px solid color-mix(in srgb, var(--success) 20%, transparent);border-radius:12px;padding:12px 14px;margin-bottom:8px">';
       html+='<div style="font-size:12px;font-weight:700;color:var(--success);margin-bottom:8px">💡 Sana Özel Öneriler</div>';
       postRecs.forEach(function(r){
         html+='<div style="display:flex;align-items:center;gap:10px;padding:6px 0;cursor:pointer" onclick="selectWorkoutProgram(\''+r.prog+'\',\'posture\')">';

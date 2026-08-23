@@ -103,7 +103,7 @@ function renderWaterTracker(){
   var noteEl=document.getElementById('water-supp-note');
   if(noteEl){
     if(wt.suppExtra>0){
-      noteEl.innerHTML='<div style="margin-top:8px;padding:8px 10px;background:rgba(46,196,182,.08);border:1px solid rgba(46,196,182,.25);border-radius:8px;font-size:11px;color:var(--text2);line-height:1.5">'+
+      noteEl.innerHTML='<div style="margin-top:8px;padding:8px 10px;background:color-mix(in srgb, var(--success) 8%, transparent);border:1px solid color-mix(in srgb, var(--success) 25%, transparent);border-radius:8px;font-size:11px;color:var(--text2);line-height:1.5">'+
         '💊 '+wt.suppReasons.join(', ')+' kullandığın için günlük su hedefin <strong style="color:var(--success)">+'+wt.suppExtra+' bardak</strong> artırıldı.'+
         '<br><span style="font-size:10px;color:var(--text3)">Temel: '+wt.baseCups+' · Aktivite: +'+wt.actExtra+' · Supplement: +'+wt.suppExtra+' = <strong>'+total+' bardak</strong></span>'+
       '</div>';

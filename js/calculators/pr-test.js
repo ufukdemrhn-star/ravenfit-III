@@ -297,7 +297,7 @@ function _prRenderBarbell(kg, variant, showVariantBtn){
     html+='<div style="width:14px;height:'+size+'px;background:'+PLATE_COLORS[p]+';border-radius:2px;border:1px solid rgba(255,255,255,.1);margin-right:1px"></div>';
   });
   /* Bar */
-  html+='<div style="width:60px;height:8px;background:linear-gradient(to bottom, #999, #ccc, #999);border-radius:2px;margin:0 4px"></div>';
+  html+='<div style="width:60px;height:8px;background:linear-gradient(to bottom, var(--text2), var(--text3), var(--text2));border-radius:2px;margin:0 4px"></div>';
   /* Sağ plakalar */
   rightPlates.forEach(function(p){
     var size=Math.min(60, 30+p*1.2);
@@ -481,12 +481,12 @@ function _prFeelSlider(context){
   if(context==='warmup'){
     levels=3;
     labels=['Kötü hissettirdi','Normaldi','İyi hissettirdi'];
-    colors=['#ff9f1c','#4cc9f0','#06d6a0'];
+    colors=['var(--warn)','var(--info)','var(--success)'];
     emojis=['😣','😐','💪'];
   } else {
     levels=4;
     labels=['Başarısız','Kötü hissettirdi','Normaldi','İyi hissettirdi'];
-    colors=['#e63946','#ff9f1c','#4cc9f0','#06d6a0'];
+    colors=['var(--accent)','var(--warn)','var(--info)','var(--success)'];
     emojis=['❌','😣','😐','💪'];
   }
 
@@ -722,7 +722,7 @@ function _prRenderBarbellAttempt(kg, variant, showVariantBtn){
     var size=Math.min(60, 30+p*1.2);
     html+='<div style="width:14px;height:'+size+'px;background:'+PLATE_COLORS[p]+';border-radius:2px;border:1px solid rgba(255,255,255,.1);margin-right:1px"></div>';
   });
-  html+='<div style="width:60px;height:8px;background:linear-gradient(to bottom, #999, #ccc, #999);border-radius:2px;margin:0 4px"></div>';
+  html+='<div style="width:60px;height:8px;background:linear-gradient(to bottom, var(--text2), var(--text3), var(--text2));border-radius:2px;margin:0 4px"></div>';
   rightPlates.forEach(function(p){
     var size=Math.min(60, 30+p*1.2);
     html+='<div style="width:14px;height:'+size+'px;background:'+PLATE_COLORS[p]+';border-radius:2px;border:1px solid rgba(255,255,255,.1);margin-left:1px"></div>';
@@ -841,7 +841,7 @@ function _prResult(){
     message='Bu denemede tüm deneme hakların başarısız oldu. Daha hafif yüklerle çalışıp tekrar dene.';
   }
 
-  var feelColors={fail:'#e63946',bad:'#ff9f1c',normal:'#4cc9f0',good:'#06d6a0'};
+  var feelColors={fail:'var(--accent)',bad:'var(--warn)',normal:'var(--info)',good:'var(--success)'};
   var feelLabels={fail:'Başarısız',bad:'Kötü hissettirdi',normal:'Normaldi',good:'İyi hissettirdi'};
 
   var html='';
@@ -859,7 +859,7 @@ function _prResult(){
     var col=feelColors[a.feel]||'var(--accent)';
     html+='<div style="display:flex;align-items:center;gap:16px;margin-bottom:14px">';
     /* Parlak gradient circle + glow halo */
-    html+='<div style="width:56px;height:56px;border-radius:50%;background:radial-gradient(circle at 30% 30%, '+col+'ff, '+col+'cc 60%, '+col+'88);color:#fff;display:flex;align-items:center;justify-content:center;font-family:\'Bebas Neue\',cursive;font-size:24px;flex-shrink:0;box-shadow:0 0 24px '+col+'66, 0 6px 16px rgba(0,0,0,.3), inset 0 1px 2px rgba(255,255,255,.3);text-shadow:0 1px 2px rgba(0,0,0,.4);font-weight:700">'+(a.idx+1)+'</div>';
+    html+='<div style="width:56px;height:56px;border-radius:50%;background:radial-gradient(circle at 30% 30%, '+col+'ff, '+col+'cc 60%, '+col+'88);color:#fff;display:flex;align-items:center;justify-content:center;font-family:\'Bebas Neue\',cursive;font-size:24px;flex-shrink:0;box-shadow:0 0 24px '+col+'66, 0 6px 16px var(--shadow-sm-c, rgba(0,0,0,.25)), inset 0 1px 2px rgba(255,255,255,.3);text-shadow:0 1px 2px var(--shadow-md-c, rgba(0,0,0,.45));font-weight:700">'+(a.idx+1)+'</div>';
     html+='<div style="flex:1">';
     html+='<div style="font-family:\'Bebas Neue\',cursive;font-size:24px;letter-spacing:1px">'+a.kg+unitLabel()+'</div>';
     html+='<div style="font-size:11px;color:'+col+';font-weight:600">'+feelLabels[a.feel]+'</div>';

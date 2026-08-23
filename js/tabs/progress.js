@@ -33,7 +33,7 @@ function renderIlerleme(){
     var realIdx=origEntries.findIndex(function(x){return x.timestamp===e.timestamp;});
     if(realIdx<0) realIdx=origEntries.indexOf(e);
     var isLatest=(i===0);
-    var latestBadge=isLatest?'<span style="font-size:9px;color:var(--success);background:rgba(46,196,182,.15);padding:2px 6px;border-radius:5px;margin-left:6px;font-weight:700">● GÜNCEL</span>':'';
+    var latestBadge=isLatest?'<span style="font-size:9px;color:var(--success);background:color-mix(in srgb, var(--success) 15%, transparent);padding:2px 6px;border-radius:5px;margin-left:6px;font-weight:700">● GÜNCEL</span>':'';
     return'<div class="hi"><div class="hi-left"><div class="hi-date">📅 '+e.date+latestBadge+'</div><div class="hi-d">'+e.weight+' kg | %'+e.bf+' yağ</div></div>'+
     '<div class="hi-stats"><div class="hi-stat"><div class="hi-sv" style="color:var(--accent)">%'+e.bf+'</div><div class="hi-sl">Yağ</div></div>'+
     '<div class="hi-stat"><div class="hi-sv" style="color:var(--success)">'+e.lm+'</div><div class="hi-sl">Yağsız</div></div>'+

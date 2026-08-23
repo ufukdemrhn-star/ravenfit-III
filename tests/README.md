@@ -41,6 +41,7 @@ girdi sınırlaması, RED-S ve Bulk risk kontrolü.
 | 3 | Regresyon | Düzeltilen hataların geri gelmesi |
 | 4 | Uç durum | NaN / Infinity üreten hesaplama |
 | 0 | **HTML yapısı** | **Eksik `</div>` — sessiz bozulma** |
+| 0b | **Tema denetimi** | **WCAG kontrast ihlali** |
 | 4b | Depolama kotası | Kota dolunca veri kaybı |
 | 4c | Yedekleme | Eksik/bozuk yedek |
 | 4d | Misafir akışı | Ekran geçişi kopması |
@@ -57,6 +58,7 @@ girdi sınırlaması, RED-S ve Bulk risk kontrolü.
     node tests/backup-restore.js     # 20 test
     node tests/guest-flow.js         # 15 test
     python3 tests/html-check.py      # 29 kontrol
+    python3 tests/theme-check.py     # 23 kontrol (7 tema × WCAG)
     python3 tests/dom-check.py       # DOM ID denetimi
     python3 tests/path-check.py      # 85 yol
     python3 tests/deadcode-check.py  # ölü kod

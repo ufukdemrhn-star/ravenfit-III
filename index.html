@@ -8,14 +8,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <!-- Stil dosyaları -->
-<link rel="stylesheet" href="css/themes.css?v=0.4.2.3">
-<link rel="stylesheet" href="css/base.css?v=0.4.2.3">
-<link rel="stylesheet" href="css/components.css?v=0.4.2.3">
-<link rel="stylesheet" href="css/profile.css?v=0.4.2.3">
-<link rel="stylesheet" href="css/workout.css?v=0.4.2.3">
-<link rel="stylesheet" href="css/misc.css?v=0.4.2.3">
-<link rel="stylesheet" href="css/supplements.css?v=0.4.2.3">
-<link rel="stylesheet" href="css/calculators.css?v=0.4.2.3">
+<link rel="stylesheet" href="css/themes.css?v=0.5.0.0">
+<link rel="stylesheet" href="css/base.css?v=0.5.0.0">
+<link rel="stylesheet" href="css/components.css?v=0.5.0.0">
+<link rel="stylesheet" href="css/profile.css?v=0.5.0.0">
+<link rel="stylesheet" href="css/workout.css?v=0.5.0.0">
+<link rel="stylesheet" href="css/misc.css?v=0.5.0.0">
+<link rel="stylesheet" href="css/supplements.css?v=0.5.0.0">
+<link rel="stylesheet" href="css/calculators.css?v=0.5.0.0">
 <link rel="icon" href="assets/icons/favicon.png" type="image/png">
 <link rel="icon" href="assets/icons/icon-192.png" type="image/png" sizes="192x192">
 <link rel="manifest" href="manifest.json">
@@ -109,7 +109,7 @@
   <img src="assets/icons/logo.png" width="148">
 </div>
   <h1 class="splash-title">RAVEN<span style="color:var(--accent)">FIT</span></h1>
-  <div class="splash-tag">Versiyon 0.4.2.1 (beta)</div>
+  <div class="splash-tag">Versiyon 0.5.0.0 (beta)</div>
   <div class="splash-sub">Sen sadece antrenmanına odaklan</div>
   <div class="pills">
     <div class="pill"><div class="pill-dot"></div>Çoklu Branş</div>
@@ -652,13 +652,35 @@
     <!-- Tema -->
     <div class="sdw-theme-row">
       <div class="sdw-theme-lbl">🎨 Görünüm Teması</div>
-      <div class="tdots">
-        <div class="tdot" data-t="dark"    style="background:#E63946" onclick="setTheme('dark')" title="Dark"></div>
-        <div class="tdot" data-t="crimson" style="background:#C0392B" onclick="setTheme('crimson')" title="Crimson"></div>
-        <div class="tdot" data-t="violet"  style="background:#9B72FF" onclick="setTheme('violet')" title="Violet"></div>
-        <div class="tdot" data-t="forest"  style="background:#22A857" onclick="setTheme('forest')" title="Forest"></div>
-        <div class="tdot" data-t="rose"    style="background:#F472B6" onclick="setTheme('rose')" title="Rose"></div>
-        <div class="tdot" data-t="light"   style="background:#E8E4DC;border:2px solid #C4BFB6" onclick="setTheme('light')" title="Light"></div>
+      <div class="theme-grid">
+        <button class="theme-card" data-t="dark" onclick="setTheme('dark')" title="Gece" aria-label="Gece teması">
+          <span class="theme-swatch" style="background:#0D0E0F"><span class="theme-dot" style="background:#E63946"></span></span>
+          <span class="theme-name">Gece</span>
+        </button>
+        <button class="theme-card" data-t="crimson" onclick="setTheme('crimson')" title="Kızıl" aria-label="Kızıl teması">
+          <span class="theme-swatch" style="background:#100C0C"><span class="theme-dot" style="background:#E5484D"></span></span>
+          <span class="theme-name">Kızıl</span>
+        </button>
+        <button class="theme-card" data-t="violet" onclick="setTheme('violet')" title="Menekşe" aria-label="Menekşe teması">
+          <span class="theme-swatch" style="background:#0D0C10"><span class="theme-dot" style="background:#9B72FF"></span></span>
+          <span class="theme-name">Menekşe</span>
+        </button>
+        <button class="theme-card" data-t="forest" onclick="setTheme('forest')" title="Orman" aria-label="Orman teması">
+          <span class="theme-swatch" style="background:#0C100E"><span class="theme-dot" style="background:#2ECC71"></span></span>
+          <span class="theme-name">Orman</span>
+        </button>
+        <button class="theme-card" data-t="rose" onclick="setTheme('rose')" title="Gül" aria-label="Gül teması">
+          <span class="theme-swatch" style="background:#100C0E"><span class="theme-dot" style="background:#F472B6"></span></span>
+          <span class="theme-name">Gül</span>
+        </button>
+        <button class="theme-card" data-t="ocean" onclick="setTheme('ocean')" title="Okyanus" aria-label="Okyanus teması">
+          <span class="theme-swatch" style="background:#0C0E10"><span class="theme-dot" style="background:#38BDF8"></span></span>
+          <span class="theme-name">Okyanus</span>
+        </button>
+        <button class="theme-card" data-t="light" onclick="setTheme('light')" title="Aydınlık" aria-label="Aydınlık teması">
+          <span class="theme-swatch" style="background:#F7F8FA"><span class="theme-dot" style="background:#E01423"></span></span>
+          <span class="theme-name">Aydınlık</span>
+        </button>
       </div>
     </div>
     <!-- Birim sistemi -->
@@ -1009,72 +1031,72 @@
 
 <!-- ══ Uygulama modülleri ══ -->
 <!-- js/core -->
-<script src="js/core/storage.js?v=0.4.2.3"></script>
-<script src="js/core/state.js?v=0.4.2.3"></script>
-<script src="js/core/utils.js?v=0.4.2.3"></script>
-<script src="js/core/data-loader.js?v=0.4.2.3"></script>
-<script src="js/core/theme.js?v=0.4.2.3"></script>
+<script src="js/core/storage.js?v=0.5.0.0"></script>
+<script src="js/core/state.js?v=0.5.0.0"></script>
+<script src="js/core/utils.js?v=0.5.0.0"></script>
+<script src="js/core/data-loader.js?v=0.5.0.0"></script>
+<script src="js/core/theme.js?v=0.5.0.0"></script>
 
 <!-- js/ui -->
-<script src="js/ui/toast.js?v=0.4.2.3"></script>
-<script src="js/ui/screens.js?v=0.4.2.3"></script>
-<script src="js/ui/wizard.js?v=0.4.2.3"></script>
-<script src="js/ui/charts.js?v=0.4.2.3"></script>
+<script src="js/ui/toast.js?v=0.5.0.0"></script>
+<script src="js/ui/screens.js?v=0.5.0.0"></script>
+<script src="js/ui/wizard.js?v=0.5.0.0"></script>
+<script src="js/ui/charts.js?v=0.5.0.0"></script>
 
 <!-- js/health -->
-<script src="js/health/calculations.js?v=0.4.2.3"></script>
-<script src="js/health/goals.js?v=0.4.2.3"></script>
-<script src="js/health/body-profile.js?v=0.4.2.3"></script>
-<script src="js/health/reds-warning.js?v=0.4.2.3"></script>
-<script src="js/health/ffmi-detail.js?v=0.4.2.3"></script>
-<script src="js/health/conditions.js?v=0.4.2.3"></script>
+<script src="js/health/calculations.js?v=0.5.0.0"></script>
+<script src="js/health/goals.js?v=0.5.0.0"></script>
+<script src="js/health/body-profile.js?v=0.5.0.0"></script>
+<script src="js/health/reds-warning.js?v=0.5.0.0"></script>
+<script src="js/health/ffmi-detail.js?v=0.5.0.0"></script>
+<script src="js/health/conditions.js?v=0.5.0.0"></script>
 
 <!-- js/tabs -->
-<script src="js/tabs/render-all.js?v=0.4.2.3"></script>
-<script src="js/tabs/body.js?v=0.4.2.3"></script>
-<script src="js/tabs/nutrition.js?v=0.4.2.3"></script>
-<script src="js/tabs/measurements.js?v=0.4.2.3"></script>
-<script src="js/tabs/progress.js?v=0.4.2.3"></script>
+<script src="js/tabs/render-all.js?v=0.5.0.0"></script>
+<script src="js/tabs/body.js?v=0.5.0.0"></script>
+<script src="js/tabs/nutrition.js?v=0.5.0.0"></script>
+<script src="js/tabs/measurements.js?v=0.5.0.0"></script>
+<script src="js/tabs/progress.js?v=0.5.0.0"></script>
 
 <!-- js/profile -->
-<script src="js/profile/avatar.js?v=0.4.2.3"></script>
-<script src="js/profile/settings.js?v=0.4.2.3"></script>
-<script src="js/profile/profile.js?v=0.4.2.3"></script>
+<script src="js/profile/avatar.js?v=0.5.0.0"></script>
+<script src="js/profile/settings.js?v=0.5.0.0"></script>
+<script src="js/profile/profile.js?v=0.5.0.0"></script>
 
 <!-- js/nutrition -->
-<script src="js/nutrition/supplements.js?v=0.4.2.3"></script>
-<script src="js/nutrition/panels.js?v=0.4.2.3"></script>
-<script src="js/nutrition/water.js?v=0.4.2.3"></script>
+<script src="js/nutrition/supplements.js?v=0.5.0.0"></script>
+<script src="js/nutrition/panels.js?v=0.5.0.0"></script>
+<script src="js/nutrition/water.js?v=0.5.0.0"></script>
 
 <!-- js/workout -->
-<script src="js/workout/labels.js?v=0.4.2.3"></script>
-<script src="js/workout/data.js?v=0.4.2.3"></script>
-<script src="js/workout/branches.js?v=0.4.2.3"></script>
-<script src="js/workout/menu.js?v=0.4.2.3"></script>
-<script src="js/workout/library.js?v=0.4.2.3"></script>
-<script src="js/workout/programs.js?v=0.4.2.3"></script>
-<script src="js/workout/history.js?v=0.4.2.3"></script>
-<script src="js/workout/engine.js?v=0.4.2.3"></script>
-<script src="js/workout/tools.js?v=0.4.2.3"></script>
+<script src="js/workout/labels.js?v=0.5.0.0"></script>
+<script src="js/workout/data.js?v=0.5.0.0"></script>
+<script src="js/workout/branches.js?v=0.5.0.0"></script>
+<script src="js/workout/menu.js?v=0.5.0.0"></script>
+<script src="js/workout/library.js?v=0.5.0.0"></script>
+<script src="js/workout/programs.js?v=0.5.0.0"></script>
+<script src="js/workout/history.js?v=0.5.0.0"></script>
+<script src="js/workout/engine.js?v=0.5.0.0"></script>
+<script src="js/workout/tools.js?v=0.5.0.0"></script>
 
 <!-- js/calculators -->
-<script src="js/calculators/index.js?v=0.4.2.3"></script>
-<script src="js/calculators/one-rm.js?v=0.4.2.3"></script>
-<script src="js/calculators/working-set.js?v=0.4.2.3"></script>
-<script src="js/calculators/sleep.js?v=0.4.2.3"></script>
-<script src="js/calculators/pr-test.js?v=0.4.2.3"></script>
+<script src="js/calculators/index.js?v=0.5.0.0"></script>
+<script src="js/calculators/one-rm.js?v=0.5.0.0"></script>
+<script src="js/calculators/working-set.js?v=0.5.0.0"></script>
+<script src="js/calculators/sleep.js?v=0.5.0.0"></script>
+<script src="js/calculators/pr-test.js?v=0.5.0.0"></script>
 
 <!-- js/badges -->
-<script src="js/badges/badges.js?v=0.4.2.3"></script>
+<script src="js/badges/badges.js?v=0.5.0.0"></script>
 
 <!-- js/auth -->
-<script src="js/auth/firebase.js?v=0.4.2.3"></script>
+<script src="js/auth/firebase.js?v=0.5.0.0"></script>
 
 <!-- js/admin -->
-<script src="js/admin/self-test.js?v=0.4.2.3"></script>
+<script src="js/admin/self-test.js?v=0.5.0.0"></script>
 
 <!-- Başlatıcı — en son yüklenir -->
-<script src="js/app.js?v=0.4.2.3"></script>
+<script src="js/app.js?v=0.5.0.0"></script>
 
 <!-- 🔥 Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>

@@ -421,6 +421,49 @@
     kod(handleAvatarUpload).indexOf('.catch') > -1);
 
   /* ═══════════════════════════════════════════════════
+     5g. TEMA SİSTEMİ
+     ═══════════════════════════════════════════════════ */
+  head('5g — Tema sistemi');
+
+  t('7 tema tanımlı', typeof TEMALAR !== 'undefined' && TEMALAR.length === 7,
+    typeof TEMALAR !== 'undefined' ? TEMALAR.length + ' tema' : 'TEMALAR yok');
+
+  /* Her temanın değişkenleri gerçekten yükleniyor mu? */
+  var kok = document.documentElement;
+  var oncekiTema = kok.getAttribute('data-theme') || 'dark';
+  var GEREKLI = ['--bg','--card','--card2','--text','--text2','--text3',
+                 '--accent','--accent-btn','--on-accent','--success','--warn',
+                 '--info','--overlay','--shadow-md'];
+  var eksikToplam = [];
+  (typeof TEMALAR !== 'undefined' ? TEMALAR : []).forEach(function(tema){
+    kok.setAttribute('data-theme', tema);
+    var st = getComputedStyle(kok);
+    GEREKLI.forEach(function(v){
+      if(!st.getPropertyValue(v).trim()) eksikToplam.push(tema + v);
+    });
+  });
+  kok.setAttribute('data-theme', oncekiTema);
+  t('Tüm temalarda 14 değişken tanımlı', eksikToplam.length === 0,
+    eksikToplam.slice(0,3).join(', '));
+
+  /* Tema kartları ve seçili işaret */
+  var kartlar = document.querySelectorAll('.theme-card');
+  t('7 tema kartı çizildi', kartlar.length === 7, kartlar.length + ' kart');
+  var secili = document.querySelectorAll('.theme-card.act');
+  t('Tek tema seçili işaretli', secili.length === 1, secili.length + ' seçili');
+
+  /* color-scheme ayarlanıyor mu? */
+  t('color-scheme ayarlanmış', !!kok.style.colorScheme,
+    kok.style.colorScheme || 'boş');
+
+  /* Bilinmeyen tema dark'a düşmeli */
+  applyTheme('boyle-bir-tema-yok');
+  t('Bilinmeyen tema dark\'a düşüyor',
+    kok.getAttribute('data-theme') === 'dark',
+    kok.getAttribute('data-theme'));
+  applyTheme(oncekiTema);
+
+  /* ═══════════════════════════════════════════════════
      6. VERİ DOSYALARI
      ═══════════════════════════════════════════════════ */
   head('6 — Veri dosyaları yüklendi mi?');

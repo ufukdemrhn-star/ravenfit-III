@@ -52,20 +52,20 @@
 .pr-feel-wrap{position:relative;min-height:480px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:30px 8px}
 .pr-feel-bg{position:absolute;inset:0;overflow:hidden;pointer-events:none;border-radius:14px}
 .pr-feel-bg::before{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(70vw,520px);height:min(70vw,520px);background:url("../assets/icons/logo.png") center/contain no-repeat;opacity:.045;filter:blur(2px) grayscale(1);animation:prFeelLogoFloat 8s ease-in-out infinite}
-.pr-feel-bg::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 30%, rgba(230,57,70,.12), transparent 60%);animation:prFeelPulse 4s ease-in-out infinite}
+.pr-feel-bg::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 60%);animation:prFeelPulse 4s ease-in-out infinite}
 @keyframes prFeelLogoFloat{0%,100%{transform:translate(-50%,-50%) scale(1) rotate(0)}50%{transform:translate(-50%,-52%) scale(1.04) rotate(3deg)}}
 @keyframes prFeelPulse{0%,100%{opacity:.5}50%{opacity:.9}}
-.pr-feel-title{position:relative;z-index:2;text-align:center;font-family:'Bebas Neue',cursive;font-size:30px;letter-spacing:3px;line-height:1.1;color:var(--text);margin:30px 0 10px;text-shadow:0 4px 24px rgba(230,57,70,.4)}
+.pr-feel-title{position:relative;z-index:2;text-align:center;font-family:'Bebas Neue',cursive;font-size:30px;letter-spacing:3px;line-height:1.1;color:var(--text);margin:30px 0 10px;text-shadow:0 4px 24px color-mix(in srgb, var(--accent) 40%, transparent)}
 .pr-feel-sub{position:relative;z-index:2;text-align:center;font-size:11px;color:var(--text2);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:24px}
-.pr-feel-emoji{position:relative;z-index:2;font-size:72px;text-align:center;line-height:1;margin:0 0 6px;transition:all .3s cubic-bezier(.34,1.56,.64,1);filter:drop-shadow(0 6px 20px rgba(0,0,0,.4))}
-.pr-feel-label{position:relative;z-index:2;text-align:center;font-family:'Bebas Neue',cursive;font-size:32px;letter-spacing:2px;font-weight:700;margin-bottom:30px;transition:color .3s;text-shadow:0 2px 12px rgba(0,0,0,.5)}
+.pr-feel-emoji{position:relative;z-index:2;font-size:72px;text-align:center;line-height:1;margin:0 0 6px;transition:all .3s cubic-bezier(.34,1.56,.64,1);filter:drop-shadow(0 6px 20px var(--shadow-md-c, rgba(0,0,0,.45)))}
+.pr-feel-label{position:relative;z-index:2;text-align:center;font-family:'Bebas Neue',cursive;font-size:32px;letter-spacing:2px;font-weight:700;margin-bottom:30px;transition:color .3s;text-shadow:0 2px 12px var(--shadow-md-c, rgba(0,0,0,.45))}
 .pr-feel-arc{position:relative;z-index:2;display:flex;justify-content:center;margin:8px 0 20px;width:100%;max-width:340px}
 .pr-feel-arc svg{width:100%;height:auto;overflow:visible}
-.pr-feel-thumb{transition:cx .3s cubic-bezier(.34,1.56,.64,1),cy .3s cubic-bezier(.34,1.56,.64,1),fill .3s;filter:drop-shadow(0 4px 12px rgba(0,0,0,.6))}
+.pr-feel-thumb{transition:cx .3s cubic-bezier(.34,1.56,.64,1),cy .3s cubic-bezier(.34,1.56,.64,1),fill .3s;filter:drop-shadow(0 4px 12px var(--overlay, rgba(0,0,0,.68)))}
 .pr-feel-btns{position:relative;z-index:2;display:grid;gap:8px;width:100%;max-width:340px;margin-top:8px}
 .pr-feel-btn{background:var(--card2);border:2px solid var(--border);border-radius:14px;padding:14px 16px;color:var(--text);cursor:pointer;display:flex;align-items:center;gap:14px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;transition:all .2s;-webkit-tap-highlight-color:transparent}
 .pr-feel-btn:active{transform:scale(.98)}
 .pr-feel-btn .icn{font-size:24px;line-height:1;width:32px;text-align:center}
-.pr-feel-btn.sel{background:var(--card);transform:scale(1.02);box-shadow:0 6px 24px rgba(0,0,0,.4)}
-.pr-feel-confirm{position:relative;z-index:2;width:100%;max-width:340px;margin:20px 0 0;padding:16px;border:none;border-radius:14px;color:#fff;font-family:'Outfit',sans-serif;font-size:16px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:0 6px 24px rgba(0,0,0,.4);transition:all .2s}
+.pr-feel-btn.sel{background:var(--card);transform:scale(1.02);box-shadow:0 6px 24px var(--shadow-md-c, rgba(0,0,0,.45))}
+.pr-feel-confirm{position:relative;z-index:2;width:100%;max-width:340px;margin:20px 0 0;padding:16px;border:none;border-radius:14px;color:#fff;font-family:'Outfit',sans-serif;font-size:16px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:0 6px 24px var(--shadow-md-c, rgba(0,0,0,.45));transition:all .2s}
 .pr-feel-confirm:active{transform:translateY(2px)}

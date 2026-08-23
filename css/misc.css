@@ -70,7 +70,7 @@
 
 .water-cups-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(36px,1fr));gap:6px;margin-top:10px}
 .water-cup{width:36px;height:36px;border-radius:8px;border:1.5px solid var(--border);background:var(--card2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;transition:all .2s;-webkit-tap-highlight-color:transparent;user-select:none}
-.water-cup.filled{background:rgba(72,149,239,0.15);border-color:var(--info)}
+.water-cup.filled{background:color-mix(in srgb, var(--info) 15%, transparent);border-color:var(--info)}
 .water-cup:active{transform:scale(0.92)}
 .water-progress{height:6px;background:var(--card2);border-radius:3px;margin-top:10px;overflow:hidden}
 .water-progress-fill{height:100%;background:var(--info);border-radius:3px;transition:width .3s}
@@ -115,7 +115,7 @@
 .supp-nav{display:flex;gap:8px;margin-top:14px}
 
 /* ── BADGE / ROZET SİSTEMİ ──────────────────────────── */
-.badge-popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);z-index:900;display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.badge-popup-overlay{position:fixed;inset:0;background:var(--overlay, rgba(0,0,0,.68));backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);z-index:900;display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px}
 .badge-popup-overlay.active{display:flex}
 .badge-popup-icon{font-size:80px;animation:badgeBounce .6s cubic-bezier(.34,1.56,.64,1) both;margin-bottom:8px}
 .badge-popup-name{font-family:'Bebas Neue',cursive;font-size:32px;letter-spacing:3px;color:var(--accent);animation:badgeFade .5s .3s both}
@@ -138,8 +138,60 @@
 /* Profil rozetleri */
 .badge-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .badge-cell{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px;background:var(--card2);border-radius:10px;border:1px solid var(--border);transition:all .2s}
-.badge-cell.earned{background:rgba(46,196,182,.08);border-color:var(--success)}
+.badge-cell.earned{background:color-mix(in srgb, var(--success) 8%, transparent);border-color:var(--success)}
 .badge-cell.locked{opacity:.4;filter:grayscale(1)}
 .badge-cell-icon{font-size:28px;line-height:1}
 .badge-cell-name{font-size:9px;font-weight:700;color:var(--text2);text-align:center;line-height:1.2}
 .badge-cell-date{font-size:8px;color:var(--text3)}
+
+/* ══════════════════════════════════════════════════════════
+   TEMA SEÇİCİ — kare kartlar, çekmece genişliğince
+   Önceki hâli küçük dairelerdi; hangi temanın ne olduğu
+   anlaşılmıyordu. Artık her kart zemin rengini ve vurgu
+   rengini birlikte gösteriyor, altında adı yazıyor.
+   ══════════════════════════════════════════════════════════ */
+.theme-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  width:100%}
+.theme-card{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:9px 4px 8px;
+  background:var(--card2);
+  border:1.5px solid var(--border);
+  border-radius:11px;
+  cursor:pointer;
+  font-family:'Outfit',sans-serif;
+  transition:border-color .18s,background .18s,transform .12s;
+  -webkit-tap-highlight-color:transparent}
+.theme-card:hover{border-color:var(--text3);background:var(--card)}
+.theme-card:active{transform:scale(.96)}
+.theme-card.act{
+  border-color:var(--accent);
+  background:var(--card);
+  box-shadow:0 0 0 1px var(--accent) inset}
+
+/* Zemin örneği — temanın gerçek arka plan rengi */
+.theme-swatch{
+  position:relative;
+  width:100%;aspect-ratio:1.35;
+  border-radius:7px;
+  border:1px solid var(--border);
+  display:block;
+  overflow:hidden}
+/* Vurgu noktası — temanın marka rengi */
+.theme-dot{
+  position:absolute;right:5px;bottom:5px;
+  width:11px;height:11px;border-radius:50%;
+  box-shadow:0 0 0 1.5px var(--card2)}
+.theme-name{
+  font-size:10px;font-weight:600;
+  color:var(--text2);
+  line-height:1;letter-spacing:.2px}
+.theme-card.act .theme-name{color:var(--text)}
+
+@media(max-width:400px){
+  .theme-grid{grid-template-columns:repeat(3,1fr)}
+  .theme-name{font-size:9px}
+}

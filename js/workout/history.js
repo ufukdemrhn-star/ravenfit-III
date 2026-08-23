@@ -27,12 +27,12 @@ function renderWorkoutHistory(){
   html+='<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">';
   /* Tümü butonu */
   var allSel=!branchFilter;
-  html+='<button onclick="window._historyBranch=null;renderWorkoutHistory()" style="padding:6px 12px;border-radius:8px;border:1.5px solid '+(allSel?'var(--accent)':'var(--border)')+';background:'+(allSel?'rgba(230,57,70,.1)':'var(--card2)')+';color:'+(allSel?'var(--accent)':'var(--text2)')+';font-size:11px;font-weight:600;cursor:pointer;font-family:\'Outfit\',sans-serif">Tümü</button>';
+  html+='<button onclick="window._historyBranch=null;renderWorkoutHistory()" style="padding:6px 12px;border-radius:8px;border:1.5px solid '+(allSel?'var(--accent)':'var(--border)')+';background:'+(allSel?'color-mix(in srgb, var(--accent) 10%, transparent)':'var(--card2)')+';color:'+(allSel?'var(--accent)':'var(--text2)')+';font-size:11px;font-weight:600;cursor:pointer;font-family:\'Outfit\',sans-serif">Tümü</button>';
   branches.forEach(function(bId){
     var isSel=(branchFilter===bId);
     var icon=branchIcons[bId]||'💪';
     var label=branchLabels[bId]||bId;
-    html+='<button onclick="window._historyBranch=\''+bId+'\';renderWorkoutHistory()" style="padding:6px 12px;border-radius:8px;border:1.5px solid '+(isSel?'var(--accent)':'var(--border)')+';background:'+(isSel?'rgba(230,57,70,.1)':'var(--card2)')+';color:'+(isSel?'var(--accent)':'var(--text2)')+';font-size:11px;font-weight:600;cursor:pointer;font-family:\'Outfit\',sans-serif">'+icon+' '+label+'</button>';
+    html+='<button onclick="window._historyBranch=\''+bId+'\';renderWorkoutHistory()" style="padding:6px 12px;border-radius:8px;border:1.5px solid '+(isSel?'var(--accent)':'var(--border)')+';background:'+(isSel?'color-mix(in srgb, var(--accent) 10%, transparent)':'var(--card2)')+';color:'+(isSel?'var(--accent)':'var(--text2)')+';font-size:11px;font-weight:600;cursor:pointer;font-family:\'Outfit\',sans-serif">'+icon+' '+label+'</button>';
   });
   html+='</div>';
 
@@ -61,7 +61,7 @@ function renderWorkoutHistory(){
   html+='<div class="ws-report-stat"><div class="ws-report-val">'+filtered.length+'</div><div class="ws-report-lbl">Antrenman</div></div>';
   html+='<div class="ws-report-stat"><div class="ws-report-val">'+totalMin+'dk</div><div class="ws-report-lbl">Toplam Süre</div></div>';
   html+='<div class="ws-report-stat"><div class="ws-report-val">'+totalKcal+'</div><div class="ws-report-lbl">Toplam kcal</div></div>';
-  html+='<div class="ws-report-stat" style="background:linear-gradient(135deg, rgba(230,57,70,.15), var(--card2));border:1px solid rgba(230,57,70,.3)"><div class="ws-report-val" style="color:var(--accent)">🎯 '+prCount+'</div><div class="ws-report-lbl">PR</div></div>';
+  html+='<div class="ws-report-stat" style="background:linear-gradient(135deg, color-mix(in srgb, var(--accent) 15%, transparent), var(--card2));border:1px solid color-mix(in srgb, var(--accent) 30%, transparent)"><div class="ws-report-val" style="color:var(--accent)">🎯 '+prCount+'</div><div class="ws-report-lbl">PR</div></div>';
   html+='</div>';
 
   /* Log listesi — yeniden eskiye, son 30 */
@@ -74,12 +74,12 @@ function renderWorkoutHistory(){
     if(log.isPR){
       var prExName={squat:'🦵 Squat',bench:'💪 Bench',deadlift:'🏋️ Deadlift'}[log.prExercise]||log.prExercise;
       var feelEmoji={good:'💪',normal:'😐',bad:'😣',fail:'❌'};
-      var feelColor={good:'#06d6a0',normal:'#4cc9f0',bad:'#ff9f1c',fail:'#e63946'};
+      var feelColor={good:'var(--success)',normal:'var(--info)',bad:'var(--warn)',fail:'var(--accent)'};
       /* En iyi feel'i ve değeri bul */
       var bestKg=log.prBest||0;
       var prDate=(typeof log.date==='string' && log.date.indexOf('T')>0)?new Date(log.date).toLocaleDateString('tr-TR'):log.date;
 
-      html+='<div class="rc" style="padding:12px 14px;background:linear-gradient(135deg, rgba(230,57,70,.05), var(--card));border:1.5px solid rgba(230,57,70,.3);cursor:pointer" onclick="_prShowDetailFromLog('+realIdx+')">';
+      html+='<div class="rc" style="padding:12px 14px;background:linear-gradient(135deg, color-mix(in srgb, var(--accent) 5%, transparent), var(--card));border:1.5px solid color-mix(in srgb, var(--accent) 30%, transparent);cursor:pointer" onclick="_prShowDetailFromLog('+realIdx+')">';
       html+='<div style="display:flex;align-items:flex-start;gap:10px">';
       html+='<div style="font-size:30px;line-height:1;flex-shrink:0">🎯</div>';
       html+='<div style="flex:1">';
