@@ -97,13 +97,10 @@ var _restTime=60,_restRemain=0,_restInterval=null,_setCount=0,_restActive=false;
 
 _suppStep=0;_suppAnswers={};
 
-/* ── INIT ─────────────────────────────────────────────── */
-window.addEventListener('load',function(){
-  var th=localStorage.getItem('rf_theme')||'dark';
-  applyTheme(th);
-  loadDataFiles();
-  showAuthScreen();
-});
+/* NOT: Uygulama başlatma kodu buradan js/app.js'e taşındı.
+   Modülerleşme sırasında bu blok yanlışlıkla iki yerde kalmıştı ve
+   applyTheme / loadDataFiles / showAuthScreen iki kez çalışıyordu
+   (8 JSON dosyası için 16 fetch isteği). Tek kaynak: js/app.js */
 
 function saveData(){
   var str=JSON.stringify({U:U,R:R,A:A,BT:BT,selST:selST,selGL:selGL,conditions:U.conditions||[]});

@@ -499,7 +499,7 @@ function _prFeelSlider(context){
   html+='<style>'+
     '.pr-feel-wrap{position:relative;min-height:480px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:30px 8px}'+
     '.pr-feel-bg{position:absolute;inset:0;overflow:hidden;pointer-events:none;border-radius:14px}'+
-    '.pr-feel-bg::before{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(70vw,520px);height:min(70vw,520px);background:url("logo.png") center/contain no-repeat;opacity:.045;filter:blur(2px) grayscale(1);animation:prFeelLogoFloat 8s ease-in-out infinite}'+
+    '.pr-feel-bg::before{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(70vw,520px);height:min(70vw,520px);background:url("assets/icons/logo.png") center/contain no-repeat;opacity:.045;filter:blur(2px) grayscale(1);animation:prFeelLogoFloat 8s ease-in-out infinite}'+
     '.pr-feel-bg::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 30%, rgba(230,57,70,.12), transparent 60%);animation:prFeelPulse 4s ease-in-out infinite}'+
     '@keyframes prFeelLogoFloat{0%,100%{transform:translate(-50%,-50%) scale(1) rotate(0)}50%{transform:translate(-50%,-52%) scale(1.04) rotate(3deg)}}'+
     '@keyframes prFeelPulse{0%,100%{opacity:.5}50%{opacity:.9}}'+

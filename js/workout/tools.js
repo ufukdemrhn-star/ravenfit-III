@@ -52,8 +52,13 @@ function skipRest(){clearInterval(_restInterval);_restActive=false;_suppStep=0;_
   document.getElementById('btn-set-done').innerHTML='✅ Seti Bitir';
 }
 
-function adjustRestTime(delta){_restTime=Math.max(15,Math.min(300,_restTime+delta));
-  document.getElementById('rest-time-val').textContent=_restTime+'s';
+/* Dinlenme süresini 15sn adımlarla ayarlar (15–300sn arası).
+   Araçlar ekranındaki  −/+  butonlarına bağlıdır. */
+function adjustRestTime(delta){
+  _restTime=Math.max(15,Math.min(300,_restTime+delta));
+  /* Araçlar ekranındaki göstergeyi güncelle */
+  var el=document.getElementById('tools-rest-time-val');
+  if(el) el.textContent=_restTime+'s';
 }
 
 function resetSets(){_setCount=0;document.getElementById('set-count').textContent='0';skipRest();}
@@ -197,11 +202,9 @@ function _toolsChronoToggle(){
     if(btn) btn.innerHTML='▶ Devam';
   } else {
     _chronoStart=Date.now(); _chronoRunning=true;
-    _chronoInterval=setInterval(function(){
-      /* global display sync */
-      var gd=document.getElementById('chrono-display');
-      if(gd) updateChronoDisplay();
-    },30);
+    /* Tek timer yeterli — eskiden burada 'chrono-display' elementini arayan
+       ikinci bir setInterval daha vardı, ama o element artık yok.
+       Saniyede ~33 kez boşa çalışıyordu. */
     _toolsChronoInterval2=setInterval(_toolsChronoUpdate,30);
     var btn=document.getElementById('tools-chrono-toggle');
     if(btn) btn.innerHTML='⏸ Durdur';
@@ -222,11 +225,6 @@ function _toolsChronoReset(){
   if(disp) disp.textContent='00:00.00';
   var btn=document.getElementById('tools-chrono-toggle');
   if(btn) btn.innerHTML='▶ Başlat';
-  /* Global display da sıfırla */
-  var gd=document.getElementById('chrono-display');
-  if(gd) gd.textContent='00:00.00';
-  var gb=document.getElementById('chrono-toggle');
-  if(gb) gb.innerHTML='▶ Başlat';
 }
 
 /* Araçlar sayfası set sayacı — mevcut global state'i kullanır */

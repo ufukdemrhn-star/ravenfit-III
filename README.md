@@ -63,3 +63,19 @@ Yeni modül eklerken `js/app.js`'ten **önce** ekleyin.
 **Hesaplama doğrulama:** Tarayıcı konsoluna `_ravenfitSelfTest()` yazın. 38 test çalışır, matematik bozulmuşsa yakalar.
 
 **GIF/video eklemek:** Dosyayı `assets/gif/` altına koyun, JSON'daki ilgili egzersizin `gif` alanına yolu yazın.
+
+## Test Etme
+
+Değişiklik yaptıktan sonra üç kontrolü çalıştır:
+
+**1. Tarayıcı konsolu** — hesaplamalar doğru mu
+
+    _ravenfitSelfTest()
+
+**2. Regresyon testi** — düzeltilen hatalar geri geldi mi
+
+    sh tests/run.sh
+
+**3. Ölü kod taraması** — erişilemeyen fonksiyon var mı
+
+    python3 tests/deadcode-check.py
