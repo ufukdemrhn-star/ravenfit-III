@@ -874,11 +874,11 @@ var SUPP_USED_LIST=[
 ];
 
 function getUserSupplements(){
-  try{return JSON.parse(localStorage.getItem('rf_supplements_used')||'[]');}catch(e){return[];}
+  try{return JSON.parse(_lsGet('rf_supplements_used')||'[]');}catch(e){return[];}
 }
 
 function saveUserSupplements(arr){
-  localStorage.setItem('rf_supplements_used',JSON.stringify(arr));
+  _lsSet('rf_supplements_used',JSON.stringify(arr));
   saveToFirebase();
 }
 

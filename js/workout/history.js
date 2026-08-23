@@ -159,7 +159,7 @@ function deleteWorkoutLog(idx){
   showConfirm('Kaydı Sil','Bu antrenman kaydı kalıcı olarak silinecek.',function(){
     var logs=getWorkoutLogs();
     logs.splice(idx,1);
-    localStorage.setItem('rf_workout_logs',JSON.stringify(logs));
+    _lsSet('rf_workout_logs',JSON.stringify(logs));
     saveToFirebase();
     showToast('Silindi.');
     renderWorkoutHistory();
@@ -214,7 +214,7 @@ function saveWorkoutLogEdit(idx){
   log.kcal=parseInt(document.getElementById('edit-kcal').value)||0;
   log.note=(document.getElementById('edit-note').value||'').trim();
   logs[idx]=log;
-  localStorage.setItem('rf_workout_logs',JSON.stringify(logs));
+  _lsSet('rf_workout_logs',JSON.stringify(logs));
   saveToFirebase();
   showToast('✅ Kaydedildi!');
   renderWorkoutHistory();
@@ -285,5 +285,5 @@ function _calcStreak(logs){
 /* ── Log helpers ─────────────────────────────────────────── */
 
 function getWorkoutLogs(){
-  try{return JSON.parse(localStorage.getItem('rf_workout_logs')||'[]');}catch(e){return[];}
+  try{return JSON.parse(_lsGet('rf_workout_logs')||'[]');}catch(e){return[];}
 }

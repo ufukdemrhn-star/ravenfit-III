@@ -33,11 +33,11 @@ function _getBadgeDefs(){
 }
 
 function getEarnedBadges(){
-  try{return JSON.parse(localStorage.getItem('rf_badges')||'[]');}catch(e){return[];}
+  try{return JSON.parse(_lsGet('rf_badges')||'[]');}catch(e){return[];}
 }
 
 function saveEarnedBadges(arr){
-  localStorage.setItem('rf_badges',JSON.stringify(arr));
+  _lsSet('rf_badges',JSON.stringify(arr));
   saveToFirebase();
 }
 

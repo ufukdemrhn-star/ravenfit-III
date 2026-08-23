@@ -629,7 +629,7 @@ function _ws_saveAndClose(){
     });
   });
   logs.push(entry);
-  localStorage.setItem('rf_workout_logs',JSON.stringify(logs));
+  _lsSet('rf_workout_logs',JSON.stringify(logs));
   saveToFirebase();
   showToast('✅ Antrenman kaydedildi!','success');
   setTimeout(checkAndAwardBadges,600);

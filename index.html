@@ -700,6 +700,18 @@
       Verileri İçe Aktar
     </button>
     <div class="sdw-sep"></div>
+    <!-- Cihaz depolama kullanımı -->
+    <div style="padding:12px 20px 14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;font-weight:600">💾 Cihaz Depolaması</div>
+        <div style="font-size:11px;font-weight:700;color:var(--text)" id="storage-usage-txt">—</div>
+      </div>
+      <div style="height:5px;background:var(--card2);border-radius:3px;overflow:hidden">
+        <div id="storage-usage-bar" style="height:100%;width:0%;background:var(--success);border-radius:3px;transition:width .4s ease"></div>
+      </div>
+      <div style="font-size:10px;color:var(--text3);margin-top:5px" id="storage-usage-note"></div>
+    </div>
+    <div class="sdw-sep"></div>
     <button class="sdw-item danger" onclick="resetAll();closeSettingsDrawer()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
       Tüm Verileri Sıfırla
@@ -1003,11 +1015,11 @@
 
 <!-- ══ Uygulama modülleri ══ -->
 <!-- js/core -->
+<script src="js/core/storage.js?v=0.3.1"></script>
 <script src="js/core/state.js?v=0.3.1"></script>
 <script src="js/core/utils.js?v=0.3.1"></script>
 <script src="js/core/data-loader.js?v=0.3.1"></script>
 <script src="js/core/theme.js?v=0.3.1"></script>
-<script src="js/core/storage.js?v=0.3.1"></script>
 
 <!-- js/ui -->
 <script src="js/ui/toast.js?v=0.3.1"></script>

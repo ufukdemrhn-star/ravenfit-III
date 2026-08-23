@@ -5,6 +5,35 @@
 
 /* ── SETTINGS DRAWER ─────────────────────────────────────── */
 
+/* Depolama göstergesini günceller — çekmece her açıldığında çağrılır. */
+function _renderStorageUsage(){
+  if(typeof _lsKullanim!=='function') return;
+  var k=_lsKullanim();
+  var txt=document.getElementById('storage-usage-txt');
+  var bar=document.getElementById('storage-usage-bar');
+  var not=document.getElementById('storage-usage-note');
+  if(txt) txt.textContent=k.toplamKB+' KB';
+  if(bar){
+    bar.style.width=Math.max(2,k.doluluk)+'%';
+    bar.style.background = k.doluluk>=85 ? 'var(--accent)'
+                         : k.doluluk>=60 ? 'var(--warn)'
+                         : 'var(--success)';
+  }
+  if(not){
+    if(k.doluluk>=85){
+      not.innerHTML='⚠️ <strong style="color:var(--accent)">Depolama doluyor.</strong> Verilerini dışa aktarıp yedekle.';
+    } else {
+      var enBuyuk=k.kalemler[0];
+      var adlar={rf_workout_logs:'antrenman geçmişi',rf_entries:'ölçüm kayıtları',
+                 avatar:'profil fotoğrafı',rf_data:'profil verisi',
+                 rf_custom_workouts:'özel programlar'};
+      not.textContent = enBuyuk
+        ? 'En çok yer kaplayan: '+(adlar[enBuyuk.anahtar]||enBuyuk.anahtar)+' ('+Math.round(enBuyuk.bayt/1024)+' KB)'
+        : '';
+    }
+  }
+}
+
 function openSettingsDrawer(){
   document.getElementById('settings-drawer').classList.add('open');
   document.getElementById('sdw-overlay').classList.add('open');
@@ -16,6 +45,7 @@ function openSettingsDrawer(){
     b.style.color=isSel?'#fff':'var(--text2)';
   });
   refreshLevelButtons();
+  _renderStorageUsage();
 }
 
 function closeSettingsDrawer(){

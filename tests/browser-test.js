@@ -306,6 +306,46 @@
     !document.getElementById('settings-bg'));
 
   /* ═══════════════════════════════════════════════════
+     5e. GÜVENLİ DEPOLAMA  (Faz E)
+     ═══════════════════════════════════════════════════ */
+  head('5e — Depolama katmanı güvenli mi?  (Faz E)');
+
+  t('_lsSet tanımlı', varMi('_lsSet'));
+  t('_lsGet tanımlı', varMi('_lsGet'));
+  t('_lsKullanim tanımlı', varMi('_lsKullanim'));
+  t('saveData güvenli katmanı kullanıyor', kod(saveData).indexOf('_lsSet') > -1);
+
+  /* Kota dolduğunda çökmemeli — sahte hata ile dene */
+  var gercekSet = localStorage.setItem.bind(localStorage);
+  var hataYakalandi = false;
+  try {
+    localStorage.setItem = function () {
+      var e = new Error('quota'); e.name = 'QuotaExceededError'; e.code = 22; throw e;
+    };
+    var sonuc = _lsSet('__test__', 'x');
+    t('Kota hatasında istisna fırlatmıyor', true);
+    t('false döndürüyor', sonuc === false);
+  } catch (e) {
+    hataYakalandi = true;
+    t('Kota hatasında istisna fırlatmıyor', false, e.message);
+  } finally {
+    localStorage.setItem = gercekSet;
+    try { localStorage.removeItem('__test__'); } catch (e) {}
+  }
+
+  /* Kullanım raporu */
+  try {
+    var kul = _lsKullanim();
+    t('Depolama kullanımı okunuyor', typeof kul.toplamKB === 'number',
+      kul.toplamKB + ' KB kullanılıyor');
+    console.log('%c     Doluluk: %' + kul.doluluk + '  ·  ' + kul.kalemler.length + ' RavenFit kaydı', C.dim);
+    if (kul.kalemler.length) {
+      console.log('%c     En büyük: ' + kul.kalemler[0].anahtar +
+        ' (' + Math.round(kul.kalemler[0].bayt / 1024) + ' KB)', C.dim);
+    }
+  } catch (e) { t('Depolama kullanımı okunuyor', false, e.message); }
+
+  /* ═══════════════════════════════════════════════════
      6. VERİ DOSYALARI
      ═══════════════════════════════════════════════════ */
   head('6 — Veri dosyaları yüklendi mi?');

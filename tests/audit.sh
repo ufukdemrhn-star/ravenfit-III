@@ -51,6 +51,13 @@ node tests/edge-cases.js > /tmp/rf_edge.log 2>&1
 sonuc $? "$(grep -o '[0-9]*/[0-9]* geçti' /tmp/rf_edge.log | head -1)"
 grep "❌" /tmp/rf_edge.log | head -5
 
+# ── 4b. Depolama kota testi ────────────────────────────────
+baslik "4b. Depolama kota testi"
+node tests/storage-quota.js > /tmp/rf_quota.log 2>&1
+! grep -q "❌" /tmp/rf_quota.log
+sonuc $? "$(grep -o '[0-9]*/[0-9]* geçti' /tmp/rf_quota.log | head -1)"
+grep "❌" /tmp/rf_quota.log | head -5
+
 # ── 5. DOM ID denetimi ─────────────────────────────────────
 baslik "5. DOM ID denetimi"
 python3 tests/dom-check.py > /tmp/rf_dom.log 2>&1

@@ -15,11 +15,11 @@ var BRANCH_DEFS=[
 ];
 
 function getUserBranches(){
-  try{return JSON.parse(localStorage.getItem('rf_branches')||'["fitness"]');}catch(e){return['fitness'];}
+  try{return JSON.parse(_lsGet('rf_branches')||'["fitness"]');}catch(e){return['fitness'];}
 }
 
 function saveUserBranches(arr){
-  localStorage.setItem('rf_branches',JSON.stringify(arr));
+  _lsSet('rf_branches',JSON.stringify(arr));
   saveToFirebase();
 }
 

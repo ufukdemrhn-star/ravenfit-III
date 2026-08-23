@@ -122,9 +122,9 @@ var _cwExercises=[];
 
 var _cwName='Benim Programım';
 
-function getCustomWorkouts(){try{return JSON.parse(localStorage.getItem('rf_custom_workouts')||'[]');}catch(e){return[];}}
+function getCustomWorkouts(){try{return JSON.parse(_lsGet('rf_custom_workouts')||'[]');}catch(e){return[];}}
 
-function saveCustomWorkouts(list){localStorage.setItem('rf_custom_workouts',JSON.stringify(list));saveToFirebase();}
+function saveCustomWorkouts(list){_lsSet('rf_custom_workouts',JSON.stringify(list));saveToFirebase();}
 
 function deleteCustomWorkout(id){
   showConfirm('Programı Sil','Bu özel program silinecek.',function(){

@@ -39,13 +39,13 @@ var PLATE_COLORS={
 /* Plaka preset yükle/kaydet */
 
 function _prLoadPlates(){
-  var saved=localStorage.getItem('rf_pr_plates');
+  var saved=_lsGet('rf_pr_plates');
   if(saved){try{return JSON.parse(saved);}catch(e){}}
   return {25:0,20:0,15:0,10:0,5:0,2.5:0,1.25:0};
 }
 
 function _prSavePlates(){
-  try{localStorage.setItem('rf_pr_plates',JSON.stringify(_pr.plates));}catch(e){}
+  try{_lsSet('rf_pr_plates',JSON.stringify(_pr.plates));}catch(e){}
 }
 
 /* Egzersiz adı */
@@ -945,7 +945,7 @@ function _prSaveToLog(){
     };
     logs.unshift(log);
     /* localStorage'a kaydet */
-    localStorage.setItem('rf_workout_logs',JSON.stringify(logs));
+    _lsSet('rf_workout_logs',JSON.stringify(logs));
     /* Firebase'e sync */
     if(typeof saveToFirebase==='function') saveToFirebase();
 

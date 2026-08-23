@@ -4,7 +4,7 @@
 
 Uygulamayı aç → **F12** → **Console**.
 
-### 1. Sağlık Testi (41 kontrol)
+### 1. Sağlık Testi (48 kontrol)
 
     fetch('tests/browser-test.js?v='+Date.now()).then(r=>r.text()).then(eval)
 
@@ -18,7 +18,7 @@ CSS düzeni, DOM elementleri, veri dosyaları, görseller.
 Yağ oranı, FFMI, BMR, TDEE, kalori hedefleri, makrolar,
 girdi sınırlaması, RED-S ve Bulk risk kontrolü.
 
-**Toplam 79 otomatik kontrol.**
+**Toplam 86 otomatik kontrol.**
 
 ### Logo/görsel sorunu olursa
 
@@ -40,6 +40,7 @@ girdi sınırlaması, RED-S ve Bulk risk kontrolü.
 | 2 | Modül birleştirme | Yükleme sırası sorunu |
 | 3 | Regresyon | Düzeltilen hataların geri gelmesi |
 | 4 | Uç durum | NaN / Infinity üreten hesaplama |
+| 4b | Depolama kotası | Kota dolunca veri kaybı |
 | 5 | DOM ID | Olmayan elemente erişim |
 | 6 | Yol çözümleme | Kırık dosya yolu |
 | 7 | Ölü kod | Erişilemeyen fonksiyon |
@@ -49,6 +50,7 @@ girdi sınırlaması, RED-S ve Bulk risk kontrolü.
 
     node tests/regression.js         # 19 test
     node tests/edge-cases.js         # 23 test
+    node tests/storage-quota.js      # 14 test
     python3 tests/dom-check.py       # DOM ID denetimi
     python3 tests/path-check.py      # 85 yol
     python3 tests/deadcode-check.py  # ölü kod

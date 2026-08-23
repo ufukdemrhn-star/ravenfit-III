@@ -138,3 +138,26 @@ Tek seferlik çözüm için sert yenileme: `Ctrl + Shift + R` (Mac: `Cmd + Shift
 - Tarayıcı testi 35 → 41 kontrole çıktı
 
 **Sonuç:** 0 kırık ID referansı, 0 riskli guard'sız erişim.
+
+### Faz E — Depolama dayanıklılığı
+
+Inline stil dönüşümü ölçüldü: 220 riskli düzenleme karşılığında sadece
+**3.7 KB (%0.89)** kazanç sağlıyordu. Değmediği için yapılmadı; onun yerine
+derin risk taraması yapıldı ve **gerçek bir veri kaybı hatası** bulundu.
+
+**Sorun:** `localStorage` kotası dolduğunda `setItem` istisna fırlatıyor.
+`saveData()` içinde bu istisna yakalanmadığı için fonksiyon yarıda kesiliyor
+ve hemen ardından gelen `saveToFirebase()` **hiç çalışmıyordu**. Yani depolama
+dolduğunda kullanıcı verisini hem yerelde hem bulutta kaybediyordu — sessizce.
+
+Kota gerçekten dolabilir: avatar 2 MB'a kadar base64 olarak saklanıyor ve
+antrenman geçmişi sınırsız büyüyor. Tipik tarayıcı sınırı 5 MB.
+
+**Çözüm — güvenli depolama katmanı (`js/core/storage.js`):**
+- `_lsSet` / `_lsGet` / `_lsRemove` — asla istisna fırlatmaz
+- Kota dolunca kullanıcı bir kez uyarılır, Firebase senkronu devam eder
+- 60 doğrudan `localStorage` çağrısı bu katmandan geçirildi
+- `_lsKullanim()` — Ayarlar ekranında doluluk çubuğu ve en çok yer kaplayan kayıt
+
+**Yükleme sırası düzeltmesi:** `storage.js` artık `state.js`'ten önce yükleniyor
+(state.js `_lsSet` kullanıyor).

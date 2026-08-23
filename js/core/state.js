@@ -13,10 +13,10 @@ var _rfConfirmCancelCb=null;
    ⚖️ BİRİM SİSTEMİ (kg / lb)
    ══════════════════════════════════════════════════════════ */
 
-function getUnit(){return localStorage.getItem('rf_unit')||'kg';}
+function getUnit(){return _lsGet('rf_unit')||'kg';}
 
 function setUnit(u){
-  localStorage.setItem('rf_unit',u);
+  _lsSet('rf_unit',u);
   saveToFirebase();
   /* Anlık gösterim güncelleme */
   document.querySelectorAll('[data-unit-btn]').forEach(function(b){
@@ -39,10 +39,10 @@ function unitLabel(){return getUnit().toUpperCase();}
    🎚️ KULLANICI SEVİYE SİSTEMİ (otomatik + manuel override)
    ══════════════════════════════════════════════════════════ */
 
-function getUserLevelMode(){return localStorage.getItem('rf_level_mode')||'auto';}
+function getUserLevelMode(){return _lsGet('rf_level_mode')||'auto';}
 
 function setUserLevelMode(m){
-  localStorage.setItem('rf_level_mode',m);
+  _lsSet('rf_level_mode',m);
   saveToFirebase();
 }
 
@@ -99,6 +99,6 @@ _suppStep=0;_suppAnswers={};
 
 function saveData(){
   var str=JSON.stringify({U:U,R:R,A:A,BT:BT,selST:selST,selGL:selGL,conditions:U.conditions||[]});
-  localStorage.setItem('rf_data',str);
+  _lsSet('rf_data',str);
   if(!_isGuest)saveToFirebase();
 }

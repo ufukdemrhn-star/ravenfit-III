@@ -38,11 +38,11 @@ function _calcWaterTarget(){
 }
 
 function getWaterState(){
-  try{var raw=localStorage.getItem('rf_water_today');if(raw){var s=JSON.parse(raw);if(s.date===todayStr())return s;}}catch(e){}
+  try{var raw=_lsGet('rf_water_today');if(raw){var s=JSON.parse(raw);if(s.date===todayStr())return s;}}catch(e){}
   return{date:todayStr(),count:0};
 }
 
-function saveWaterState(s){localStorage.setItem('rf_water_today',JSON.stringify(s));}
+function saveWaterState(s){_lsSet('rf_water_today',JSON.stringify(s));}
 
 function toggleWaterCup(idx){
   if(!R.water)return;

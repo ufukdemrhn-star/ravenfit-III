@@ -7,7 +7,7 @@
 
 function setTheme(t){
   applyTheme(t);
-  localStorage.setItem('rf_theme',t);
+  _lsSet('rf_theme',t);
   saveToFirebase();
 }
 

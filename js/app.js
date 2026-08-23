@@ -5,7 +5,7 @@
 
 window.addEventListener('load', function(){
   /* 1. Kayıtlı temayı uygula */
-  var th = localStorage.getItem('rf_theme') || 'dark';
+  var th = _lsGet('rf_theme') || 'dark';
   applyTheme(th);
 
   /* 2. JSON veri dosyalarını yükle (egzersiz, program, rozet...) */

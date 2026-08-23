@@ -63,7 +63,7 @@ function enterAsGuest(){
   hideAuthScreen();
   /* Mevcut localStorage verisini yükle (varsa) */
   try{
-    var raw=localStorage.getItem('rf_data');
+    var raw=_lsGet('rf_data');
     if(raw&&raw.length>2){
       var d=JSON.parse(raw);
       U=d.U||{};R=d.R||{};A=d.A||{};BT=d.BT||{};
@@ -272,7 +272,7 @@ function _clearUserLocalData(){
                     'rf_branches','rf_supplements_used','rf_badges','rf_pr_plates',
                     'rf_water_today','avatar','nickname'];
   keysToRemove.forEach(function(k){
-    try{ localStorage.removeItem(k); }catch(e){}
+    try{ _lsRemove(k); }catch(e){}
   });
   /* Misafir banner'ını gizle */
   var bn=document.getElementById('guest-banner');
@@ -344,42 +344,42 @@ function onUserLoggedIn(user){
             var fd=JSON.parse(d.rf_data);
             U=fd.U||{};R=fd.R||{};A=fd.A||{};BT=fd.BT||{};
             selST=fd.selST||null;selGL=fd.selGL||null;
-            localStorage.setItem('rf_data',d.rf_data);
+            _lsSet('rf_data',d.rf_data);
           }catch(e){}
         }
         if(d.rf_entries&&d.rf_entries.length>2){
-          try{ localStorage.setItem('rf_entries',d.rf_entries); }catch(e){}
+          try{ _lsSet('rf_entries',d.rf_entries); }catch(e){}
         }
         if(d.rf_workout_logs&&d.rf_workout_logs.length>2){
-          try{ localStorage.setItem('rf_workout_logs',d.rf_workout_logs); }catch(e){}
+          try{ _lsSet('rf_workout_logs',d.rf_workout_logs); }catch(e){}
         }
         if(d.rf_custom_workouts&&d.rf_custom_workouts.length>2){
-          try{ localStorage.setItem('rf_custom_workouts',d.rf_custom_workouts); }catch(e){}
+          try{ _lsSet('rf_custom_workouts',d.rf_custom_workouts); }catch(e){}
         }
         if(d.rf_branches&&d.rf_branches.length>2){
-          try{ localStorage.setItem('rf_branches',d.rf_branches); }catch(e){}
+          try{ _lsSet('rf_branches',d.rf_branches); }catch(e){}
         }
         if(d.rf_supplements_used&&d.rf_supplements_used.length>2){
-          try{ localStorage.setItem('rf_supplements_used',d.rf_supplements_used); }catch(e){}
+          try{ _lsSet('rf_supplements_used',d.rf_supplements_used); }catch(e){}
         }
         if(d.rf_badges&&d.rf_badges.length>2){
-          try{ localStorage.setItem('rf_badges',d.rf_badges); }catch(e){}
+          try{ _lsSet('rf_badges',d.rf_badges); }catch(e){}
         }
         if(d.rf_theme){
-          localStorage.setItem('rf_theme',d.rf_theme);
+          _lsSet('rf_theme',d.rf_theme);
           applyTheme(d.rf_theme);
         }
         if(d.rf_unit){
-          try{ localStorage.setItem('rf_unit',d.rf_unit); }catch(e){}
+          try{ _lsSet('rf_unit',d.rf_unit); }catch(e){}
         }
         if(d.rf_level_mode){
-          try{ localStorage.setItem('rf_level_mode',d.rf_level_mode); }catch(e){}
+          try{ _lsSet('rf_level_mode',d.rf_level_mode); }catch(e){}
         }
       }
       /* MİGRASYON: Firebase'de veri yok ama localStorage'da var → yükle */
       if(!fbHasData){
         try{
-          var raw=localStorage.getItem('rf_data');
+          var raw=_lsGet('rf_data');
           if(raw&&raw.length>2){
             var ld=JSON.parse(raw);
             U=ld.U||{};R=ld.R||{};A=ld.A||{};BT=ld.BT||{};
@@ -408,7 +408,7 @@ function onUserLoggedIn(user){
       console.warn('Veri yükleme hatası:',e);
       /* Hata olsa da localStorage'dan yükle */
       try{
-        var raw=localStorage.getItem('rf_data');
+        var raw=_lsGet('rf_data');
         if(raw){var d=JSON.parse(raw);U=d.U||{};R=d.R||{};A=d.A||{};BT=d.BT||{};}
       }catch(ex){}
       if(Object.keys(R).length && R.tdee){
@@ -450,15 +450,15 @@ function saveToFirebase(){
   clearTimeout(_fbSaveTimer);
   _fbSaveTimer=setTimeout(function(){
     var dataStr=JSON.stringify({U:U,R:R,A:A,BT:BT,selST:selST,selGL:selGL});
-    var entriesStr=localStorage.getItem('rf_entries')||'[]';
-    var logsStr=localStorage.getItem('rf_workout_logs')||'[]';
-    var customStr=localStorage.getItem('rf_custom_workouts')||'[]';
-    var branchesStr=localStorage.getItem('rf_branches')||'["fitness"]';
-    var suppsUsedStr=localStorage.getItem('rf_supplements_used')||'[]';
-    var badgesStr=localStorage.getItem('rf_badges')||'[]';
-    var themeStr=localStorage.getItem('rf_theme')||'dark';
-    var unitStr=localStorage.getItem('rf_unit')||'kg';
-    var levelModeStr=localStorage.getItem('rf_level_mode')||'auto';
+    var entriesStr=_lsGet('rf_entries')||'[]';
+    var logsStr=_lsGet('rf_workout_logs')||'[]';
+    var customStr=_lsGet('rf_custom_workouts')||'[]';
+    var branchesStr=_lsGet('rf_branches')||'["fitness"]';
+    var suppsUsedStr=_lsGet('rf_supplements_used')||'[]';
+    var badgesStr=_lsGet('rf_badges')||'[]';
+    var themeStr=_lsGet('rf_theme')||'dark';
+    var unitStr=_lsGet('rf_unit')||'kg';
+    var levelModeStr=_lsGet('rf_level_mode')||'auto';
     _fbDb.collection('users').doc(_fbUser.uid).set({
       rf_data:dataStr,
       rf_entries:entriesStr,
