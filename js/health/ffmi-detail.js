@@ -15,27 +15,19 @@ function openFFMIDetail(){
   var ffmi = (R && R.ffmi) ? R.ffmi : null;
   
   /* Cinsiyet bazlı bantlar */
-  var bands;
-  if(male){
-    bands = [
-      {min:0,    max:18, label:'Zayıf',     cls:'bb', desc:'Ortalamanın altında. Düzenli direnç antrenmanı ve protein alımıyla geliştirilebilir.'},
-      {min:18,   max:20, label:'Ortalama',  cls:'bb', desc:'Yetişkin erkekler için ortalama kas kütlesi seviyesi.'},
-      {min:20,   max:22, label:'İyi',       cls:'bg', desc:'Ortalamanın üzerinde kas gelişimi. Düzenli antrenmanın etkisi görülüyor.'},
-      {min:22,   max:24, label:'Çok İyi',   cls:'bg', desc:'Atletik seviyede kas kütlesi. Güçlü ve dengeli bir fizik.'},
-      {min:24,   max:26, label:'Elit',      cls:'bp', desc:'İleri düzey kas gelişimi. Yıllarca disiplinli antrenmanın sonucu.'},
-      {min:26,   max:99, label:'İstisnai',  cls:'br', desc:'Doğal yollarla ulaşılması son derece nadir. Olağanüstü bir seviye.'}
-    ];
-  } else {
-    bands = [
-      {min:0,    max:14, label:'Zayıf',     cls:'bb', desc:'Ortalamanın altında. Direnç antrenmanı ve protein alımıyla geliştirilebilir.'},
-      {min:14,   max:16, label:'Ortalama',  cls:'bb', desc:'Yetişkin kadınlar için ortalama yağsız kütle seviyesi.'},
-      {min:16,   max:18, label:'İyi',       cls:'bg', desc:'Ortalamanın üzerinde kas gelişimi.'},
-      {min:18,   max:20, label:'Çok İyi',   cls:'bg', desc:'Atletik seviyede kas kütlesi.'},
-      {min:20,   max:22, label:'Elit',      cls:'bp', desc:'İleri düzey kas gelişimi.'},
-      {min:22,   max:99, label:'İstisnai',  cls:'br', desc:'Doğal yollarla ulaşılması son derece nadir.'}
-    ];
-  }
-  
+  /* Bantlar tek kaynaktan gelir: _ffmiBands() (js/health/calculations.js).
+     Böylece ana sayfadaki skala, rozet ve bu tablo hep aynı eşikleri kullanır. */
+  var _bl = _ffmiBands(male);
+  var bands = _bl.map(function(b, i){
+    return {
+      min:   i === 0 ? 0 : _bl[i-1].ust,
+      max:   i === _bl.length-1 ? 99 : b.ust,
+      label: b.ad,
+      cls:   b.cls,
+      desc:  b.txt
+    };
+  });
+
   /* Mevcut FFMI hangi banta düşüyor? */
   var currentBand = null;
   if(ffmi != null){

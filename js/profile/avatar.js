@@ -18,7 +18,11 @@ function handleAvatarUpload(inp){
     setAvatar(b64);
     /* Firebase Storage yerine Firestore'da base64 saklıyoruz */
     if(_fbUser&&_fbDb){
-      _fbDb.collection('users').doc(_fbUser.uid).set({avatar:b64},{merge:true});
+      _fbDb.collection('users').doc(_fbUser.uid).set({avatar:b64},{merge:true})
+        .catch(function(e){
+          console.warn('Avatar buluta yüklenemedi:', e && e.message);
+          showToast('⚠️ Fotoğraf cihaza kaydedildi ama buluta yüklenemedi.','warn');
+        });
     }
     showToast('✅ Profil fotoğrafı güncellendi!');
   };

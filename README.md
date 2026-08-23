@@ -161,3 +161,52 @@ antrenman geçmişi sınırsız büyüyor. Tipik tarayıcı sınırı 5 MB.
 
 **Yükleme sırası düzeltmesi:** `storage.js` artık `state.js`'ten önce yükleniyor
 (state.js `_lsSet` kullanıyor).
+
+### Faz F — Dayanıklılık
+
+Bellek sızıntısı, yarış durumu ve veri doğrulama taraması. Üç gerçek sorun:
+
+**1. Yedekleme eksikti — veri kaybı riski**
+`exportData` 10 veri türünden yalnızca **2'sini** yedekliyordu. Kullanıcı
+yedek alıp geri yüklediğinde antrenman geçmişi, rozetler, özel programlar,
+branş seçimleri ve supplement kayıtları **siliniyordu**.
+→ 11 anahtarın tamamı yedekleniyor.
+
+**2. İçe aktarma doğrulamasızdı**
+Herhangi bir JSON dosyası, içeriği kontrol edilmeden mevcut verinin üzerine
+yazılıyordu — onay bile sorulmuyordu.
+→ Format imzası, tip kontrolü, boyut sınırı ve kullanıcı onayı eklendi.
+
+**3. Antrenman timer sızıntısı**
+`_doStartSession` önceki oturumun `setInterval`'ini temizlemiyordu. Antrenman
+iki kez başlatılırsa eski sayaç arka planda çalışmaya devam ediyordu.
+→ Oturum başında temizleniyor.
+
+Ayrıca 3 Firestore çağrısına `.catch` eklendi (yakalanmamış promise reddi).
+
+---
+
+## v0.4.2.1 — Arayüz ve kullanım iyileştirmeleri
+
+| # | Değişiklik |
+|---|-----------|
+| 1 | Giriş ekranı: logo 92→130px, silüet opaklığı 2 kat, 3 katmanlı radyal gradyan doku |
+| 2 | Tarayıcı otomatik doldurmasının alanı beyaza boyaması engellendi |
+| 3 | "Misafir olarak devam et" → sade metin bağlantısı |
+| 4 | Wizard sırasında başlık ortalanıyor |
+| 5 | Versiyon 0.4.2.1 (beta) |
+| 6 | Misafir banner'ı artık wizard'da çıkmıyor (Devam butonuyla çakışıyordu) |
+| 7 | Splash'e "Giriş Yap / Kayıt Ol" butonları — misafir modundan geri dönülebiliyor |
+| 8 | Ölçüm ipuçları belirginleştirildi (punto, renk, sol kenarlık) |
+| 9 | 3'lü seçenek satırındaki taşma düzeltildi (`minmax(0,1fr)`) |
+| 10 | İlk hafta ölçüleri 6 satır × 2 sütun; "— opsiyonel" kaldırıldı |
+| 11 | FFMI: iki ayrı bar birleştirildi, 6 banda çıkarıldı, "Sen: X — Y" satırı eklendi |
+| 12 | Vücut tipi grafiği: çubuk ↔ SVG halka geçişi, tercih saklanıyor |
+| 13 | Ölçülerim'de boy/yaş artık kaydediliyor + eski kayıtlar için onarım |
+| 14 | Alt menü ve misafir banner'ı 640px sütuna hizalandı |
+| 15 | Geçmiş kayıtlar: ilk 3 + "daha fazla / daha az göster" |
+| 16 | Araçlar: Kronometre ve Set Sayacı hesaplayıcılara taşındı, havuz/geçmiş alta indi |
+
+**Yan bulgu:** FFMI rozeti ile skala farklı etiketler gösteriyordu (skala "İyi" derken
+rozet "Atletik" diyordu). Bantlar `_ffmiBands()` altında tek kaynağa taşındı —
+skala, rozet ve detay tablosu artık aynı eşikleri kullanıyor.

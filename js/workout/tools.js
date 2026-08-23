@@ -24,13 +24,29 @@ function renderWorkoutTools(){
   html+='<button class="btn btn-s" onclick="renderWorkoutHome()" style="padding:8px 12px;font-size:12px">← Geri</button>';
   html+='<div style="font-size:16px;font-weight:700">🛠️ Araçlar</div></div>';
 
-  /* ── Egzersiz Havuzu + Antrenman Geçmişi (2 sütun) ── */
+  /* ── 🧮 HESAPLAYICILAR (madde 16) ──────────────────────
+     Kronometre ve Set Sayacı da buraya taşındı — hepsi aynı
+     tıklanabilir kart deseninde, 3×2 ızgara. */
+  html+='<div class="rc">';
+  html+='<div class="rct">🧮 Hesaplayıcılar</div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+  html+='<div class="calc-tool-card" onclick="openCalculator(\'1rm\')"><div class="calc-tool-icon">💪</div><div class="calc-tool-label">1RM</div><div class="calc-tool-sub">Max Tahmini</div></div>';
+  html+='<div class="calc-tool-card" onclick="openCalculator(\'working-set\')"><div class="calc-tool-icon">⚙️</div><div class="calc-tool-label">Çalışma Seti</div><div class="calc-tool-sub">%1RM × Rep</div></div>';
+  html+='<div class="calc-tool-card" onclick="openCalculator(\'pr\')"><div class="calc-tool-icon">🎯</div><div class="calc-tool-label">PR Denemesi</div><div class="calc-tool-sub">Rekor Kırma</div></div>';
+  html+='<div class="calc-tool-card" onclick="openCalculator(\'sleep\')"><div class="calc-tool-icon">😴</div><div class="calc-tool-label">Uyku</div><div class="calc-tool-sub">REM Döngüsü</div></div>';
+  html+='<div class="calc-tool-card" onclick="openToolOverlay(\'chrono\')"><div class="calc-tool-icon">⏱️</div><div class="calc-tool-label">Kronometre</div><div class="calc-tool-sub" id="tools-chrono-preview">'+(_chronoMs>0||_chronoRunning?'Aktif':'Hazır')+'</div></div>';
+  html+='<div class="calc-tool-card" onclick="openToolOverlay(\'set-counter\')"><div class="calc-tool-icon">💪</div><div class="calc-tool-label">Set Sayacı</div><div class="calc-tool-sub">'+_setCount+' set · '+_restTime+'s</div></div>';
+  html+='</div>';
+  html+='<div style="margin-top:10px;font-size:10px;color:var(--text3);text-align:center">Seviyen: <strong>'+getUserLevelLabel()+'</strong> · Birim: <strong>'+unitLabel()+'</strong></div>';
+  html+='</div>';
+
+  /* ── Egzersiz Havuzu + Antrenman Geçmişi (en altta) ── */
   var exCount=0;
   branches.forEach(function(bId){
     var d=_getBranchExercises(bId);
     if(d&&d.exercises) exCount+=d.exercises.length;
   });
-  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">';
   html+='<div class="wh-card" onclick="window._exCat=\'all\';window._exSearch=\'\';window._exBranch=\''+branches[0]+'\';renderExerciseLibrary()" style="padding:14px 10px;text-align:center">';
   html+='<div style="font-size:28px;margin-bottom:4px">📚</div>';
   html+='<div class="wh-card-label" style="font-size:13px">Egzersiz Havuzu</div>';
@@ -41,32 +57,6 @@ function renderWorkoutTools(){
   html+='<div class="wh-card-label" style="font-size:13px">Antrenman Geçmişi</div>';
   html+='<div style="font-size:10px;color:var(--text2);margin-top:2px">'+logs.length+' kayıt</div>';
   html+='</div>';
-  html+='</div>';
-
-  /* ── Kronometre + Set Sayacı (2 sütun buton) ── */
-  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">';
-  html+='<div class="wh-card" onclick="openToolOverlay(\'chrono\')" style="padding:14px 10px;text-align:center">';
-  html+='<div style="font-size:28px;margin-bottom:4px">⏱️</div>';
-  html+='<div class="wh-card-label" style="font-size:13px">Kronometre</div>';
-  html+='<div style="font-size:10px;color:var(--text2);margin-top:2px" id="tools-chrono-preview">'+(_chronoMs>0||_chronoRunning?'Aktif':'Hazır')+'</div>';
-  html+='</div>';
-  html+='<div class="wh-card" onclick="openToolOverlay(\'set-counter\')" style="padding:14px 10px;text-align:center">';
-  html+='<div style="font-size:28px;margin-bottom:4px">💪</div>';
-  html+='<div class="wh-card-label" style="font-size:13px">Set Sayacı</div>';
-  html+='<div style="font-size:10px;color:var(--text2);margin-top:2px">'+_setCount+' set · '+_restTime+'s dinlenme</div>';
-  html+='</div>';
-  html+='</div>';
-
-  /* ── 🧮 HESAPLAYICILAR (2×2 grid, plaka kaldırıldı) ── */
-  html+='<div class="rc">';
-  html+='<div class="rct">🧮 Hesaplayıcılar</div>';
-  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
-  html+='<div class="calc-tool-card" onclick="openCalculator(\'1rm\')"><div class="calc-tool-icon">💪</div><div class="calc-tool-label">1RM</div><div class="calc-tool-sub">Max Tahmini</div></div>';
-  html+='<div class="calc-tool-card" onclick="openCalculator(\'working-set\')"><div class="calc-tool-icon">⚙️</div><div class="calc-tool-label">Çalışma Seti</div><div class="calc-tool-sub">%1RM × Rep</div></div>';
-  html+='<div class="calc-tool-card" onclick="openCalculator(\'pr\')"><div class="calc-tool-icon">🎯</div><div class="calc-tool-label">PR Denemesi</div><div class="calc-tool-sub">Rekor Kırma</div></div>';
-  html+='<div class="calc-tool-card" onclick="openCalculator(\'sleep\')"><div class="calc-tool-icon">😴</div><div class="calc-tool-label">Uyku</div><div class="calc-tool-sub">REM Döngüsü</div></div>';
-  html+='</div>';
-  html+='<div style="margin-top:10px;font-size:10px;color:var(--text3);text-align:center">Seviyen: <strong>'+getUserLevelLabel()+'</strong> · Birim: <strong>'+unitLabel()+'</strong></div>';
   html+='</div>';
 
   el.innerHTML=html;

@@ -397,3 +397,35 @@ function calcAll(){
     console.error('calcAll fatal:',err);
   }
 }
+
+/* ══════════════════════════════════════════════════════════
+   FFMI BANTLARI — TEK KAYNAK
+
+   Bu tanım üç yerde kullanılır:
+     • js/tabs/body.js        → renkli skala + rozet
+     • js/health/ffmi-detail.js → detay tablosu
+   Ayrı ayrı yazıldığında etiketler birbirini tutmuyordu
+   (skala "İyi" derken rozet "Atletik" diyordu).
+   ══════════════════════════════════════════════════════════ */
+function _ffmiBands(male){
+  return male
+    ? [{ust:18, ad:'Zayıf',    cls:'bb', renk:'#4895EF', txt:'Kas kütlesi ortalamanın altında. Düzenli direnç antrenmanı ve yeterli protein alımıyla geliştirilebilir.'},
+       {ust:20, ad:'Ortalama', cls:'bb', renk:'#4CC9F0', txt:'Yetişkin erkekler için ortalama kas kütlesi seviyesindesin.'},
+       {ust:22, ad:'İyi',      cls:'bg', renk:'#2EC4B6', txt:'Ortalamanın üzerinde kas gelişimi. Düzenli antrenmanın etkisi görülüyor.'},
+       {ust:24, ad:'Çok İyi',  cls:'bg', renk:'#8AC926', txt:'Atletik seviyede kas kütlesi. Güçlü ve dengeli bir fiziğin var.'},
+       {ust:26, ad:'Elit',     cls:'bp', renk:'#9B72FF', txt:'İleri düzey kas gelişimi. Yıllarca disiplinli antrenmanın sonucu.'},
+       {ust:30, ad:'İstisnai', cls:'br', renk:'#E63946', txt:'Doğal yollarla ulaşılması son derece nadir bir seviye.'}]
+    : [{ust:14, ad:'Zayıf',    cls:'bb', renk:'#4895EF', txt:'Yağsız kütlen ortalamanın altında. Antrenman ve beslenmeyle ilerleyebilirsin.'},
+       {ust:16, ad:'Ortalama', cls:'bb', renk:'#4CC9F0', txt:'Kadınlar için ortalama yağsız kütle seviyesindesin.'},
+       {ust:18, ad:'İyi',      cls:'bg', renk:'#2EC4B6', txt:'Ortalamanın üzerinde kas gelişimi. İyi bir seviyedesin.'},
+       {ust:20, ad:'Çok İyi',  cls:'bg', renk:'#8AC926', txt:'Atletik seviyede kas kütlesi. Güçlü bir fiziğin var.'},
+       {ust:22, ad:'Elit',     cls:'bp', renk:'#9B72FF', txt:'İleri düzey kas gelişimi. Üst düzey bir seviye.'},
+       {ust:26, ad:'İstisnai', cls:'br', renk:'#E63946', txt:'Kadınlarda doğal yollarla ulaşılması çok nadir.'}];
+}
+
+/* Verilen FFMI değerinin hangi banda düştüğünü döndürür. */
+function _ffmiBand(ffmi, male){
+  var b = _ffmiBands(male);
+  for(var i=0;i<b.length;i++){ if(ffmi < b[i].ust) return b[i]; }
+  return b[b.length-1];
+}

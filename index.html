@@ -8,14 +8,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <!-- Stil dosyaları -->
-<link rel="stylesheet" href="css/themes.css?v=0.3.1">
-<link rel="stylesheet" href="css/base.css?v=0.3.1">
-<link rel="stylesheet" href="css/components.css?v=0.3.1">
-<link rel="stylesheet" href="css/profile.css?v=0.3.1">
-<link rel="stylesheet" href="css/workout.css?v=0.3.1">
-<link rel="stylesheet" href="css/misc.css?v=0.3.1">
-<link rel="stylesheet" href="css/supplements.css?v=0.3.1">
-<link rel="stylesheet" href="css/calculators.css?v=0.3.1">
+<link rel="stylesheet" href="css/themes.css?v=0.4.2.1">
+<link rel="stylesheet" href="css/base.css?v=0.4.2.1">
+<link rel="stylesheet" href="css/components.css?v=0.4.2.1">
+<link rel="stylesheet" href="css/profile.css?v=0.4.2.1">
+<link rel="stylesheet" href="css/workout.css?v=0.4.2.1">
+<link rel="stylesheet" href="css/misc.css?v=0.4.2.1">
+<link rel="stylesheet" href="css/supplements.css?v=0.4.2.1">
+<link rel="stylesheet" href="css/calculators.css?v=0.4.2.1">
 <link rel="icon" href="assets/icons/favicon.png" type="image/png">
 <link rel="icon" href="assets/icons/icon-192.png" type="image/png" sizes="192x192">
 <link rel="manifest" href="manifest.json">
@@ -41,12 +41,13 @@
 <!-- 🔥 AUTH EKRANI -->
 <div id="auth-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:500;align-items:center;justify-content:center;padding:20px;flex-direction:column;overflow-y:auto">
   <!-- Background silüet animasyonu -->
+  <div class="auth-texture" aria-hidden="true"><i></i></div>
   <img src="assets/icons/logo.png" aria-hidden="true" class="auth-bg-silhouette">
   <div class="auth-bg-gradient"></div>
   <div style="width:100%;max-width:360px;padding:10px 0;position:relative;z-index:2">
     <!-- Logo -->
     <div style="text-align:center;margin-bottom:24px">
-      <img src="assets/icons/logo.png" width="92" style="margin-bottom:12px;filter:drop-shadow(0 6px 20px var(--ag));animation:authLogoFloat 4s ease-in-out infinite">
+      <img src="assets/icons/logo.png" width="130" style="margin-bottom:10px;filter:drop-shadow(0 6px 20px var(--ag));animation:authLogoFloat 4s ease-in-out infinite">
       <div style="font-family:'Bebas Neue',cursive;font-size:36px;letter-spacing:5px;color:var(--text)">RAVEN<span style="color:var(--accent)">FIT</span></div>
       <div style="font-size:11px;color:var(--text2);margin-top:3px;letter-spacing:2px;text-transform:uppercase">Hesabına giriş yap</div>
     </div>
@@ -90,20 +91,11 @@
         <button id="auth-btn-register" onclick="doRegister()" style="background:var(--accent);color:#fff;border:none;border-radius:11px;padding:14px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;cursor:pointer;width:100%;box-shadow:0 4px 16px var(--ag)">Kayıt Ol</button>
       </div>
     </div>
-    <!-- Misafir Girişi -->
-    <div style="margin-top:16px">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-        <div style="flex:1;height:1px;background:var(--border)"></div>
-        <div style="font-size:11px;color:var(--text3);white-space:nowrap">veya</div>
-        <div style="flex:1;height:1px;background:var(--border)"></div>
-      </div>
-      <button onclick="enterAsGuest()" style="width:100%;background:none;border:1.5px solid var(--border);border-radius:11px;padding:13px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
-        <span style="font-size:18px">👀</span>
-        Misafir Olarak Devam Et
-      </button>
-      <div style="font-size:10px;color:var(--text3);margin-top:7px;text-align:center;line-height:1.5">Kayıt olmadan keşfet. Veriler yalnızca bu cihazda saklanır,<br>hesap oluşturulana kadar buluta yüklenmez.</div>
+    <!-- Misafir Girişi — sade metin bağlantısı -->
+    <div style="margin-top:18px;text-align:center">
+      <span style="font-size:12px;color:var(--text3)">veya </span>
+      <button onclick="enterAsGuest()" class="link-btn">misafir olarak devam et</button>
     </div>
-  </div>
 </div>
 
 <div id="app-main">
@@ -116,7 +108,7 @@
   <img src="assets/icons/logo.png" width="148">
 </div>
   <h1 class="splash-title">RAVEN<span style="color:var(--accent)">FIT</span></h1>
-  <div class="splash-tag">Versiyon 0.3.0.1(beta)</div>
+  <div class="splash-tag">Versiyon 0.4.2.1 (beta)</div>
   <div class="splash-sub">Sen sadece antrenmanına odaklan</div>
   <div class="pills">
     <div class="pill"><div class="pill-dot"></div>Çoklu Branş</div>
@@ -131,6 +123,11 @@
     <div class="pill"><div class="pill-dot"></div>Yüzme Modülü</div>
   </div>
   <button class="btn btn-p btn-lg" type="button" onclick="startWizard()" ontouchend="startWizardFromTouch(event)">Analize Başla <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+  <!-- Misafir modunda: giriş/kayıt ekranına dön (madde 7) -->
+  <div id="splash-guest-actions" style="display:none;gap:10px;margin-top:16px;align-items:center;justify-content:center">
+    <button class="btn btn-s" type="button" onclick="backToAuth('login')" style="padding:9px 18px;font-size:12px">Giriş Yap</button>
+    <button class="btn btn-s" type="button" onclick="backToAuth('register')" style="padding:9px 18px;font-size:12px">Kayıt Ol</button>
+  </div>
   <!-- Ana menüye dön — sadece analiz tamamlanmışsa görünür -->
   <button id="splash-home-btn" type="button" onclick="goToMainMenu()" style="display:none;margin-top:14px;background:transparent;border:1.5px solid var(--border);border-radius:50%;width:48px;height:48px;cursor:pointer;align-items:center;justify-content:center;transition:all .2s;-webkit-tap-highlight-color:transparent" onmousedown="this.style.transform='scale(.92)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(.92)'" ontouchend="this.style.transform=''" title="Ana Menüye Dön">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text2)">
@@ -349,28 +346,27 @@
         <div class="fg"><label class="fl">Yaş</label><div class="iw"><input class="fi" id="s5-age" type="number" readonly><span class="iu">yaş</span></div></div>
         <div class="fg"><label class="fl">Boy</label><div class="iw"><input class="fi" id="s5-ht" type="number" readonly><span class="iu">cm</span></div></div>
       </div>
-      <div class="fg"><label class="fl">Vücut Ağırlığı (kg)</label><div class="iw"><input class="fi" id="s5-wt" type="number" inputmode="decimal" step="0.1"><span class="iu">kg</span></div></div>
       <div class="frow">
-        <div class="fg"><label class="fl">Boyun (cm)</label><div class="iw"><input class="fi" id="s5-nk" type="number" inputmode="decimal" step="0.5"><span class="iu">cm</span></div></div>
-        <div class="fg"><label class="fl">Bel (cm)</label><div class="iw"><input class="fi" id="s5-wst" type="number" inputmode="decimal" step="0.5"><span class="iu">cm</span></div></div>
+        <div class="fg"><label class="fl">Vücut Ağırlığı</label><div class="iw"><input class="fi" id="s5-wt" type="number" inputmode="decimal" step="0.1"><span class="iu">kg</span></div></div>
+        <div class="fg"><label class="fl">Boyun</label><div class="iw"><input class="fi" id="s5-nk" type="number" inputmode="decimal" step="0.5"><span class="iu">cm</span></div></div>
       </div>
       <div class="frow">
-        <div class="fg" id="s5-grp-spe">
-          <label class="fl" id="s5-lbl-spe">Omuz (cm)</label><div class="iw"><input class="fi" id="s5-spe" type="number" inputmode="decimal" step="0.5"><span class="iu">cm</span></div>
-        </div>
-        <div class="fg" id="s5-grp-hip">
-          <label class="fl" id="s5-lbl-hip">Kalça (cm)</label><div class="iw"><input class="fi" id="s5-hip" type="number" inputmode="decimal" step="0.5"><span class="iu">cm</span></div>
-        </div>
+        <div class="fg" id="s5-grp-hip"><label class="fl" id="s5-lbl-hip">Kalça</label><div class="iw"><input class="fi" id="s5-hip" type="number" inputmode="decimal" step="0.5"><span class="iu">cm</span></div></div>
+        <div class="fg"><label class="fl">Bel</label><div class="iw"><input class="fi" id="s5-wst" type="number" inputmode="decimal" step="0.5"><span class="iu">cm</span></div></div>
       </div>
       <div class="frow">
-        <div class="fg"><label class="fl">Göğüs (cm)</label><input class="fi" id="s5-ch" type="number" inputmode="decimal" step="0.5"></div>
-        <div class="fg"><label class="fl">Kol (cm)</label><input class="fi" id="s5-arm" type="number" inputmode="decimal" step="0.5"></div>
+        <div class="fg"><label class="fl">Göğüs</label><div class="iw"><input class="fi" id="s5-ch" type="number" inputmode="decimal" step="0.5"><span class="iu">cm</span></div></div>
+        <div class="fg" id="s5-grp-spe"><label class="fl" id="s5-lbl-spe">Omuz</label><div class="iw"><input class="fi" id="s5-spe" type="number" inputmode="decimal" step="0.5"><span class="iu">cm</span></div></div>
       </div>
       <div class="frow">
-        <div class="fg"><label class="fl">Ön Kol (cm)</label><input class="fi" id="s5-farm" type="number" inputmode="decimal" step="0.5"></div>
-        <div class="fg"><label class="fl">Bacak (cm)</label><input class="fi" id="s5-leg" type="number" inputmode="decimal" step="0.5"></div>
+        <div class="fg"><label class="fl">Kol</label><div class="iw"><input class="fi" id="s5-arm" type="number" inputmode="decimal" step="0.5"><span class="iu">cm</span></div></div>
+        <div class="fg"><label class="fl">Ön Kol</label><div class="iw"><input class="fi" id="s5-farm" type="number" inputmode="decimal" step="0.5"><span class="iu">cm</span></div></div>
       </div>
-      <div class="fg"><label class="fl">Kalf (cm)</label><div class="iw"><input class="fi" id="s5-calf" type="number" inputmode="decimal" step="0.5"><span class="iu">cm</span></div></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Bacak</label><div class="iw"><input class="fi" id="s5-leg" type="number" inputmode="decimal" step="0.5"><span class="iu">cm</span></div></div>
+        <div class="fg"><label class="fl">Kalf</label><div class="iw"><input class="fi" id="s5-calf" type="number" inputmode="decimal" step="0.5"><span class="iu">cm</span></div></div>
+      </div>
+
     </div>
 
     <!-- S6: Özel Durumlar -->
@@ -421,16 +417,13 @@
         <div class="rct">📊 FFMI Endeksi</div>
         <div style="display:flex;align-items:flex-end;gap:5px"><div class="bv" id="ffmi-v">—</div></div>
         <div id="ffmi-badge"></div>
-        <div class="ffmi-scale">
-          <div class="ffmi-seg" style="background:#4895EF;flex:4"></div>
-          <div class="ffmi-seg" style="background:#2EC4B6;flex:2"></div>
-          <div class="ffmi-seg" style="background:#9B72FF;flex:3"></div>
-          <div class="ffmi-seg" style="background:#E63946;flex:2"></div>
+        <!-- Tek birleşik skala: 6 bant + üzerinde konum işaretçisi (madde 11).
+             Bantlar cinsiyete göre JS'te doldurulur. -->
+        <div class="ffmi-track">
+          <div class="ffmi-scale" id="ffmi-scale"></div>
+          <div class="ffmi-dot" id="ffmi-mrk" style="left:0%"></div>
         </div>
-        <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text2);margin-top:3px">
-          <span id="ffmi-lo-lbl">Ort.(&lt;18)</span><span>Atletik(18-21)</span><span>Kaslı(21-25)</span><span>Elit(25+)</span>
-        </div>
-        <div class="mbar"><div class="bar-trk"><div class="bar-mrk" id="ffmi-mrk" style="left:0%"></div></div></div>
+        <div class="ffmi-you" id="ffmi-you">—</div>
         <div class="ib"><span>ℹ️</span><span id="ffmi-info">—</span></div>
         <div style="margin-top:10px;text-align:center">
           <button onclick="openFFMIDetail()" style="background:transparent;border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;color:var(--accent);cursor:pointer">📖 Detaylı Açıklama</button>
@@ -1015,72 +1008,72 @@
 
 <!-- ══ Uygulama modülleri ══ -->
 <!-- js/core -->
-<script src="js/core/storage.js?v=0.3.1"></script>
-<script src="js/core/state.js?v=0.3.1"></script>
-<script src="js/core/utils.js?v=0.3.1"></script>
-<script src="js/core/data-loader.js?v=0.3.1"></script>
-<script src="js/core/theme.js?v=0.3.1"></script>
+<script src="js/core/storage.js?v=0.4.2.1"></script>
+<script src="js/core/state.js?v=0.4.2.1"></script>
+<script src="js/core/utils.js?v=0.4.2.1"></script>
+<script src="js/core/data-loader.js?v=0.4.2.1"></script>
+<script src="js/core/theme.js?v=0.4.2.1"></script>
 
 <!-- js/ui -->
-<script src="js/ui/toast.js?v=0.3.1"></script>
-<script src="js/ui/screens.js?v=0.3.1"></script>
-<script src="js/ui/wizard.js?v=0.3.1"></script>
-<script src="js/ui/charts.js?v=0.3.1"></script>
+<script src="js/ui/toast.js?v=0.4.2.1"></script>
+<script src="js/ui/screens.js?v=0.4.2.1"></script>
+<script src="js/ui/wizard.js?v=0.4.2.1"></script>
+<script src="js/ui/charts.js?v=0.4.2.1"></script>
 
 <!-- js/health -->
-<script src="js/health/calculations.js?v=0.3.1"></script>
-<script src="js/health/goals.js?v=0.3.1"></script>
-<script src="js/health/body-profile.js?v=0.3.1"></script>
-<script src="js/health/reds-warning.js?v=0.3.1"></script>
-<script src="js/health/ffmi-detail.js?v=0.3.1"></script>
-<script src="js/health/conditions.js?v=0.3.1"></script>
+<script src="js/health/calculations.js?v=0.4.2.1"></script>
+<script src="js/health/goals.js?v=0.4.2.1"></script>
+<script src="js/health/body-profile.js?v=0.4.2.1"></script>
+<script src="js/health/reds-warning.js?v=0.4.2.1"></script>
+<script src="js/health/ffmi-detail.js?v=0.4.2.1"></script>
+<script src="js/health/conditions.js?v=0.4.2.1"></script>
 
 <!-- js/tabs -->
-<script src="js/tabs/render-all.js?v=0.3.1"></script>
-<script src="js/tabs/body.js?v=0.3.1"></script>
-<script src="js/tabs/nutrition.js?v=0.3.1"></script>
-<script src="js/tabs/measurements.js?v=0.3.1"></script>
-<script src="js/tabs/progress.js?v=0.3.1"></script>
+<script src="js/tabs/render-all.js?v=0.4.2.1"></script>
+<script src="js/tabs/body.js?v=0.4.2.1"></script>
+<script src="js/tabs/nutrition.js?v=0.4.2.1"></script>
+<script src="js/tabs/measurements.js?v=0.4.2.1"></script>
+<script src="js/tabs/progress.js?v=0.4.2.1"></script>
 
 <!-- js/profile -->
-<script src="js/profile/avatar.js?v=0.3.1"></script>
-<script src="js/profile/settings.js?v=0.3.1"></script>
-<script src="js/profile/profile.js?v=0.3.1"></script>
+<script src="js/profile/avatar.js?v=0.4.2.1"></script>
+<script src="js/profile/settings.js?v=0.4.2.1"></script>
+<script src="js/profile/profile.js?v=0.4.2.1"></script>
 
 <!-- js/nutrition -->
-<script src="js/nutrition/supplements.js?v=0.3.1"></script>
-<script src="js/nutrition/panels.js?v=0.3.1"></script>
-<script src="js/nutrition/water.js?v=0.3.1"></script>
+<script src="js/nutrition/supplements.js?v=0.4.2.1"></script>
+<script src="js/nutrition/panels.js?v=0.4.2.1"></script>
+<script src="js/nutrition/water.js?v=0.4.2.1"></script>
 
 <!-- js/workout -->
-<script src="js/workout/labels.js?v=0.3.1"></script>
-<script src="js/workout/data.js?v=0.3.1"></script>
-<script src="js/workout/branches.js?v=0.3.1"></script>
-<script src="js/workout/menu.js?v=0.3.1"></script>
-<script src="js/workout/library.js?v=0.3.1"></script>
-<script src="js/workout/programs.js?v=0.3.1"></script>
-<script src="js/workout/history.js?v=0.3.1"></script>
-<script src="js/workout/engine.js?v=0.3.1"></script>
-<script src="js/workout/tools.js?v=0.3.1"></script>
+<script src="js/workout/labels.js?v=0.4.2.1"></script>
+<script src="js/workout/data.js?v=0.4.2.1"></script>
+<script src="js/workout/branches.js?v=0.4.2.1"></script>
+<script src="js/workout/menu.js?v=0.4.2.1"></script>
+<script src="js/workout/library.js?v=0.4.2.1"></script>
+<script src="js/workout/programs.js?v=0.4.2.1"></script>
+<script src="js/workout/history.js?v=0.4.2.1"></script>
+<script src="js/workout/engine.js?v=0.4.2.1"></script>
+<script src="js/workout/tools.js?v=0.4.2.1"></script>
 
 <!-- js/calculators -->
-<script src="js/calculators/index.js?v=0.3.1"></script>
-<script src="js/calculators/one-rm.js?v=0.3.1"></script>
-<script src="js/calculators/working-set.js?v=0.3.1"></script>
-<script src="js/calculators/sleep.js?v=0.3.1"></script>
-<script src="js/calculators/pr-test.js?v=0.3.1"></script>
+<script src="js/calculators/index.js?v=0.4.2.1"></script>
+<script src="js/calculators/one-rm.js?v=0.4.2.1"></script>
+<script src="js/calculators/working-set.js?v=0.4.2.1"></script>
+<script src="js/calculators/sleep.js?v=0.4.2.1"></script>
+<script src="js/calculators/pr-test.js?v=0.4.2.1"></script>
 
 <!-- js/badges -->
-<script src="js/badges/badges.js?v=0.3.1"></script>
+<script src="js/badges/badges.js?v=0.4.2.1"></script>
 
 <!-- js/auth -->
-<script src="js/auth/firebase.js?v=0.3.1"></script>
+<script src="js/auth/firebase.js?v=0.4.2.1"></script>
 
 <!-- js/admin -->
-<script src="js/admin/self-test.js?v=0.3.1"></script>
+<script src="js/admin/self-test.js?v=0.4.2.1"></script>
 
 <!-- Başlatıcı — en son yüklenir -->
-<script src="js/app.js?v=0.3.1"></script>
+<script src="js/app.js?v=0.4.2.1"></script>
 
 <!-- 🔥 Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>

@@ -48,7 +48,9 @@
 .chart-svg{width:100%;height:130px;display:block;overflow:visible}
 .chart-empty{text-align:center;color:var(--text3);font-size:12px;padding:20px 0}
 
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:62px;background:var(--hbg);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border-top:1px solid var(--border);display:none;align-items:stretch;justify-content:space-around;z-index:300;padding-bottom:env(safe-area-inset-bottom,0px)}
+/* Uygulama içeriği max 640px sütunda — alt menü de aynı genişlikte
+   kalmalı, aksi halde geniş ekranda menü yayvan görünür (madde 14). */
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:640px;height:62px;background:var(--hbg);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border-top:1px solid var(--border);display:none;align-items:stretch;justify-content:space-around;z-index:300;padding-bottom:env(safe-area-inset-bottom,0px)}
 .bottom-nav.visible{display:flex}
 .bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;color:var(--text3);font-family:'Outfit',sans-serif;font-size:9px;font-weight:600;letter-spacing:.3px;cursor:pointer;padding:8px 4px 6px;transition:color .22s;-webkit-tap-highlight-color:transparent;position:relative;text-transform:uppercase}
 .bnav-btn svg{width:22px;height:22px;transition:transform .22s}

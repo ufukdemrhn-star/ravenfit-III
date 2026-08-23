@@ -346,6 +346,36 @@
   } catch (e) { t('Depolama kullanımı okunuyor', false, e.message); }
 
   /* ═══════════════════════════════════════════════════
+     5f. DAYANIKLILIK  (Faz F)
+     ═══════════════════════════════════════════════════ */
+  head('5f — Dayanıklılık  (Faz F)');
+
+  /* Yedekleme tüm veriyi kapsıyor mu? */
+  t('YEDEK_ANAHTARLARI tanımlı', typeof YEDEK_ANAHTARLARI !== 'undefined');
+  if (typeof YEDEK_ANAHTARLARI !== 'undefined') {
+    t('11 veri türü yedekleniyor', YEDEK_ANAHTARLARI.length >= 11,
+      YEDEK_ANAHTARLARI.length + ' anahtar');
+    t('Antrenman geçmişi yedek kapsamında',
+      YEDEK_ANAHTARLARI.indexOf('rf_workout_logs') > -1);
+    t('Rozetler yedek kapsamında',
+      YEDEK_ANAHTARLARI.indexOf('rf_badges') > -1);
+  }
+
+  /* İçe aktarma doğrulama yapıyor mu? */
+  var impSrc = kod(importData);
+  t('İçe aktarma yapı doğruluyor', impSrc.indexOf('typeof') > -1);
+  t('İçe aktarma kullanıcı onayı istiyor', impSrc.indexOf('showConfirm') > -1);
+  t('İçe aktarma dosya boyutu sınırlıyor', impSrc.indexOf('1024') > -1);
+
+  /* Antrenman motoru timer sızdırmıyor mu? */
+  t('Oturum başlangıcı eski timer\'ı temizliyor',
+    kod(_doStartSession).indexOf('clearInterval') > -1);
+
+  /* Firestore çağrıları korumalı mı? */
+  t('Avatar yükleme hata yakalıyor',
+    kod(handleAvatarUpload).indexOf('.catch') > -1);
+
+  /* ═══════════════════════════════════════════════════
      6. VERİ DOSYALARI
      ═══════════════════════════════════════════════════ */
   head('6 — Veri dosyaları yüklendi mi?');

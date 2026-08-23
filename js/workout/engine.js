@@ -52,6 +52,14 @@ function closeWarmup(skip){
 }
 
 function _doStartSession(prog){
+  /* Önceki oturumdan kalan timer'ları temizle.
+     Aksi halde antrenman iki kez başlatılırsa eski setInterval
+     arka planda çalışmaya devam eder ve süre yanlış sayılır. */
+  clearInterval(_ws.elapsedInterval);
+  clearInterval(_ws.restInterval);
+  _ws.elapsedInterval=null;
+  _ws.restInterval=null;
+
   var logs=getWorkoutLogs();
   var progLogs=logs.filter(function(l){return l.programId===prog.id;});
   var lastDayIdx=progLogs.length>0?progLogs[progLogs.length-1].dayIndex:-1;

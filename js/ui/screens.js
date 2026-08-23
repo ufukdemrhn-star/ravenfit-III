@@ -33,6 +33,11 @@ function showScreen(id){
   });
   var el=document.getElementById(id);
   if(el){ el.style.removeProperty('display'); el.classList.add('active'); }
+  /* Wizard'da başlık ortalanır (madde 4) */
+  document.body.classList.toggle('wizard-mode', id==='wizard');
+  /* Misafir arayüzü ekrana göre ayarlanır (madde 6 & 7):
+     banner sadece sonuçta, giriş/kayıt butonları sadece splash'te */
+  if(typeof _syncGuestUI==='function') _syncGuestUI();
   window.scrollTo(0,0);
 }
 

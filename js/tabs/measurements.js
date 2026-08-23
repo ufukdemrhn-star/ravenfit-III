@@ -5,7 +5,23 @@
 
 /* ── TAB: ÖLÇÜLERİM ──────────────────────────────────── */
 
+/* Eski sürümlerde ilk ölçüm kaydına boy ve yaş yazılmıyordu.
+   Bu yüzden "Ölçülerim → Başlangıç" sütununda boy/yaş boş görünüyordu.
+   Aşağıdaki onarım, eksik alanları mevcut profilden bir kez doldurur. */
+function _onarEksikOlcuAlanlari(){
+  var entries=getEntries();
+  if(!entries.length) return entries;
+  var degisti=false;
+  entries.forEach(function(e){
+    if(e.height==null && U.height){ e.height=U.height; degisti=true; }
+    if(e.age==null    && U.age){    e.age=U.age;       degisti=true; }
+  });
+  if(degisti){ _setEntries(entries); }
+  return entries;
+}
+
 function renderOlculerim(){
+  _onarEksikOlcuAlanlari();
   var male=U.gender==='male';
   var ratioHTML='';
   if(male){
@@ -139,6 +155,9 @@ function saveFirstWeekMeasurements() {
     date: now.toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit',year:'numeric'}),
     timestamp: now.getTime(),
     weight: U.weight,
+    /* Boy ve yaş da kaydediliyor — "Başlangıç" sütununda boş kalmasın (madde 13) */
+    height: U.height || null,
+    age: U.age || null,
     neck: U.neck, waist: U.waist,
     shoulder: U.shoulder || null,
     chest: U.chest || null,

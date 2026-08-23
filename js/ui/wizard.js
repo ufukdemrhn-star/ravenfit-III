@@ -161,12 +161,20 @@ function updGenderUI(){
 }
 
 function updS5GenderUI(){
-  /* Her iki alan da her zaman görünür — cinsiyete göre ek bilgi etiketi değişir */
+  /* Her iki alan da her zaman görünür. Yağ oranı formülü erkekte omuz,
+     kadında kalça kullanır — ilgili alan vurgulanır, diğeri sade kalır.
+     "— opsiyonel" metni kaldırıldı (madde 10): tablo hizasını bozuyordu. */
   var male=U.gender==='male';
   var lSpe=document.getElementById('s5-lbl-spe');
   var lHip=document.getElementById('s5-lbl-hip');
-  if(lSpe)lSpe.textContent=male?'Omuz (cm)':'Omuz (cm) — opsiyonel';
-  if(lHip)lHip.textContent=male?'Kalça (cm) — opsiyonel':'Kalça (cm)';
+  if(lSpe){
+    lSpe.textContent='Omuz';
+    lSpe.style.color = male ? 'var(--accent)' : '';
+  }
+  if(lHip){
+    lHip.textContent='Kalça';
+    lHip.style.color = male ? '' : 'var(--accent)';
+  }
 }
 
 function selOpt(el,grp){

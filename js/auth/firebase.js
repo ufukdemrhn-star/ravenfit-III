@@ -70,21 +70,47 @@ function enterAsGuest(){
       selST=d.selST||null;selGL=d.selGL||null;
     }
   }catch(e){}
-  /* Verisi varsa results ekranına, yoksa splash'e git */
+  /* Verisi varsa results ekranına, yoksa splash'e git.
+     Banner yalnızca sonuç ekranında gösterilir — splash ve wizard'da
+     "Devam Et" butonuyla çakışıyordu (madde 6 & 7). */
   if(Object.keys(R).length&&R.bf){
     showResults();
   } else {
     goHome();
   }
-  /* Misafir banner'ını göster */
-  showGuestBanner();
+  _syncGuestUI();
+}
+
+/* Misafir arayüzünü ekrana göre ayarlar.
+   Banner  → sadece sonuç ekranında (alt menü varken)
+   Giriş/Kayıt butonları → sadece splash ekranında */
+function _syncGuestUI(){
+  var sonucAktif = !!document.querySelector('#results.active');
+  var splashAktif = !!document.querySelector('#splash.active');
+
+  /* Banner */
+  if(_isGuest && sonucAktif){ showGuestBanner(); }
+  else { var bn=document.getElementById('guest-banner'); if(bn) bn.remove(); }
+
+  /* Splash'teki giriş/kayıt butonları */
+  var gb=document.getElementById('splash-guest-actions');
+  if(gb) gb.style.display = (_isGuest && splashAktif) ? 'flex' : 'none';
+}
+
+/* Misafir modundan çıkıp giriş ekranına dön (madde 7) */
+function backToAuth(sekme){
+  var bn=document.getElementById('guest-banner');
+  if(bn) bn.remove();
+  _isGuest=false;
+  showAuthScreen();
+  if(sekme==='register') showRegisterTab(); else showLoginTab();
 }
 
 function showGuestBanner(){
   if(document.getElementById('guest-banner'))return;
   var bn=document.createElement('div');
   bn.id='guest-banner';
-  bn.style.cssText='position:fixed;bottom:68px;left:0;right:0;background:var(--card);border-top:1px solid var(--border);padding:8px 14px;display:flex;align-items:center;gap:10px;z-index:300;animation:slideUp .3s ease';
+  bn.style.cssText='position:fixed;bottom:68px;left:50%;transform:translateX(-50%);width:100%;max-width:640px;background:var(--card);border-top:1px solid var(--border);padding:8px 14px;display:flex;align-items:center;gap:10px;z-index:300;animation:slideUp .3s ease';
   bn.innerHTML='<span style="font-size:14px">👀</span>'+
     '<div style="flex:1;min-width:0"><div style="font-size:11px;font-weight:700;color:var(--text)">Misafir Modu</div>'+
     '<div style="font-size:10px;color:var(--text2)">Veriler yalnızca bu cihazda</div></div>'+
@@ -94,12 +120,8 @@ function showGuestBanner(){
 }
 
 function exitGuestMode(){
-  /* Çıkış yapmadan auth'a yönlendir — veriler korunuyor */
-  var bn=document.getElementById('guest-banner');
-  if(bn)bn.remove();
-  _isGuest=false;
-  showAuthScreen();
-  showRegisterTab();
+  /* Banner'daki "Hesap Oluştur" butonu — kayıt sekmesine götürür */
+  backToAuth('register');
 }
 
 /* ── Giriş Yap ───────────────────────────────────────── */
@@ -233,7 +255,9 @@ function doRegister(){
         if(bn2) bn2.remove();
       } catch(e){}
       /* Kullanıcı adını Firebase'e kaydet */
-      _fbDb.collection('users').doc(cred.user.uid).set({nickname:nick,created:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+      _fbDb.collection('users').doc(cred.user.uid)
+        .set({nickname:nick,created:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})
+        .catch(function(e){ console.warn('Kullanıcı adı kaydedilemedi:', e && e.message); });
     })
     .catch(function(e){
       btn.textContent='Kayıt Ol';btn.disabled=false;

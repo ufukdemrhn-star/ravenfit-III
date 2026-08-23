@@ -5,6 +5,8 @@
 
 /* ── HEADER ──────────────────────────────────────────────────  */
 .hdr{position:fixed;top:0;left:0;right:0;height:56px;background:var(--hbg);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:200;transition:background .3s,border-color .3s}
+/* Wizard sırasında logo ortalanır — dikkat dağıtmasın, denge kursun */
+body.wizard-mode .hdr{justify-content:center}
 .logo{display:flex;align-items:center;gap:9px;cursor:pointer;user-select:none}
 .logo-txt{font-family:'Bebas Neue',cursive;font-size:20px;letter-spacing:3px;color:var(--text);line-height:1}
 .logo-txt span{color:var(--accent)}
@@ -22,7 +24,7 @@
 .s-silhouette{position:absolute;top:50%;left:50%;transform:translate(-50%,-54%);width:min(420px,90vw);opacity:.045;pointer-events:none;z-index:1;filter:blur(1px)}
 
 /* ── AUTH SCREEN BACKGROUND ── */
-.auth-bg-silhouette{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(1);width:min(560px,110vw);opacity:.04;pointer-events:none;z-index:0;filter:blur(2px);animation:authBgFloat 12s ease-in-out infinite}
+.auth-bg-silhouette{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(1);width:min(560px,110vw);opacity:.085;pointer-events:none;z-index:0;filter:blur(2px);animation:authBgFloat 12s ease-in-out infinite}
 .auth-bg-gradient{position:absolute;inset:0;background:radial-gradient(circle at 30% 20%, var(--ag), transparent 50%), radial-gradient(circle at 70% 80%, var(--ag), transparent 50%);opacity:.6;pointer-events:none;z-index:0;animation:authBgPulse 8s ease-in-out infinite}
 @keyframes authBgFloat{0%,100%{transform:translate(-50%,-50%) scale(1) rotate(0deg)}50%{transform:translate(-50%,-52%) scale(1.05) rotate(2deg)}}
 @keyframes authBgPulse{0%,100%{opacity:.4}50%{opacity:.7}}
@@ -47,3 +49,57 @@
 .pill-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);flex-shrink:0}
 #splash .btn{animation:splashFadeUp .5s .9s both}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+
+
+/* ── AUTH EKRANI DOKUSU ────────────────────────────────────
+   Radyal gradyan lekeler — düz arka plana derinlik katar.
+   Yavaş hareket eden 3 katman, birbirinden bağımsız ritimde. */
+.auth-texture{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.auth-texture::before,
+.auth-texture::after{content:'';position:absolute;border-radius:50%;filter:blur(70px)}
+.auth-texture::before{
+  width:60vw;height:60vw;max-width:520px;max-height:520px;
+  top:-12%;left:-18%;
+  background:radial-gradient(circle,var(--ag) 0%,transparent 70%);
+  opacity:.55;
+  animation:authBlob1 18s ease-in-out infinite}
+.auth-texture::after{
+  width:52vw;height:52vw;max-width:460px;max-height:460px;
+  bottom:-14%;right:-16%;
+  background:radial-gradient(circle,var(--accent) 0%,transparent 72%);
+  opacity:.16;
+  animation:authBlob2 22s ease-in-out infinite}
+/* Üçüncü leke — ortada, çok soluk */
+.auth-texture i{
+  position:absolute;display:block;
+  width:44vw;height:44vw;max-width:400px;max-height:400px;
+  top:38%;left:58%;
+  background:radial-gradient(circle,var(--info,#4895EF) 0%,transparent 70%);
+  opacity:.10;filter:blur(80px);border-radius:50%;
+  animation:authBlob3 26s ease-in-out infinite}
+
+@keyframes authBlob1{
+  0%,100%{transform:translate(0,0) scale(1)}
+  50%    {transform:translate(8%,6%) scale(1.12)}}
+@keyframes authBlob2{
+  0%,100%{transform:translate(0,0) scale(1)}
+  50%    {transform:translate(-7%,-8%) scale(1.08)}}
+@keyframes authBlob3{
+  0%,100%{transform:translate(-50%,-50%) scale(1)}
+  50%    {transform:translate(-58%,-42%) scale(1.15)}}
+
+/* ── OTOMATİK DOLDURMA DÜZELTMESİ ──────────────────────────
+   Tarayıcı kayıtlı şifreyi doldurduğunda alanı beyaz boyuyor.
+   Aşağıdaki hile arka planı temaya sabitler: box-shadow ile
+   iç dolgu yapılır, geçiş süresi çok uzun tutularak
+   tarayıcının kendi rengi hiç görünmez. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active{
+  -webkit-box-shadow:0 0 0 1000px var(--card2) inset !important;
+  box-shadow:0 0 0 1000px var(--card2) inset !important;
+  -webkit-text-fill-color:var(--text) !important;
+  caret-color:var(--text) !important;
+  -webkit-transition:background-color 100000s ease-in-out 0s !important;
+  transition:background-color 100000s ease-in-out 0s !important}

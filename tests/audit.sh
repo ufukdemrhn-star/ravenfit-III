@@ -58,6 +58,13 @@ node tests/storage-quota.js > /tmp/rf_quota.log 2>&1
 sonuc $? "$(grep -o '[0-9]*/[0-9]* geçti' /tmp/rf_quota.log | head -1)"
 grep "❌" /tmp/rf_quota.log | head -5
 
+# ── 4c. Yedekleme / geri yükleme ───────────────────────────
+baslik "4c. Yedekleme / geri yükleme"
+node tests/backup-restore.js > /tmp/rf_backup.log 2>&1
+! grep -q "❌" /tmp/rf_backup.log
+sonuc $? "$(grep -o '[0-9]*/[0-9]* geçti' /tmp/rf_backup.log | head -1)"
+grep "❌" /tmp/rf_backup.log | head -5
+
 # ── 5. DOM ID denetimi ─────────────────────────────────────
 baslik "5. DOM ID denetimi"
 python3 tests/dom-check.py > /tmp/rf_dom.log 2>&1

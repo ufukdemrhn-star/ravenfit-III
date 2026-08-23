@@ -21,7 +21,14 @@ function renderIlerleme(){
   // Eski tip liste görünümü — en yeni üstte
   // realIdx için: getEntries()'in orijinal sırasındaki index'i bulmamız lazım
   var origEntries=getEntries();
-  elList.innerHTML=entries.slice().reverse().map(function(e,i){
+  /* Uzun listeyi kırp: ilk 3 kayıt + "daha fazla göster" (madde 15).
+     Tercih oturum boyunca korunur — kullanıcı açtıysa açık kalır. */
+  var hepsiAcik = window._hListExpanded === true;
+  var tersSirali = entries.slice().reverse();
+  var gosterilecek = hepsiAcik ? tersSirali : tersSirali.slice(0,3);
+  var gizliSayi = tersSirali.length - gosterilecek.length;
+
+  elList.innerHTML=gosterilecek.map(function(e,i){
     /* Orijinal entries array'inde bu entry'nin gerçek index'ini bul */
     var realIdx=origEntries.findIndex(function(x){return x.timestamp===e.timestamp;});
     if(realIdx<0) realIdx=origEntries.indexOf(e);
@@ -34,6 +41,15 @@ function renderIlerleme(){
     '<button class="edit-btn" onclick="editEntry('+realIdx+')">✎</button>'+
     '<button class="del-btn" onclick="deleteEntry('+realIdx+')">✕</button></div></div>';
   }).join('');
+
+  /* Aç/kapa butonu — 3'ten fazla kayıt varsa göster */
+  if(tersSirali.length > 3){
+    elList.innerHTML += '<button class="h-more-btn" onclick="toggleHistoryList()">'+
+      (hepsiAcik
+        ? '▲ Daha az göster'
+        : '▼ Daha fazla kayıt gör  <span style="opacity:.6">(+'+gizliSayi+')</span>')+
+      '</button>';
+  }
 
   // 4 sütunlu tablo — en yeni solda
   tblCont.style.display = 'block';
@@ -115,4 +131,11 @@ function renderIlerleme(){
     mkRow('Kalf (cm)',       'calf',    false) +
     '</tbody></table></div>';
   drawCharts();
+}
+
+
+/* Geçmiş kayıt listesini aç/kapa (madde 15). */
+function toggleHistoryList(){
+  window._hListExpanded = !window._hListExpanded;
+  renderIlerleme();
 }
