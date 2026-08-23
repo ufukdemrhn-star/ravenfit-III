@@ -587,7 +587,8 @@ function _ws_renderReport(){
   html+='</div>';
 
   document.getElementById('ws-body').innerHTML=html;
-  document.getElementById('ws-footer')&&(document.getElementById('ws-footer').style.display='none');
+  /* ws-footer bir CLASS, id değil — hemen altındaki querySelector doğru olan.
+     Buradaki getElementById('ws-footer') hiçbir zaman eşleşmiyordu. */
   var footer=document.querySelector('.ws-footer');
   if(footer)footer.style.display='none';
 

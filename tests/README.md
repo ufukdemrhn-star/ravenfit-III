@@ -1,22 +1,15 @@
 # Test Araçları
 
-## 🌐 Tarayıcıda test — program kurmaya gerek yok
+## 🌐 Tarayıcıda — program kurmaya gerek yok
 
-Uygulamayı aç → **F12** → **Console** sekmesi.
+Uygulamayı aç → **F12** → **Console**.
 
-### 1. Sağlık Testi (35 kontrol)
+### 1. Sağlık Testi (41 kontrol)
 
-    fetch('tests/browser-test.js').then(r=>r.text()).then(eval)
+    fetch('tests/browser-test.js?v='+Date.now()).then(r=>r.text()).then(eval)
 
-Kontrol ettikleri:
-- 16 modül yüklendi mi
-- JSON dosyaları çift yükleniyor mu
-- Set sayacı +/− butonları çalışıyor mu
-- PR stilleri CSS'te mi, logo yolu doğru mu
-- Kronometre gereksiz timer kuruyor mu
-- Ölü kod temizlendi mi, güvenlik yardımcıları bağlı mı
-- CSS duplicate var mı, 8 modül yüklü mü
-- 8 veri dosyası ve 4 görsel erişilebilir mi
+Modüller, çift yükleme, set sayacı, logo yolu, kronometre, ölü kod,
+CSS düzeni, DOM elementleri, veri dosyaları, görseller.
 
 ### 2. Hesaplama Testi (38 kontrol)
 
@@ -25,27 +18,37 @@ Kontrol ettikleri:
 Yağ oranı, FFMI, BMR, TDEE, kalori hedefleri, makrolar,
 girdi sınırlaması, RED-S ve Bulk risk kontrolü.
 
-**Toplam 73 otomatik kontrol — hepsi tarayıcıda.**
+**Toplam 79 otomatik kontrol.**
 
----
-
-## 💻 Bilgisayarda test — Node.js / Python gerekir
-
-Zorunlu değil, tarayıcı testleri aynı alanları kapsar.
-Bunlar geliştirme sırasında dosya bazlı derin kontrol içindir.
-
-    sh tests/run.sh                    # 19 regresyon + 23 uç durum + 85 yol testi
-    python3 tests/deadcode-check.py    # erişilemeyen fonksiyon taraması
-    python3 tests/path-check.py        # kırık dosya yolu taraması
-
-**Uç durum testi** özellikle değerli: bel ≤ boyun, boy 0 gibi
-imkânsız girdilerde hesaplamaların NaN/Infinity üretmediğini doğrular.
-
----
-
-## 🔍 Logo görünmüyorsa
+### Logo/görsel sorunu olursa
 
     fetch('tests/diagnose-logo.js?v='+Date.now()).then(r=>r.text()).then(eval)
 
-Dosyanın sunucuda olup olmadığını, CSS'in hangi yolu aradığını ve
-tarayıcının bunu neye çözdüğünü adım adım gösterir; sonunda net teşhis verir.
+---
+
+## 💻 Bilgisayarda — Node.js + Python gerekir
+
+### Tam denetim (tek komut)
+
+    sh tests/audit.sh
+
+8 denetimi sırayla çalıştırır:
+
+| # | Denetim | Ne arar |
+|---|---------|---------|
+| 1 | JS sözdizimi | 44 dosyada hata |
+| 2 | Modül birleştirme | Yükleme sırası sorunu |
+| 3 | Regresyon | Düzeltilen hataların geri gelmesi |
+| 4 | Uç durum | NaN / Infinity üreten hesaplama |
+| 5 | DOM ID | Olmayan elemente erişim |
+| 6 | Yol çözümleme | Kırık dosya yolu |
+| 7 | Ölü kod | Erişilemeyen fonksiyon |
+| 8 | CSS tekrar | Birebir aynı kural |
+
+### Tek tek
+
+    node tests/regression.js         # 19 test
+    node tests/edge-cases.js         # 23 test
+    python3 tests/dom-check.py       # DOM ID denetimi
+    python3 tests/path-check.py      # 85 yol
+    python3 tests/deadcode-check.py  # ölü kod

@@ -283,6 +283,29 @@
   }
 
   /* ═══════════════════════════════════════════════════
+     5d. DOM ID BÜTÜNLÜĞÜ  (Faz D)
+     ═══════════════════════════════════════════════════ */
+  head('5d — Kritik DOM elementleri yerinde mi?  (Faz D)');
+
+  /* Sayfa açılışında var olması gereken elementler */
+  var kritikId = [
+    'splash','wizard','results','auth-screen','bottom-nav',
+    'ws-screen','ws-body','warmup-overlay','ws-rest-overlay',
+    'reds-warning-overlay','bulk-warning-overlay','ffmi-detail-overlay',
+    'settings-drawer','sdw-overlay','avatar-initials','avatar-img',
+    'user-email-display','workout-main','supp-modal'
+  ];
+  var eksikId = kritikId.filter(function (id) { return !document.getElementById(id); });
+  t(kritikId.length + ' kritik element mevcut', eksikId.length === 0, eksikId.join(', '));
+
+  /* Faz D'de düzeltilen eski ID referansları */
+  t('ws-footer class olarak erişiliyor', !!document.querySelector('.ws-footer'));
+  t('Eski "avatar-display" ID\'si kullanılmıyor',
+    !document.getElementById('avatar-display'));
+  t('Eski "settings-bg" ID\'si kullanılmıyor',
+    !document.getElementById('settings-bg'));
+
+  /* ═══════════════════════════════════════════════════
      6. VERİ DOSYALARI
      ═══════════════════════════════════════════════════ */
   head('6 — Veri dosyaları yüklendi mi?');

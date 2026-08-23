@@ -182,9 +182,6 @@ function _toolsSetDone(){
   _setCount++;
   var sc=document.getElementById('tools-set-count');
   if(sc) sc.textContent=_setCount;
-  /* Global set count da güncelle */
-  var gsc=document.getElementById('set-count');
-  if(gsc) gsc.textContent=_setCount;
   _toolsStartRest();
   showToast('Set #'+_setCount+' tamamlandı! Dinlenme başlıyor...','success');
 }
@@ -221,7 +218,5 @@ function _toolsResetSets(){
   _setCount=0;
   var sc=document.getElementById('tools-set-count');
   if(sc) sc.textContent='0';
-  var gsc=document.getElementById('set-count');
-  if(gsc) gsc.textContent='0';
   _toolsSkipRest();
 }

@@ -126,3 +126,15 @@ eski sürümü önbellekten sunmaya devam eder.
     <script src="js/core/state.js?v=0.3.2"></script>
 
 Tek seferlik çözüm için sert yenileme: `Ctrl + Shift + R` (Mac: `Cmd + Shift + R`)
+
+### Faz D — Denetim altyapısı
+- **DOM ID denetimi** eklendi. `adjustRestTime` hatası bir sınıftı, aynı sınıftan
+  4 tane daha bulundu ve düzeltildi:
+  - `ws-footer` — class olduğu halde `getElementById` ile aranıyordu (ölü satır)
+  - `set-count` — eski sistemden kalma, 2 yerde (kaldırıldı)
+  - `settings-bg` → `sdw-overlay` (doğru ID)
+  - `avatar-display` → `avatar-initials` + `avatar-img`
+- `tests/audit.sh` — 8 denetimi tek komutta çalıştıran ana script
+- Tarayıcı testi 35 → 41 kontrole çıktı
+
+**Sonuç:** 0 kırık ID referansı, 0 riskli guard'sız erişim.

@@ -292,7 +292,7 @@ function _clearUserLocalData(){
     /* Açık overlay/drawer varsa kapat */
     document.querySelectorAll('.calc-overlay.active').forEach(function(o){o.classList.remove('active');});
     var sd=document.getElementById('settings-drawer');if(sd){sd.classList.remove('open');}
-    var sb=document.getElementById('settings-bg');if(sb){sb.classList.remove('open');}
+    var sb=document.getElementById('sdw-overlay');if(sb){sb.classList.remove('open');}
     document.body.style.overflow='';
   } catch(e){}
   /* Wizard input'larını temizle */
@@ -429,8 +429,11 @@ function onUserLoggedOut(){
   document.getElementById('bottom-nav').classList.remove('visible');
   /* Sayfa yüklenmiş elementleri sıfırla */
   try {
-    var avEl=document.getElementById('avatar-display');
-    if(avEl){ avEl.textContent=''; avEl.style.backgroundImage=''; }
+    /* Avatar iki parçadan oluşuyor: baş harf yazısı + yüklenen resim */
+    var avIni=document.getElementById('avatar-initials');
+    if(avIni){ avIni.textContent='?'; avIni.style.display=''; }
+    var avImg=document.getElementById('avatar-img');
+    if(avImg){ avImg.src=''; avImg.style.display='none'; }
     var nickEl=document.getElementById('user-email-display');
     if(nickEl) nickEl.textContent='';
   } catch(e){}
