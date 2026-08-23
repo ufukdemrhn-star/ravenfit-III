@@ -115,3 +115,14 @@ Değişiklik yaptıktan sonra üç kontrolü çalıştır:
 > ulaşmak için `../assets/icons/logo.png` yazılmalı. Bu kural taşıma sırasında
 > gözden kaçtı ve arka plan logosu kırıldı; düzeltildi ve `tests/path-check.py`
 > ile artık otomatik doğrulanıyor.
+
+### Önbellek yönetimi
+
+`index.html` içindeki CSS ve JS bağlantılarında `?v=0.3.1` sürüm damgası var.
+Bir dosyayı güncellediğinde **bu numarayı artır** — aksi halde tarayıcılar
+eski sürümü önbellekten sunmaya devam eder.
+
+    <link rel="stylesheet" href="css/base.css?v=0.3.2">
+    <script src="js/core/state.js?v=0.3.2"></script>
+
+Tek seferlik çözüm için sert yenileme: `Ctrl + Shift + R` (Mac: `Cmd + Shift + R`)

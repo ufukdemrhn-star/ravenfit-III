@@ -267,6 +267,21 @@
   var cssLink = document.querySelectorAll('link[rel="stylesheet"][href^="css/"]');
   t('8 CSS modülü yüklü', cssLink.length === 8, cssLink.length + ' bulundu');
 
+  /* Önbellek kırıcı sürüm damgası var mı? */
+  var surumluCss = 0;
+  for (var ci = 0; ci < cssLink.length; ci++) {
+    if ((cssLink[ci].getAttribute('href') || '').indexOf('?v=') > -1) surumluCss++;
+  }
+  t('CSS dosyalarında sürüm damgası var', surumluCss === cssLink.length,
+    surumluCss + '/' + cssLink.length);
+
+  /* PR logo yolu — eski önbellek kalmış mı? */
+  if (logoYolu && logoYolu.indexOf('logo.png') > -1) {
+    var eskiYol = /url\(["']?assets\/icons\/logo\.png/.test(logoYolu);
+    t('CSS önbellekten eski sürüm gelmiyor', !eskiYol,
+      eskiYol ? 'Ctrl+Shift+R ile sert yenile!' : '');
+  }
+
   /* ═══════════════════════════════════════════════════
      6. VERİ DOSYALARI
      ═══════════════════════════════════════════════════ */

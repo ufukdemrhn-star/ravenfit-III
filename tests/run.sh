@@ -5,7 +5,7 @@ echo "▸ JS dosyalarını birleştiriyorum..."
 node -e "
 const fs=require('fs');
 const idx=fs.readFileSync('index.html','utf8');
-const files=[...idx.matchAll(/<script src=\"(js\/[^\"]+)\"/g)].map(m=>m[1]);
+const files=[...idx.matchAll(/<script src=\"(js\/[^\"?]+)[^\"]*\"/g)].map(m=>m[1]);
 fs.writeFileSync('tests/_combined.tmp.js', files.map(f=>fs.readFileSync(f,'utf8')).join('\n'));
 console.log('  '+files.length+' dosya birleştirildi');
 "

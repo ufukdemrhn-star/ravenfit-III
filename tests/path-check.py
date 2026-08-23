@@ -15,6 +15,10 @@ os.chdir(KOK)
 
 gecti = basarisiz = 0
 
+def temizle(yol):
+    """?v=... ve #... eklerini atar — bunlar dosya adının parçası değildir."""
+    return yol.split('?')[0].split('#')[0].strip()
+
 def kontrol(etiket, kosul, detay=''):
     global gecti, basarisiz
     if kosul:
@@ -35,7 +39,7 @@ for f in sorted(glob.glob('css/*.css')):
     icerik = open(f, encoding='utf-8').read()
     css_dizin = os.path.dirname(f)
     for m in re.finditer(r'url\((["\']?)([^"\')]+)\1\)', icerik):
-        yol = m.group(2).strip()
+        yol = temizle(m.group(2))
         if yol.startswith(('http', '//', 'data:', '#')):
             continue
         css_bulundu += 1
@@ -50,7 +54,7 @@ if css_bulundu == 0:
 print('\n▸ index.html içindeki src / href')
 html = open('index.html', encoding='utf-8').read()
 for m in re.finditer(r'(?:src|href)="([^"]+)"', html):
-    yol = m.group(1).strip()
+    yol = temizle(m.group(1))
     if yol.startswith(('http', '//', 'data:', '#', 'mailto:')):
         continue
     kontrol(f'index.html → {yol}', os.path.isfile(yol), 'dosya yok')
@@ -66,8 +70,10 @@ for f in sorted(glob.glob('js/**/*.js', recursive=True)):
         adaylar.add(m.group(2))
     for m in re.finditer(r'["\']((?:assets|data|css|js)/[\w./-]+\.\w{2,4})["\']', icerik):
         adaylar.add(m.group(1))
-    for yol in adaylar:
-        if yol.startswith(('http', '//', 'data:', '#')):
+    for ham in adaylar:
+        yol = temizle(ham)
+        # url(#id) → SVG filtre/gradyan referansı, dosya değil
+        if not yol or yol.startswith(('http', '//', 'data:', '#')):
             continue
         js_bulundu += 1
         # JS'ten enjekte edilen yollar HTML sayfasına göre çözülür (kök)
@@ -81,7 +87,7 @@ import json
 try:
     mf = json.load(open('manifest.json', encoding='utf-8'))
     for ic in mf.get('icons', []):
-        yol = ic.get('src', '')
+        yol = temizle(ic.get('src', ''))
         kontrol(f'manifest → {yol}', os.path.isfile(yol), 'dosya yok')
 except Exception as e:
     kontrol('manifest.json okunabildi', False, str(e))

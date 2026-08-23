@@ -40,3 +40,12 @@ Bunlar geliştirme sırasında dosya bazlı derin kontrol içindir.
 
 **Uç durum testi** özellikle değerli: bel ≤ boyun, boy 0 gibi
 imkânsız girdilerde hesaplamaların NaN/Infinity üretmediğini doğrular.
+
+---
+
+## 🔍 Logo görünmüyorsa
+
+    fetch('tests/diagnose-logo.js?v='+Date.now()).then(r=>r.text()).then(eval)
+
+Dosyanın sunucuda olup olmadığını, CSS'in hangi yolu aradığını ve
+tarayıcının bunu neye çözdüğünü adım adım gösterir; sonunda net teşhis verir.
