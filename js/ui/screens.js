@@ -94,7 +94,11 @@ function switchMain(id){
   document.querySelectorAll('.bnav-btn').forEach(function(b){b.classList.remove('active');});
   document.getElementById('ms-'+id).classList.add('active');
   document.getElementById('bnav-'+id).classList.add('active');
-  if(id==='profil'){renderProfilMlist();renderProfileBadges();renderConditionsSummary();}
+  if(id==='profil'){
+    renderProfilMlist();renderProfileBadges();renderConditionsSummary();
+    /* Sosyal profil başlığı ve istatistik vitrini */
+    if(typeof renderProfil==='function') renderProfil();
+  }
   if(id==='vucudum')setTimeout(drawCharts,100);
   if(id==='antrenman')renderWorkoutHome();
   window.scrollTo(0,0);

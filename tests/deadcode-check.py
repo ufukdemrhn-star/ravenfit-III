@@ -90,6 +90,15 @@ def main():
     # Konsol araçları
     roots |= {'_ravenfitSelfTest'} & all_fns
 
+    # Sonraki fazlar için hazırlanmış, henüz bağlanmamış API'ler.
+    # Ölü kod değiller — kasıtlı olarak önceden yazıldılar.
+    # Bir fonksiyon bağlandığında bu listeden çıkarılmalı.
+    HAZIRLANAN = {
+        'gorselSikistir', 'gorselCiftiUret', 'baytMetni',   # Faz P6 — gönderi
+        'profilNesnesiUret',                                # Faz P5 — açık profil
+    }
+    roots |= HAZIRLANAN & all_fns
+
     # ── state.js'teki load listener de kök (şimdilik, duplicate olsa da) ──
     st = sources.get(f'{BUILD}/js/core/state.js','')
     m = re.search(r"window\.addEventListener\('load'.*?\}\);", st, re.S)

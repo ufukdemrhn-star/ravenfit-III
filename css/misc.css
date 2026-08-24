@@ -198,3 +198,31 @@
   .theme-grid{grid-template-columns:repeat(3,1fr)}
   .theme-name{font-size:9px}
 }
+
+/* ══════════════════════════════════════════════════════════
+   ALT MENÜ — ORTA ARAMA BUTONU
+   Yükseltilmiş daire, marka renginde halka. Diğer sekmelerden
+   görsel olarak ayrılır çünkü bir sekme değil, eylem butonudur.
+   ══════════════════════════════════════════════════════════ */
+.bnav-search{
+  background:none;border:none;padding:0;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  flex:1;position:relative;
+  -webkit-tap-highlight-color:transparent}
+.bnav-search-ring{
+  position:relative;top:-14px;
+  width:54px;height:54px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--card);
+  border:2.5px solid var(--accent);
+  box-shadow:0 4px 16px var(--ag), var(--shadow-md);
+  color:var(--accent);
+  transition:transform .18s,box-shadow .18s}
+.bnav-search-ring svg{width:23px;height:23px}
+.bnav-search:active .bnav-search-ring{transform:scale(.92)}
+.bnav-search.act .bnav-search-ring{
+  background:var(--accent-btn);color:var(--on-accent);
+  box-shadow:0 6px 22px var(--ag)}
+
+/* Alt menü yüksekliği — yükseltilmiş buton taşmasın */
+.bottom-nav{overflow:visible}

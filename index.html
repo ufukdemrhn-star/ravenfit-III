@@ -8,14 +8,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <!-- Stil dosyaları -->
-<link rel="stylesheet" href="css/themes.css?v=0.6.0.1">
-<link rel="stylesheet" href="css/base.css?v=0.6.0.1">
-<link rel="stylesheet" href="css/components.css?v=0.6.0.1">
-<link rel="stylesheet" href="css/profile.css?v=0.6.0.1">
-<link rel="stylesheet" href="css/workout.css?v=0.6.0.1">
-<link rel="stylesheet" href="css/misc.css?v=0.6.0.1">
-<link rel="stylesheet" href="css/supplements.css?v=0.6.0.1">
-<link rel="stylesheet" href="css/calculators.css?v=0.6.0.1">
+<link rel="stylesheet" href="css/themes.css?v=0.7.0.0">
+<link rel="stylesheet" href="css/base.css?v=0.7.0.0">
+<link rel="stylesheet" href="css/components.css?v=0.7.0.0">
+<link rel="stylesheet" href="css/profile.css?v=0.7.0.0">
+<link rel="stylesheet" href="css/workout.css?v=0.7.0.0">
+<link rel="stylesheet" href="css/misc.css?v=0.7.0.0">
+<link rel="stylesheet" href="css/supplements.css?v=0.7.0.0">
+<link rel="stylesheet" href="css/calculators.css?v=0.7.0.0">
+<link rel="stylesheet" href="css/social.css?v=0.7.0.0">
 <link rel="icon" href="assets/icons/favicon.png" type="image/png">
 <link rel="icon" href="assets/icons/icon-192.png" type="image/png" sizes="192x192">
 <link rel="manifest" href="manifest.json">
@@ -109,7 +110,7 @@
   <img src="assets/icons/logo.png" width="148">
 </div>
   <h1 class="splash-title">RAVEN<span style="color:var(--accent)">FIT</span></h1>
-  <div class="splash-tag">Versiyon 0.6.0.0 (beta)</div>
+  <div class="splash-tag">Versiyon 0.7.0.0 (beta)</div>
   <div class="splash-sub">Sen sadece antrenmanına odaklan</div>
   <div class="pills">
     <div class="pill"><div class="pill-dot"></div>Çoklu Branş</div>
@@ -568,33 +569,97 @@
 
   <!-- PROFİL -->
   <div class="main-section" id="ms-profil">
-    <div class="r-hero">
-      <div class="r-card-hero">
-        <!-- Avatar sağda -->
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
-          <div style="flex:1;min-width:0">
-            <div class="r-name" id="r-name">Analiz Tamamlandı</div>
-            <div class="r-title">SONUÇLARIN HAZIR</div>
-            <div class="r-stats">
-              <div class="rs"><div class="rs-v" id="r-bf">—</div><div class="rs-l">Yağ Oranı</div></div>
-              <div class="rs"><div class="rs-v" id="r-lm">—</div><div class="rs-l">Yağsız Kütle</div></div>
-              <div class="rs"><div class="rs-v" id="r-ffmi">—</div><div class="rs-l">FFMI</div></div>
-              <div class="rs"><div class="rs-v" id="r-cal">—</div><div class="rs-l">Günlük Kalori</div></div>
-            </div>
-          </div>
-          <div class="avatar-wrap">
-            <div class="avatar" id="profile-avatar" onclick="triggerAvatarUpload()">
-              <span id="avatar-initials">?</span>
-              <img id="avatar-img" src="" style="display:none">
-            </div>
-            <div class="avatar-cam" onclick="triggerAvatarUpload()" title="Fotoğraf değiştir">📷</div>
-            <input type="file" id="avatar-file-input" accept="image/*" style="display:none" onchange="handleAvatarUpload(this)">
-          </div>
-        </div>
+
+  <!-- ══ SOSYAL PROFİL BAŞLIĞI ══════════════════════════════ -->
+  <div class="pr-top">
+    <div class="pr-nick-row">
+      <div class="pr-nick" id="pr-nick">@kullanici</div>
+      <div class="pr-top-actions">
+        <button class="pr-icon-btn" onclick="openNewPost()" title="Yeni gönderi" aria-label="Yeni gönderi">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/>
+          </svg>
+        </button>
+        <button class="pr-icon-btn" onclick="openSettingsDrawer()" title="Menü" aria-label="Menü">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M4 7h16M4 12h16M4 17h16"/>
+          </svg>
+        </button>
       </div>
     </div>
-    <div class="rb">
-      <!-- Hesap bilgisi + Ayarlar butonu -->
+
+    <!-- Avatar + sayaçlar -->
+    <div class="pr-head">
+      <div class="pr-av-wrap">
+        <div class="pr-av" id="pr-avatar" onclick="onAvatarTap()">
+          <span id="avatar-initials">?</span>
+          <img id="avatar-img" src="" style="display:none" alt="">
+        </div>
+        <button class="pr-av-edit" id="pr-av-edit" onclick="triggerAvatarUpload()" title="Fotoğraf değiştir" aria-label="Fotoğraf değiştir">+</button>
+        <input type="file" id="avatar-file-input" accept="image/*" style="display:none" onchange="handleAvatarUpload(event)">
+      </div>
+      <div class="pr-counts">
+        <button class="pr-count" onclick="openPostList()">
+          <span class="pr-count-v" id="pr-c-post">0</span><span class="pr-count-l">gönderi</span>
+        </button>
+        <button class="pr-count" onclick="openFollowList('followers')">
+          <span class="pr-count-v" id="pr-c-followers">0</span><span class="pr-count-l">takipçi</span>
+        </button>
+        <button class="pr-count" onclick="openFollowList('following')">
+          <span class="pr-count-v" id="pr-c-following">0</span><span class="pr-count-l">takip</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- İsim + biyografi -->
+    <div class="pr-name" id="pr-name">—</div>
+    <div class="pr-bio" id="pr-bio"></div>
+
+    <!-- Eylem butonları — kendi profilim / başkasının profili -->
+    <div class="pr-actions" id="pr-actions"></div>
+  </div>
+
+  <div class="rb">
+
+    <!-- ══ İSTATİSTİKLER ══════════════════════════════════════ -->
+    <div class="rc" id="pr-stats-card">
+      <div class="pr-stats-head">
+        <div class="rct" style="margin:0">📊 İSTATİSTİKLER</div>
+        <button class="pr-detay-btn" onclick="openStatsDetail()">Detaylar ›</button>
+      </div>
+      <div class="pr-vitrin" id="pr-vitrin"></div>
+    </div>
+
+    <!-- ══ ROZETLER ═══════════════════════════════════════════ -->
+      <div class="rc">
+        <div class="rct">🏅 Rozetlerim</div>
+        <div id="profil-badges"></div>
+      </div>
+
+    <!-- ══ SEKMELER: gönderi / antrenman / hizmet ═════════════ -->
+    <div class="rc" style="padding:0;overflow:hidden">
+      <div class="pr-tabs">
+        <button class="pr-tab act" data-pt="posts" onclick="switchProfileTab('posts')" aria-label="Gönderiler">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+            <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+          </svg>
+        </button>
+        <button class="pr-tab" data-pt="programs" onclick="switchProfileTab('programs')" aria-label="Antrenman programları">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
+            <path d="M6.5 6.5v11M17.5 6.5v11M3 9v6M21 9v6M6.5 12h11"/>
+          </svg>
+        </button>
+        <button class="pr-tab" data-pt="services" onclick="switchProfileTab('services')" aria-label="Hizmetler">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
+            <circle cx="9" cy="15" r="5"/><path d="M13.5 12.5L20 6M20 6l-3.5-.5M20 6l.5 3.5"/>
+          </svg>
+        </button>
+      </div>
+      <div id="pr-tab-body"></div>
+    </div>
+
+    <!-- ══ HESABIM — mevcut ayarlar bloğu, DEĞİŞMEDEN en altta ══ -->
       <div class="rc">
         <div class="rct">👤 Hesabım</div>
         <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0">
@@ -618,16 +683,6 @@
             <button onclick="openConditionsEdit()" style="background:var(--card2);border:1.5px solid var(--accent);border-radius:9px;padding:8px 14px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;color:var(--accent);cursor:pointer;flex-shrink:0;margin-left:10px">⚙️ Düzenle</button>
           </div>
         </div>
-      </div>
-      <!-- Vücut Gelişimim -->
-      <div class="rc">
-        <div class="rct">📊 Vücut Gelişimim</div>
-        <div id="mlist-profil"></div>
-      </div>
-      <!-- Rozetlerim -->
-      <div class="rc">
-        <div class="rct">🏅 Rozetlerim</div>
-        <div id="profil-badges"></div>
       </div>
     </div>
   </div>
@@ -812,6 +867,14 @@
       <path d="M10 12h4"/><path d="M10 16h4"/>
     </svg>
     Beslenme
+  </button>
+  <!-- Orta arama butonu — yükseltilmiş, marka renginde halka -->
+  <button class="bnav-search" id="bnav-kesfet" onclick="openDiscover()" aria-label="Keşfet">
+    <span class="bnav-search-ring">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>
+      </svg>
+    </span>
   </button>
   <button class="bnav-btn" id="bnav-antrenman" onclick="switchMain('antrenman')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
@@ -1004,6 +1067,53 @@
   </div>
 </div>
 
+<!-- ══ PROFİL DÜZENLEME ═══════════════════════════════════ -->
+<div class="sp-overlay" id="profile-edit-overlay">
+  <div class="sp-sheet">
+    <div class="sp-head">
+      <div class="sp-baslik">Profili Düzenle</div>
+      <button class="sp-kapat" onclick="closeProfileEdit()" aria-label="Kapat">&times;</button>
+    </div>
+    <div class="sp-body" id="pe-body" style="padding:4px 18px 12px"></div>
+    <div class="sp-foot">
+      <button class="btn btn-s" onclick="closeProfileEdit()">Vazgeç</button>
+      <button class="btn btn-p" onclick="saveProfileEdit()">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ İSTATİSTİK PAYLAŞIM PANELİ ══════════════════════════ -->
+<div class="sp-overlay" id="stats-panel-overlay">
+  <div class="sp-sheet">
+    <div class="sp-head">
+      <div class="sp-baslik">İstatistik Paylaşımı</div>
+      <div class="sp-alt">Aşağıdaki bilgilerden hangilerinin profilinde görüneceğini sen seçersin.</div>
+      <button class="sp-kapat" onclick="closeStatsPanel()" aria-label="Kapat">&times;</button>
+    </div>
+    <div class="sp-body" id="sp-body"></div>
+    <div class="sp-not">🔒 işaretli değerler, paylaştığın diğer verilerden hesaplanabildiği için tek başına gizlenemez.</div>
+    <div class="sp-foot">
+      <button class="btn btn-s" onclick="spHepsiniKapat()">Tümünü Gizle</button>
+      <button class="btn btn-p" onclick="spKaydet()">Kaydet</button>
+    </div>
+    <div class="sp-soru" id="sp-soru"></div>
+  </div>
+</div>
+
+<!-- ══ İSTATİSTİK DETAY PENCERESİ ══════════════════════════ -->
+<div class="sp-overlay" id="stats-detail-overlay">
+  <div class="sp-sheet">
+    <div class="sp-head">
+      <div class="sp-baslik" id="sd-baslik">İstatistikler</div>
+      <button class="sp-kapat" onclick="closeStatsDetail()" aria-label="Kapat">&times;</button>
+    </div>
+    <div class="sp-body" id="sd-body"></div>
+    <div class="sp-foot">
+      <button class="btn btn-s btn-full" onclick="closeStatsDetail()">Kapat</button>
+    </div>
+  </div>
+</div>
+
 <div class="warmup-overlay" id="warmup-overlay">
   <div class="warmup-card">
     <div class="warmup-icon" id="warmup-icon">🔥</div>
@@ -1023,72 +1133,79 @@
 
 <!-- ══ Uygulama modülleri ══ -->
 <!-- js/core -->
-<script src="js/core/storage.js?v=0.6.0.1"></script>
-<script src="js/core/state.js?v=0.6.0.1"></script>
-<script src="js/core/utils.js?v=0.6.0.1"></script>
-<script src="js/core/data-loader.js?v=0.6.0.1"></script>
-<script src="js/core/theme.js?v=0.6.0.1"></script>
+<script src="js/core/storage.js?v=0.7.0.0"></script>
+<script src="js/core/state.js?v=0.7.0.0"></script>
+<script src="js/core/utils.js?v=0.7.0.0"></script>
+<script src="js/core/data-loader.js?v=0.7.0.0"></script>
+<script src="js/core/theme.js?v=0.7.0.0"></script>
 
 <!-- js/ui -->
-<script src="js/ui/toast.js?v=0.6.0.1"></script>
-<script src="js/ui/screens.js?v=0.6.0.1"></script>
-<script src="js/ui/wizard.js?v=0.6.0.1"></script>
-<script src="js/ui/charts.js?v=0.6.0.1"></script>
+<script src="js/ui/toast.js?v=0.7.0.0"></script>
+<script src="js/ui/screens.js?v=0.7.0.0"></script>
+<script src="js/ui/wizard.js?v=0.7.0.0"></script>
+<script src="js/ui/charts.js?v=0.7.0.0"></script>
 
 <!-- js/health -->
-<script src="js/health/calculations.js?v=0.6.0.1"></script>
-<script src="js/health/goals.js?v=0.6.0.1"></script>
-<script src="js/health/body-profile.js?v=0.6.0.1"></script>
-<script src="js/health/reds-warning.js?v=0.6.0.1"></script>
-<script src="js/health/ffmi-detail.js?v=0.6.0.1"></script>
-<script src="js/health/conditions.js?v=0.6.0.1"></script>
+<script src="js/health/calculations.js?v=0.7.0.0"></script>
+<script src="js/health/goals.js?v=0.7.0.0"></script>
+<script src="js/health/body-profile.js?v=0.7.0.0"></script>
+<script src="js/health/reds-warning.js?v=0.7.0.0"></script>
+<script src="js/health/ffmi-detail.js?v=0.7.0.0"></script>
+<script src="js/health/conditions.js?v=0.7.0.0"></script>
 
 <!-- js/tabs -->
-<script src="js/tabs/render-all.js?v=0.6.0.1"></script>
-<script src="js/tabs/body.js?v=0.6.0.1"></script>
-<script src="js/tabs/nutrition.js?v=0.6.0.1"></script>
-<script src="js/tabs/measurements.js?v=0.6.0.1"></script>
-<script src="js/tabs/progress.js?v=0.6.0.1"></script>
+<script src="js/tabs/render-all.js?v=0.7.0.0"></script>
+<script src="js/tabs/body.js?v=0.7.0.0"></script>
+<script src="js/tabs/nutrition.js?v=0.7.0.0"></script>
+<script src="js/tabs/measurements.js?v=0.7.0.0"></script>
+<script src="js/tabs/progress.js?v=0.7.0.0"></script>
 
 <!-- js/profile -->
-<script src="js/profile/avatar.js?v=0.6.0.1"></script>
-<script src="js/profile/settings.js?v=0.6.0.1"></script>
-<script src="js/profile/profile.js?v=0.6.0.1"></script>
+<script src="js/profile/avatar.js?v=0.7.0.0"></script>
+<script src="js/profile/settings.js?v=0.7.0.0"></script>
+<script src="js/profile/profile.js?v=0.7.0.0"></script>
 
 <!-- js/nutrition -->
-<script src="js/nutrition/supplements.js?v=0.6.0.1"></script>
-<script src="js/nutrition/panels.js?v=0.6.0.1"></script>
-<script src="js/nutrition/water.js?v=0.6.0.1"></script>
+<script src="js/nutrition/supplements.js?v=0.7.0.0"></script>
+<script src="js/nutrition/panels.js?v=0.7.0.0"></script>
+<script src="js/nutrition/water.js?v=0.7.0.0"></script>
 
 <!-- js/workout -->
-<script src="js/workout/labels.js?v=0.6.0.1"></script>
-<script src="js/workout/data.js?v=0.6.0.1"></script>
-<script src="js/workout/branches.js?v=0.6.0.1"></script>
-<script src="js/workout/menu.js?v=0.6.0.1"></script>
-<script src="js/workout/library.js?v=0.6.0.1"></script>
-<script src="js/workout/programs.js?v=0.6.0.1"></script>
-<script src="js/workout/history.js?v=0.6.0.1"></script>
-<script src="js/workout/engine.js?v=0.6.0.1"></script>
-<script src="js/workout/tools.js?v=0.6.0.1"></script>
+<script src="js/workout/labels.js?v=0.7.0.0"></script>
+<script src="js/workout/data.js?v=0.7.0.0"></script>
+<script src="js/workout/branches.js?v=0.7.0.0"></script>
+<script src="js/workout/menu.js?v=0.7.0.0"></script>
+<script src="js/workout/library.js?v=0.7.0.0"></script>
+<script src="js/workout/programs.js?v=0.7.0.0"></script>
+<script src="js/workout/history.js?v=0.7.0.0"></script>
+<script src="js/workout/engine.js?v=0.7.0.0"></script>
+<script src="js/workout/tools.js?v=0.7.0.0"></script>
 
 <!-- js/calculators -->
-<script src="js/calculators/index.js?v=0.6.0.1"></script>
-<script src="js/calculators/one-rm.js?v=0.6.0.1"></script>
-<script src="js/calculators/working-set.js?v=0.6.0.1"></script>
-<script src="js/calculators/sleep.js?v=0.6.0.1"></script>
-<script src="js/calculators/pr-test.js?v=0.6.0.1"></script>
+<script src="js/calculators/index.js?v=0.7.0.0"></script>
+<script src="js/calculators/one-rm.js?v=0.7.0.0"></script>
+<script src="js/calculators/working-set.js?v=0.7.0.0"></script>
+<script src="js/calculators/sleep.js?v=0.7.0.0"></script>
+<script src="js/calculators/pr-test.js?v=0.7.0.0"></script>
 
 <!-- js/badges -->
-<script src="js/badges/badges.js?v=0.6.0.1"></script>
+<script src="js/badges/badges.js?v=0.7.0.0"></script>
 
 <!-- js/auth -->
-<script src="js/auth/firebase.js?v=0.6.0.1"></script>
+<script src="js/auth/firebase.js?v=0.7.0.0"></script>
 
 <!-- js/admin -->
-<script src="js/admin/self-test.js?v=0.6.0.1"></script>
+<script src="js/admin/self-test.js?v=0.7.0.0"></script>
+
+<!-- js/social -->
+<script src="js/social/media.js?v=0.7.0.0"></script>
+<script src="js/social/profiles.js?v=0.7.0.0"></script>
+<script src="js/social/stats-panel.js?v=0.7.0.0"></script>
+<script src="js/social/profile-view.js?v=0.7.0.0"></script>
+<script src="js/social/profile-edit.js?v=0.7.0.0"></script>
 
 <!-- Başlatıcı — en son yüklenir -->
-<script src="js/app.js?v=0.6.0.1"></script>
+<script src="js/app.js?v=0.7.0.0"></script>
 
 <!-- 🔥 Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>

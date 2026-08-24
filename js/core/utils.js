@@ -67,12 +67,10 @@ function animateResults(){
   var ffmiEl=document.getElementById('ffmi-v');
   var bmiEl=document.getElementById('bmi-v');
   var calEl=document.getElementById('cal-v');
-  var rBfEl=document.getElementById('r-bf');
-  var rCalEl=document.getElementById('r-cal');
+  /* Not: Profil sayfasındaki eski sonuç kartı (r-bf, r-cal) kaldırıldı;
+     yerini sosyal profil vitrini aldı. */
   animateNum(bfEl,0,R.bf,1200,2);
   animateNum(ffmiEl,0,R.ffmi,1200,2);
   animateNum(bmiEl,0,R.bmi,1000,1);
   animateNum(calEl,0,R.goalCal,1000,0);
-  if(rBfEl)animateNum(rBfEl,0,R.bf,1000,2,'%');
-  if(rCalEl)animateNum(rCalEl,0,R.goalCal,1000,0,' kcal');
 }
