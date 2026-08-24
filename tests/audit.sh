@@ -30,6 +30,13 @@ python3 tests/theme-check.py > /tmp/rf_theme.log 2>&1
 sonuc $? "$(grep -o '[0-9]*/[0-9]* geçti' /tmp/rf_theme.log | head -1)"
 grep "❌\|✗" /tmp/rf_theme.log | head -8
 
+# ── 0b2. CSS yerleşimi ─────────────────────────────────────
+baslik "0b2. CSS yerleşimi"
+python3 tests/layout-check.py > /tmp/rf_layout.log 2>&1
+! grep -q "❌" /tmp/rf_layout.log
+sonuc $? "$(grep -o '[0-9]*/[0-9]* geçti' /tmp/rf_layout.log | head -1)"
+grep "❌\|🔴" /tmp/rf_layout.log | head -6
+
 # ── 0c. Tema göçü ──────────────────────────────────────────
 baslik "0c. Tema göçü"
 node -e "

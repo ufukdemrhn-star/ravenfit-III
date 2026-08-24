@@ -464,6 +464,45 @@
   applyTheme(oncekiTema);
 
   /* ═══════════════════════════════════════════════════
+     5h. YERLEŞİM — sabit katmanlar
+     ═══════════════════════════════════════════════════ */
+  head('5h — Sabit katmanlar yerinde mi?');
+
+  /* Bu öğeler position:fixed olmalı. Bir ID kuralı sınıfı ezerse
+     sayfa akışına düşerler ve her sekmede kaydırınca görünürler. */
+  var SABIT = [
+    ['#settings-drawer', 'Ayarlar çekmecesi'],
+    ['#sdw-overlay',     'Ayarlar örtüsü'],
+    ['.hdr',             'Başlık'],
+    ['.bottom-nav',      'Alt menü'],
+    ['#ws-screen',       'Antrenman ekranı'],
+    ['#warmup-overlay',  'Isınma katmanı']
+  ];
+  var akista = [];
+  SABIT.forEach(function(p){
+    var el = document.querySelector(p[0]);
+    if(!el) return;
+    var pos = getComputedStyle(el).position;
+    if(pos !== 'fixed') akista.push(p[1] + ' (' + pos + ')');
+  });
+  t(SABIT.length + ' katman position:fixed', akista.length === 0, akista.join(', '));
+
+  /* Çekmece kapalıyken görünmemeli */
+  var sd = document.getElementById('settings-drawer');
+  if(sd){
+    var acik = sd.classList.contains('open');
+    var tr = getComputedStyle(sd).transform;
+    t('Ayarlar çekmecesi kapalı konumda', acik || tr !== 'none',
+      'transform ile gizlenmiyor olabilir');
+  }
+
+  /* Doku katmanı tıklamayı engellemiyor mu? */
+  var govdeStil = getComputedStyle(document.body, '::before');
+  t('Grain katmanı tıklamayı engellemiyor',
+    govdeStil.pointerEvents === 'none' || govdeStil.pointerEvents === '',
+    govdeStil.pointerEvents);
+
+  /* ═══════════════════════════════════════════════════
      6. VERİ DOSYALARI
      ═══════════════════════════════════════════════════ */
   head('6 — Veri dosyaları yüklendi mi?');

@@ -207,11 +207,15 @@ body::after{
     radial-gradient(ellipse 80% 50% at 50% -10%, var(--ag), transparent 60%),
     radial-gradient(ellipse 60% 40% at 100% 100%, var(--ag), transparent 65%)}
 
-/* İçerik doku katmanlarının üstünde kalmalı */
-.hdr,#app-main,#auth-screen,.bottom-nav,.ws-screen,
-.calc-overlay,.modal-overlay,#settings-drawer{position:relative;z-index:2}
-.hdr{z-index:200}
-.bottom-nav{z-index:300}
+/* İçerik doku katmanlarının üstünde kalmalı.
+
+   ÖNEMLİ: Burada position ATANMAZ. Önceki sürümde bu kural
+   position:relative veriyordu ve #settings-drawer gibi ID
+   seçicileri, sınıflarındaki position:fixed'i eziyordu —
+   çekmece sabit katman olmaktan çıkıp sayfa akışına giriyordu.
+   z-index yalnızca konumlandırılmış öğelerde çalışır, bu öğelerin
+   hepsinin zaten kendi position değeri var. */
+#app-main,#auth-screen{position:relative;z-index:2}
 
 @media(prefers-reduced-motion:reduce){
   body{transition:none}
