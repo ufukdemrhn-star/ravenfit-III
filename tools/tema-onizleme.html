@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="gece">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RavenFit — Tema Önizleme</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+/* ── GECE — nötr soğuk, orta kontrast — varsayılan */
+:root,[data-theme="gece"]{
+  --bg:#0F1113; --bg2:#16191C; --card:#1D2125; --card2:#272B31;
+  --border:#3A424C;
+  --text:#EFF4FA; --text2:#9199A2; --text3:#747B82;
+  --accent:#E63C49; --accent-btn:#DC3141; --on-accent:#FFFFFF;
+  --ag:rgba(230,60,73,0.14); --hbg:rgba(15,17,19,0.88);
+  --success:#45A875; --warn:#CA8902; --danger:#F16D66;
+  --info:#469CE0; --purple:#AF82E0;
+  /* Veri renkleri — anlam renklerinden AYRI */
+  --c1:#5692DC; --c2:#A57ED2; --c3:#D07198; --c4:#D3774C; --c5:#A88E16; --c6:#54A058;
+  --s1:#52A4EE; --s2:#06B3C1; --s3:#44B77E; --s4:#B29F25; --s5:#D98939; --s6:#E67B6E;
+  /* Doku katmanları */
+  --cam:rgba(255,255,255,.045); --isik:rgba(255,255,255,.075); --grain-op:.030;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.28); --shadow-md:0 4px 12px rgba(0,0,0,.42); --shadow-lg:0 12px 32px rgba(0,0,0,.55);
+  --overlay:rgba(0,0,0,.66);
+}
+
+/* ── OKYANUS — derin mavi-turkuaz, yüksek kontrast */
+[data-theme="okyanus"]{
+  --bg:#040F15; --bg2:#081821; --card:#0C222C; --card2:#122E3B;
+  --border:#21485B;
+  --text:#ECF6FC; --text2:#8B9BA3; --text3:#6F7C83;
+  --accent:#1BBAE9; --accent-btn:#017FA2; --on-accent:#FFFFFF;
+  --ag:rgba(27,186,233,0.14); --hbg:rgba(4,15,21,0.88);
+  --success:#45A875; --warn:#CB8904; --danger:#F16D66;
+  --info:#469DE0; --purple:#AF83E0;
+  /* Veri renkleri — anlam renklerinden AYRI */
+  --c1:#019CC4; --c2:#798ADF; --c3:#B878C3; --c4:#D67182; --c5:#CB7D38; --c6:#989320;
+  --s1:#52A4EE; --s2:#06B3C1; --s3:#44B77E; --s4:#B29F25; --s5:#D98939; --s6:#E67B6E;
+  /* Doku katmanları */
+  --cam:rgba(255,255,255,.045); --isik:rgba(255,255,255,.075); --grain-op:.030;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.28); --shadow-md:0 4px 12px rgba(0,0,0,.42); --shadow-lg:0 12px 32px rgba(0,0,0,.55);
+  --overlay:rgba(0,0,0,.66);
+}
+
+/* ── MENEKŞE — mor, yumuşak kontrast — sıcak koyu */
+[data-theme="menekse"]{
+  --bg:#141119; --bg2:#1D1924; --card:#25202F; --card2:#302A3D;
+  --border:#483F5B;
+  --text:#F3F1FA; --text2:#9D99A5; --text3:#7E7B85;
+  --accent:#AA7BF3; --accent-btn:#8C5BD1; --on-accent:#FFFFFF;
+  --ag:rgba(170,123,243,0.14); --hbg:rgba(20,17,25,0.88);
+  --success:#49AB78; --warn:#CE8B05; --danger:#F46F68;
+  --info:#489FE2; --purple:#B185E2;
+  /* Veri renkleri — anlam renklerinden AYRI */
+  --c1:#A282D8; --c2:#CF74A7; --c3:#D97660; --c4:#BB891F; --c5:#7A9D3F; --c6:#00A586;
+  --s1:#52A4EE; --s2:#06B3C1; --s3:#44B77E; --s4:#B29F25; --s5:#D98939; --s6:#E67B6E;
+  /* Doku katmanları */
+  --cam:rgba(255,255,255,.045); --isik:rgba(255,255,255,.075); --grain-op:.030;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.28); --shadow-md:0 4px 12px rgba(0,0,0,.42); --shadow-lg:0 12px 32px rgba(0,0,0,.55);
+  --overlay:rgba(0,0,0,.66);
+}
+
+/* ── BAKIR — sıcak amber-bakır, toprak tonlu */
+[data-theme="bakir"]{
+  --bg:#17100C; --bg2:#211711; --card:#2C1E16; --card2:#39281B;
+  --border:#563C2A;
+  --text:#FCF1E9; --text2:#A6968B; --text3:#86786F;
+  --accent:#ED9235; --accent-btn:#AD6300; --on-accent:#FFFFFF;
+  --ag:rgba(237,146,53,0.14); --hbg:rgba(23,16,12,0.88);
+  --success:#46A976; --warn:#CC8A00; --danger:#F26E67;
+  --info:#469DE1; --purple:#B083E0;
+  /* Veri renkleri — anlam renklerinden AYRI */
+  --c1:#CA7F33; --c2:#919628; --c3:#27A373; --c4:#069FB4; --c5:#6590DF; --c6:#AF7CCD;
+  --s1:#52A4EE; --s2:#06B3C1; --s3:#44B77E; --s4:#B29F25; --s5:#D98939; --s6:#E67B6E;
+  /* Doku katmanları */
+  --cam:rgba(255,255,255,.045); --isik:rgba(255,255,255,.075); --grain-op:.030;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.28); --shadow-md:0 4px 12px rgba(0,0,0,.42); --shadow-lg:0 12px 32px rgba(0,0,0,.55);
+  --overlay:rgba(0,0,0,.66);
+}
+
+/* ── AYDINLIK — nötr yumuşak — kartlar beyaz, zemin gri */
+[data-theme="aydinlik"]{
+  --bg:#F0F2F4; --bg2:#E7EAED; --card:#FFFFFF; --card2:#F3F6FA;
+  --border:#D3DAE2;
+  --text:#181F28; --text2:#586577; --text3:#748090;
+  --accent:#C52B30; --accent-btn:#D53D3D; --on-accent:#FFFFFF;
+  --ag:rgba(197,43,48,0.1); --hbg:rgba(240,242,244,0.9);
+  --success:#017447; --warn:#8A5C01; --danger:#B73737;
+  --info:#0069A8; --purple:#7D51A9;
+  /* Veri renkleri — anlam renklerinden AYRI */
+  --c1:#326CB4; --c2:#8159AA; --c3:#A84C74; --c4:#AA5227; --c5:#7F6900; --c6:#2E7A35;
+  --s1:#2179BF; --s2:#00848F; --s3:#008B56; --s4:#857501; --s5:#A86002; --s6:#B65046;
+  /* Doku katmanları */
+  --cam:rgba(255,255,255,.70); --isik:rgba(255,255,255,.95); --grain-op:.020;
+  --shadow-sm:0 1px 2px rgba(12,16,24,.08); --shadow-md:0 4px 12px rgba(12,16,24,.10); --shadow-lg:0 12px 32px rgba(12,16,24,.14);
+  --overlay:rgba(18,22,30,.42);
+}
+
+/* ══ DOKU KATMANLARI ══════════════════════════════════════
+   1. Grain  — SVG gürültü, çok hafif film greni
+   2. Cam    — kartlarda hafif şeffaflık + blur
+   3. Işık   — kart üst kenarında 1px iç aydınlık çizgi
+   ═══════════════════════════════════════════════════════ */
+body{
+  font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);
+  min-height:100vh;padding:0 0 60px;transition:background .3s,color .3s;
+  position:relative}
+/* Grain katmanı — tüm sayfaya ince doku */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:1;
+  opacity:var(--grain-op);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+/* Zemin derinliği — çok soluk radyal ışık */
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, var(--ag), transparent 60%),
+    radial-gradient(ellipse 60% 40% at 100% 100%, var(--ag), transparent 65%)}
+
+.wrap{max-width:640px;margin:0 auto;padding:16px;position:relative;z-index:2}
+.hdr{position:sticky;top:0;background:var(--hbg);backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);
+  padding:12px 16px;z-index:50;margin:0 -16px 16px}
+h1{font-family:'Bebas Neue',cursive;font-size:26px;letter-spacing:1px}
+h1 span{color:var(--accent)}
+.sub{font-size:11px;color:var(--text3);margin-top:1px}
+
+/* ── Tema seçici ── */
+.tg{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:20px}
+.tc{display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px 4px;
+  background:var(--card2);border:1.5px solid var(--border);border-radius:11px;
+  cursor:pointer;font-family:inherit;transition:.18s}
+.tc:hover{border-color:var(--text3)}
+.tc.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.tc-sw{position:relative;width:100%;aspect-ratio:1.4;border-radius:7px;
+  border:1px solid var(--border);overflow:hidden;display:block}
+.tc-sw i{position:absolute;left:5px;top:5px;width:52%;height:46%;border-radius:3px}
+.tc-sw b{position:absolute;right:5px;bottom:5px;width:11px;height:11px;border-radius:50%}
+.tc-n{font-size:10px;font-weight:600;color:var(--text2)}
+.tc.on .tc-n{color:var(--text)}
+
+/* ── Kart — cam + iç ışık ── */
+.c{background:var(--card);border:1px solid var(--border);border-radius:15px;
+  padding:16px;margin-bottom:12px;position:relative;overflow:hidden;
+  box-shadow:var(--shadow-sm)}
+/* İç ışık çizgisi — üst kenarda, yükseklik hissi verir */
+.c::before{content:'';position:absolute;top:0;left:12px;right:12px;height:1px;
+  background:linear-gradient(90deg,transparent,var(--isik),transparent)}
+.c.glass{background:var(--cam);backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px)}
+.ct{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;
+  letter-spacing:.7px;margin-bottom:12px}
+
+/* ── Tipografi ── */
+.t1{font-size:15px;color:var(--text);margin-bottom:5px}
+.t2{font-size:13px;color:var(--text2);margin-bottom:5px}
+.t3{font-size:12px;color:var(--text3)}
+.big{font-family:'Bebas Neue',cursive;font-size:40px;line-height:1;color:var(--accent)}
+
+/* ── Butonlar ── */
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.b{padding:11px 18px;border-radius:11px;border:none;font-family:inherit;
+  font-size:14px;font-weight:600;cursor:pointer;transition:.18s}
+.bp{background:var(--accent-btn);color:var(--on-accent);box-shadow:0 4px 14px var(--ag)}
+.bs{background:var(--card2);color:var(--text);border:1px solid var(--border)}
+.bg_{background:transparent;color:var(--accent);border:1.5px solid var(--accent)}
+.b:active{transform:scale(.97)}
+
+/* ── Rozetler ── */
+.bd{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:20px;
+  font-size:11px;font-weight:600;margin:0 5px 5px 0}
+.bd-a{background:var(--ag);color:var(--accent)}
+.bd-s{background:color-mix(in srgb,var(--success) 15%,transparent);color:var(--success)}
+.bd-w{background:color-mix(in srgb,var(--warn) 15%,transparent);color:var(--warn)}
+.bd-d{background:color-mix(in srgb,var(--danger) 15%,transparent);color:var(--danger)}
+.bd-i{background:color-mix(in srgb,var(--info) 15%,transparent);color:var(--info)}
+
+/* ── Grafikler ── */
+.bars{display:flex;flex-direction:column;gap:11px}
+.bar-r{display:flex;align-items:center;gap:10px}
+.bar-l{font-size:12px;color:var(--text2);width:78px;flex-shrink:0}
+.bar-t{flex:1;height:9px;background:var(--card2);border-radius:5px;overflow:hidden}
+.bar-f{height:100%;border-radius:5px;transition:width .8s}
+.bar-v{font-size:12px;font-weight:700;width:44px;text-align:right}
+
+/* Sıralı ölçek (FFMI) */
+.seq{position:relative;height:6px;margin:14px 0 0}
+.seq-s{display:flex;height:6px;border-radius:3px;overflow:hidden}
+.seq-s i{height:100%;flex:1}
+.seq-d{position:absolute;top:50%;transform:translate(-50%,-50%);width:13px;height:13px;
+  border-radius:50%;background:var(--bg);border:2.5px solid var(--accent);
+  box-shadow:0 0 0 3px var(--ag)}
+.seq-y{text-align:center;margin-top:12px;font-size:12px;color:var(--text2)}
+
+/* Girdi */
+.fi{width:100%;padding:12px 14px;background:var(--card2);border:1.5px solid var(--border);
+  border-radius:11px;font-family:inherit;font-size:15px;color:var(--text);outline:none}
+.fi:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--ag)}
+.fi::placeholder{color:var(--text3)}
+.fl{font-size:12px;color:var(--text2);margin-bottom:6px;display:block}
+
+/* Liste */
+.li{display:flex;justify-content:space-between;padding:10px 0;
+  border-bottom:1px solid var(--border);font-size:13px}
+.li:last-child{border:none}
+.li b{font-weight:600}
+.note{font-size:11px;color:var(--text3);margin-top:10px;line-height:1.6}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="wrap" style="padding:0">
+    <h1>RAVEN<span>FIT</span> — Tema Önizleme</h1>
+    <div class="sub">Kartları tıklayarak temalar arasında geç</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="tg"><button class="tc" data-t="gece" onclick="setT('gece')"><span class="tc-sw" style="background:#0F1113"><i style="background:#1D2125"></i><b style="background:#E63C49"></b></span><span class="tc-n">Gece</span></button><button class="tc" data-t="okyanus" onclick="setT('okyanus')"><span class="tc-sw" style="background:#040F15"><i style="background:#0C222C"></i><b style="background:#1BBAE9"></b></span><span class="tc-n">Okyanus</span></button><button class="tc" data-t="menekse" onclick="setT('menekse')"><span class="tc-sw" style="background:#141119"><i style="background:#25202F"></i><b style="background:#AA7BF3"></b></span><span class="tc-n">Menekşe</span></button><button class="tc" data-t="bakir" onclick="setT('bakir')"><span class="tc-sw" style="background:#17100C"><i style="background:#2C1E16"></i><b style="background:#ED9235"></b></span><span class="tc-n">Bakır</span></button><button class="tc" data-t="aydinlik" onclick="setT('aydinlik')"><span class="tc-sw" style="background:#F0F2F4"><i style="background:#FFFFFF"></i><b style="background:#C52B30"></b></span><span class="tc-n">Aydınlık</span></button></div>
+
+  <!-- Tipografi -->
+  <div class="c">
+    <div class="ct">Tipografi & Okunabilirlik</div>
+    <div class="t1">Ana metin — vücut yağ oranın %14.2 olarak hesaplandı.</div>
+    <div class="t2">İkincil metin — bu değer atletik aralığın içinde yer alıyor.</div>
+    <div class="t3">Üçüncül metin — son ölçüm 3 gün önce kaydedildi.</div>
+    <div class="big" style="margin-top:12px">2 480 kcal</div>
+    <div class="note">Üç metin katmanı da WCAG AA eşiğini geçer. Üçüncül metin
+      en açık yüzeyde bile 3.3:1 üzerindedir.</div>
+  </div>
+
+  <!-- Butonlar -->
+  <div class="c">
+    <div class="ct">Butonlar</div>
+    <div class="row">
+      <button class="b bp">Analize Başla</button>
+      <button class="b bs">Geri</button>
+      <button class="b bg_">Düzenle</button>
+    </div>
+    <div style="margin-top:14px">
+      <span class="bd bd-a">● Marka</span><span class="bd bd-s">● Başarılı</span>
+      <span class="bd bd-w">● Uyarı</span><span class="bd bd-d">● Tehlike</span>
+      <span class="bd bd-i">● Bilgi</span>
+    </div>
+    <div class="note">Dolu buton zemini <code>--accent-btn</code> kullanır —
+      beyaz metinle 4.6:1 sağlar. Marka rengi çizgi ve ikonlarda kalır.</div>
+  </div>
+
+  <!-- Cam kart -->
+  <div class="c glass">
+    <div class="ct">Cam Efektli Kart</div>
+    <div class="t2">Bu kart yarı saydam ve arkasını bulanıklaştırır.
+      Modal ve üst katman öğeleri için kullanılır.</div>
+  </div>
+
+  <!-- Kategorik grafik -->
+  <div class="c">
+    <div class="ct">Kategorik Grafik — Veri Paleti</div>
+    <div class="bars">
+      <div class="bar-r"><div class="bar-l">Ektomorf</div>
+        <div class="bar-t"><div class="bar-f" style="width:28%;background:var(--c1)"></div></div>
+        <div class="bar-v" style="color:var(--c1)">28%</div></div>
+      <div class="bar-r"><div class="bar-l">Mezomorf</div>
+        <div class="bar-t"><div class="bar-f" style="width:52%;background:var(--c2)"></div></div>
+        <div class="bar-v" style="color:var(--c2)">52%</div></div>
+      <div class="bar-r"><div class="bar-l">Endomorf</div>
+        <div class="bar-t"><div class="bar-f" style="width:20%;background:var(--c3)"></div></div>
+        <div class="bar-v" style="color:var(--c3)">20%</div></div>
+    </div>
+    <div style="display:flex;gap:6px;margin-top:16px">
+      <div style="flex:1;height:30px;border-radius:6px;background:var(--c1)"></div>
+      <div style="flex:1;height:30px;border-radius:6px;background:var(--c2)"></div>
+      <div style="flex:1;height:30px;border-radius:6px;background:var(--c3)"></div>
+      <div style="flex:1;height:30px;border-radius:6px;background:var(--c4)"></div>
+      <div style="flex:1;height:30px;border-radius:6px;background:var(--c5)"></div>
+      <div style="flex:1;height:30px;border-radius:6px;background:var(--c6)"></div>
+    </div>
+    <div class="note">Kategorik renkler her temaya özel üretilir ve tümü aynı
+      algısal ağırlıktadır — hiçbiri diğerinden öne çıkmaz. Anlam renklerinden
+      (başarı/uyarı) tamamen ayrıdır, çünkü "mezomorf" iyi ya da kötü değildir.</div>
+  </div>
+
+  <!-- Sıralı ölçek -->
+  <div class="c">
+    <div class="ct">Sıralı Ölçek — FFMI</div>
+    <div class="seq">
+      <div class="seq-s">
+        <i style="background:var(--s1)"></i><i style="background:var(--s2)"></i>
+        <i style="background:var(--s3)"></i><i style="background:var(--s4)"></i>
+        <i style="background:var(--s5)"></i><i style="background:var(--s6)"></i>
+      </div>
+      <div class="seq-d" style="left:58%"></div>
+    </div>
+    <div class="seq-y">Sen: <b style="color:var(--text)">21.4</b> —
+      <b style="color:var(--s4)">İyi</b></div>
+    <div class="note">Sıralı ölçekler tüm temalarda aynı gradyanı kullanır —
+      soğuktan sıcağa. Böylece "düşük/yüksek" algısı tema değişse de bozulmaz.</div>
+  </div>
+
+  <!-- Form -->
+  <div class="c">
+    <div class="ct">Form Alanları</div>
+    <label class="fl">Vücut Ağırlığı</label>
+    <input class="fi" placeholder="80.5" style="margin-bottom:12px">
+    <label class="fl">Bel Çevresi</label>
+    <input class="fi" placeholder="85">
+  </div>
+
+  <!-- Liste -->
+  <div class="c">
+    <div class="ct">Veri Listesi</div>
+    <div class="li"><span style="color:var(--text2)">Bazal metabolizma</span><b>1 780 kcal</b></div>
+    <div class="li"><span style="color:var(--text2)">Aktivite çarpanı</span><b>1.55</b></div>
+    <div class="li"><span style="color:var(--text2)">Günlük hedef</span>
+      <b style="color:var(--accent)">2 480 kcal</b></div>
+    <div class="li"><span style="color:var(--text2)">Protein</span>
+      <b style="color:var(--c1)">176 g</b></div>
+    <div class="li"><span style="color:var(--text2)">Karbonhidrat</span>
+      <b style="color:var(--c2)">248 g</b></div>
+    <div class="li"><span style="color:var(--text2)">Yağ</span>
+      <b style="color:var(--c3)">69 g</b></div>
+  </div>
+
+  <!-- Yüzey merdiveni -->
+  <div class="c">
+    <div class="ct">Yüzey Merdiveni</div>
+    <div style="display:flex;gap:0;border-radius:10px;overflow:hidden;border:1px solid var(--border)">
+      <div style="flex:1;height:56px;background:var(--bg);display:flex;align-items:flex-end;
+        justify-content:center;padding-bottom:5px;font-size:9px;color:var(--text3)">bg</div>
+      <div style="flex:1;height:56px;background:var(--bg2);display:flex;align-items:flex-end;
+        justify-content:center;padding-bottom:5px;font-size:9px;color:var(--text3)">bg2</div>
+      <div style="flex:1;height:56px;background:var(--card);display:flex;align-items:flex-end;
+        justify-content:center;padding-bottom:5px;font-size:9px;color:var(--text3)">card</div>
+      <div style="flex:1;height:56px;background:var(--card2);display:flex;align-items:flex-end;
+        justify-content:center;padding-bottom:5px;font-size:9px;color:var(--text3)">card2</div>
+    </div>
+    <div class="note">Yükseklik gölgeyle değil yüzey açıklığıyla anlatılır.
+      Her temanın kendi merdiven eğrisi vardır — bu yüzden temalar birbirinin
+      renk filtresi gibi görünmez.</div>
+  </div>
+
+</div>
+
+<script>
+function setT(k){
+  document.documentElement.setAttribute('data-theme',k);
+  document.documentElement.style.colorScheme = (k==='aydinlik')?'light':'dark';
+  document.querySelectorAll('.tc').forEach(function(c){
+    c.classList.toggle('on', c.dataset.t===k);
+  });
+  try{ localStorage.setItem('rf_preview_theme',k); }catch(e){}
+}
+setT(localStorage.getItem('rf_preview_theme')||'gece');
+</script>
+</body>
+</html>

@@ -47,7 +47,7 @@ print('\n╔══════════════════════�
 print('║  TEMA DENETİMİ — WCAG 2.2 AA                                 ║')
 print('╚══════════════════════════════════════════════════════════════╝')
 
-BEKLENEN = ['dark','crimson','violet','forest','rose','ocean','light']
+BEKLENEN = ['gece','okyanus','menekse','bakir','aydinlik']
 print(f'\n▸ Tema sayısı')
 kontrol(f'{len(BEKLENEN)} tema tanımlı', len(temalar) == len(BEKLENEN),
         f'bulunan: {sorted(temalar)}')
@@ -55,7 +55,10 @@ kontrol(f'{len(BEKLENEN)} tema tanımlı', len(temalar) == len(BEKLENEN),
 # Her temada bulunması gereken değişkenler
 GEREKLI = ['bg','bg2','card','card2','border','text','text2','text3',
            'accent','accent-btn','on-accent','ag','success','warn','info',
-           'purple','danger','hbg','shadow-sm','shadow-md','overlay']
+           'purple','danger','hbg','shadow-sm','shadow-md','overlay',
+           'cam','isik','grain-op',
+           'c1','c2','c3','c4','c5','c6',
+           's1','s2','s3','s4','s5','s6']
 
 print(f'\n▸ Değişken bütünlüğü')
 for ad in BEKLENEN:
@@ -86,7 +89,9 @@ DENETIMLER = [
     ('danger',  'card',  3.0, 'tehlike/kart'),
     ('border',  'bg',    1.15,'kenarlık/zemin'),
     ('border',  'card',  1.10,'kenarlık/kart'),
-]
+] + [(f'c{i}', 'card', 3.0, f'veri{i}/kart') for i in range(1,7)] \
+  + [(f'c{i}', 'card2',3.0, f'veri{i}/iç kart') for i in range(1,7)] \
+  + [(f's{i}', 'card', 3.0, f'sıra{i}/kart') for i in range(1,7)]
 
 print(f'\n▸ Kontrast oranları')
 print(f"  {'TEMA':<9} {'txt/bg':>7} {'txt2/bg':>8} {'txt3/bg':>8} {'acc/bg':>7} {'btn':>6} {'DURUM':>7}")
@@ -119,7 +124,7 @@ for ad in BEKLENEN:
     if ad not in temalar: continue
     t = temalar[ad]
     l = [luminans(t[k]) for k in ['bg','bg2','card','card2']]
-    if ad == 'light':
+    if ad == 'aydinlik':
         # Aydınlık temada kart zeminden AÇIK olmalı (yükselmiş = daha beyaz)
         artan = l[2] >= l[0]
         kontrol(f'{ad}: kart zeminden açık', artan,

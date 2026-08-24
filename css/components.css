@@ -241,3 +241,20 @@
   -webkit-tap-highlight-color:transparent}
 .h-more-btn:hover{border-color:var(--accent);color:var(--text)}
 .h-more-btn:active{transform:scale(.98)}
+
+/* ══════════════════════════════════════════════════════════
+   KART DOKUSU — cam + iç ışık
+   Yükseklik hissi gölgeyle değil, üst kenardaki ince ışık
+   çizgisiyle verilir. Koyu temada gölge okunmaz.
+   ══════════════════════════════════════════════════════════ */
+.rc{position:relative;overflow:hidden}
+.rc::before{
+  content:'';position:absolute;top:0;left:14px;right:14px;height:1px;
+  background:linear-gradient(90deg,transparent,var(--isik),transparent);
+  pointer-events:none}
+
+/* Üst katman öğeleri — cam efekti */
+.calc-overlay .calc-sheet,
+.modal-overlay .modal-box,
+#settings-drawer{
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}

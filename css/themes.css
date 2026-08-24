@@ -1,207 +1,189 @@
 /* ══════════════════════════════════════════════════════════
    RavenFit — themes.css
-   7 tema · tamamı WCAG 2.2 AA uyumlu
+   5 tema · OKLCH ile üretildi · tamamı WCAG 2.2 AA
 
-   TASARIM KURALLARI (Material Design + WCAG 2.2 araştırması)
-   ──────────────────────────────────────────────────────────
-   • Saf siyah (#000) yok — halation ve göz yorgunluğu yapar.
-     Tabanlar #0C-#10 aralığında, temanın tonuyla hafif renklendirilmiş.
-   • Saf beyaz metin yok — #EE-#F1 aralığı "beyaz" okunur ama parlamaz.
-   • Koyu temada yükseklik GÖLGEYLE değil YÜZEY AÇIKLIĞIYLA anlatılır:
-       bg (en koyu) → bg2 → card → card2 (en açık)
-   • Koyu temada anlam renkleri AÇIK tonlardan seçilir (Material 200-50),
-     doygun koyu tonlar (900-500) göz titremesi yapar.
-   • Her renk çifti WCAG AA eşiğini karşılar:
-       normal metin 4.5:1 · büyük metin ve UI öğesi 3:1
+   NEDEN OKLCH?
+   HSL'de aynı "lightness" farklı renklerde farklı parlaklıkta
+   görünür — bu yüzden HSL ile üretilen temalar "aynı ama hue
+   döndürülmüş" hissi verir. OKLCH algısal olarak uniformdur.
 
-   Bu dosya tools/theme_gen.py ile üretilip doğrulanmıştır.
-   Elle değiştirirsen kontrast denetimini tekrar çalıştır.
+   TEMA KARAKTERİ
+   Her tema kendi yüzey eğrisini ve doygunluk profilini kullanır.
+   Sadece renk tonu değil, kontrast seviyesi ve chroma miktarı da
+   temaya özgüdür. Bu yüzden birbirinin filtresi gibi görünmezler.
+
+   RENK KATMANLARI
+   • Yüzey  : bg → bg2 → card → card2   (yükseklik açıklıkla anlatılır)
+   • Marka  : accent (çizgi/ikon) + accent-btn (dolu buton zemini)
+   • Anlam  : success / warn / danger / info — sadece durum bildirimi
+   • Veri   : c1-c6 kategorik (temaya özel)
+              s1-s6 sıralı (tüm temalarda aynı gradyan)
+
+   Veri renkleri anlam renklerinden AYRIDIR. "Mezomorf" iyi ya da
+   kötü değildir — kategoriktir, bu yüzden yeşil/turuncu olamaz.
+
+   tools/theme_gen.py ile üretilip doğrulanmıştır.
    ══════════════════════════════════════════════════════════ */
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
-/* ── DARK — nötr koyu, hafif soğuk ton */
-:root,[data-theme="dark"]{
-  /* Yüzey merdiveni — koyu temada yükseklik açıklıkla anlatılır */
-  --bg:#0D0E0F; --bg2:#141416; --card:#1A1B1D; --card2:#232427;
-  --border:#36373D;
+/* ── GECE — nötr soğuk, orta kontrast — varsayılan */
+:root,[data-theme="gece"]{
+  /* Yüzey merdiveni — her temanın kendi eğrisi var */
+  --bg:#0F1113; --bg2:#16191C; --card:#1D2125; --card2:#272B31;
+  --border:#3A424C;
 
-  /* Metin — en açık yüzeye (card2) göre hesaplandı, hepsi WCAG AA */
-  --text:#EEEFF1; --text2:#898FA6; --text3:#6A718A;
-
-  /* Marka */
-  --accent:#E63946;       /* çizgi, ikon, vurgu metni */
-  --accent-btn:#E32432;   /* dolu buton zemini — beyaz metinle 4.6:1 */
-  --on-accent:#FFFFFF;        /* vurgu zemini üzerindeki metin */
-  --ag:rgba(230,57,70,0.16);
-
-  /* Anlam renkleri */
-  --success:#28AC9A; --warn:#E58D0A; --info:#4196EA;
-  --purple:#A572EE; --danger:#EB5B69;
-
-  /* Yüzey ve örtü */
-  --hbg:rgba(13,14,15,0.90);
-  --shadow-sm-c:rgba(0,0,0,.25); --shadow-md-c:rgba(0,0,0,.45);
-  --shadow-sm:0 1px 3px rgba(0,0,0,.25); --shadow-md:0 4px 14px rgba(0,0,0,.45); --shadow-lg:0 10px 34px rgba(0,0,0,.58);
-  --overlay:rgba(0,0,0,.68);
-}
-
-/* ── CRIMSON — kızıl tonlu koyu */
-[data-theme="crimson"]{
-  /* Yüzey merdiveni — koyu temada yükseklik açıklıkla anlatılır */
-  --bg:#100C0C; --bg2:#181212; --card:#201718; --card2:#2B1F20;
-  --border:#433031;
-
-  /* Metin — en açık yüzeye (card2) göre hesaplandı, hepsi WCAG AA */
-  --text:#F1EEEE; --text2:#A48688; --text3:#88686A;
+  /* Metin — en zor yüzeye göre hesaplandı, tamamı WCAG AA */
+  --text:#EFF4FA; --text2:#9199A2; --text3:#747B82;
 
   /* Marka */
-  --accent:#E5484D;       /* çizgi, ikon, vurgu metni */
-  --accent-btn:#E1292F;   /* dolu buton zemini — beyaz metinle 4.6:1 */
-  --on-accent:#FFFFFF;        /* vurgu zemini üzerindeki metin */
-  --ag:rgba(229,72,77,0.16);
+  --accent:#E63C49;       /* çizgi, ikon, vurgu metni */
+  --accent-btn:#DC3141;   /* dolu buton — beyaz metinle 4.6:1 */
+  --on-accent:#FFFFFF;
+  --ag:rgba(230,60,73,0.14); --hbg:rgba(15,17,19,0.88);
 
-  /* Anlam renkleri */
-  --success:#28AA98; --warn:#E28B09; --info:#3E94EA;
-  --purple:#A46FED; --danger:#EA5866;
+  /* Anlam renkleri — SADECE durum bildirimi */
+  --success:#45A875; --warn:#CA8902; --danger:#F16D66;
+  --info:#469CE0; --purple:#AF82E0;
 
-  /* Yüzey ve örtü */
-  --hbg:rgba(16,12,12,0.90);
-  --shadow-sm-c:rgba(0,0,0,.25); --shadow-md-c:rgba(0,0,0,.45);
-  --shadow-sm:0 1px 3px rgba(0,0,0,.25); --shadow-md:0 4px 14px rgba(0,0,0,.45); --shadow-lg:0 10px 34px rgba(0,0,0,.58);
-  --overlay:rgba(0,0,0,.68);
+  /* Veri renkleri — anlamdan bağımsız, grafikler için */
+  --c1:#5692DC; --c2:#A57ED2; --c3:#D07198; --c4:#D3774C; --c5:#A88E16; --c6:#54A058;
+  --s1:#52A4EE; --s2:#06B3C1; --s3:#44B77E; --s4:#B29F25; --s5:#D98939; --s6:#E67B6E;
+
+  /* Doku ve derinlik */
+  --cam:rgba(255,255,255,.045); --isik:rgba(255,255,255,.075); --grain-op:.030;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.28); --shadow-md:0 4px 12px rgba(0,0,0,.42); --shadow-lg:0 12px 32px rgba(0,0,0,.55);
+  --shadow-sm-c:rgba(0,0,0,.28); --shadow-md-c:rgba(0,0,0,.42);
+  --overlay:rgba(0,0,0,.66);
 }
 
-/* ── VIOLET — mor tonlu koyu */
-[data-theme="violet"]{
-  /* Yüzey merdiveni — koyu temada yükseklik açıklıkla anlatılır */
-  --bg:#0D0C10; --bg2:#141218; --card:#1A1720; --card2:#231F2B;
-  --border:#373043;
+/* ── OKYANUS — derin mavi-turkuaz, yüksek kontrast */
+[data-theme="okyanus"]{
+  /* Yüzey merdiveni — her temanın kendi eğrisi var */
+  --bg:#040F15; --bg2:#081821; --card:#0C222C; --card2:#122E3B;
+  --border:#21485B;
 
-  /* Metin — en açık yüzeye (card2) göre hesaplandı, hepsi WCAG AA */
-  --text:#EFEEF1; --text2:#9288A5; --text3:#756A89;
+  /* Metin — en zor yüzeye göre hesaplandı, tamamı WCAG AA */
+  --text:#ECF6FC; --text2:#8B9BA3; --text3:#6F7C83;
 
   /* Marka */
-  --accent:#9B72FF;       /* çizgi, ikon, vurgu metni */
-  --accent-btn:#8350FF;   /* dolu buton zemini — beyaz metinle 4.6:1 */
-  --on-accent:#FFFFFF;        /* vurgu zemini üzerindeki metin */
-  --ag:rgba(155,114,255,0.16);
+  --accent:#1BBAE9;       /* çizgi, ikon, vurgu metni */
+  --accent-btn:#017FA2;   /* dolu buton — beyaz metinle 4.6:1 */
+  --on-accent:#FFFFFF;
+  --ag:rgba(27,186,233,0.14); --hbg:rgba(4,15,21,0.88);
 
-  /* Anlam renkleri */
-  --success:#28A997; --warn:#E18A09; --info:#3C93E9;
-  --purple:#A36EED; --danger:#EA5664;
+  /* Anlam renkleri — SADECE durum bildirimi */
+  --success:#45A875; --warn:#CB8904; --danger:#F16D66;
+  --info:#469DE0; --purple:#AF83E0;
 
-  /* Yüzey ve örtü */
-  --hbg:rgba(13,12,16,0.90);
-  --shadow-sm-c:rgba(0,0,0,.25); --shadow-md-c:rgba(0,0,0,.45);
-  --shadow-sm:0 1px 3px rgba(0,0,0,.25); --shadow-md:0 4px 14px rgba(0,0,0,.45); --shadow-lg:0 10px 34px rgba(0,0,0,.58);
-  --overlay:rgba(0,0,0,.68);
+  /* Veri renkleri — anlamdan bağımsız, grafikler için */
+  --c1:#019CC4; --c2:#798ADF; --c3:#B878C3; --c4:#D67182; --c5:#CB7D38; --c6:#989320;
+  --s1:#52A4EE; --s2:#06B3C1; --s3:#44B77E; --s4:#B29F25; --s5:#D98939; --s6:#E67B6E;
+
+  /* Doku ve derinlik */
+  --cam:rgba(255,255,255,.045); --isik:rgba(255,255,255,.075); --grain-op:.030;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.28); --shadow-md:0 4px 12px rgba(0,0,0,.42); --shadow-lg:0 12px 32px rgba(0,0,0,.55);
+  --shadow-sm-c:rgba(0,0,0,.28); --shadow-md-c:rgba(0,0,0,.42);
+  --overlay:rgba(0,0,0,.66);
 }
 
-/* ── FOREST — yeşil tonlu koyu */
-[data-theme="forest"]{
-  /* Yüzey merdiveni — koyu temada yükseklik açıklıkla anlatılır */
-  --bg:#0C100E; --bg2:#121815; --card:#181F1C; --card2:#202A25;
-  --border:#31413A;
+/* ── MENEKŞE — mor, yumuşak kontrast — sıcak koyu */
+[data-theme="menekse"]{
+  /* Yüzey merdiveni — her temanın kendi eğrisi var */
+  --bg:#141119; --bg2:#1D1924; --card:#25202F; --card2:#302A3D;
+  --border:#483F5B;
 
-  /* Metin — en açık yüzeye (card2) göre hesaplandı, hepsi WCAG AA */
-  --text:#EEF1F0; --text2:#7A9A8B; --text3:#5F7B6E;
+  /* Metin — en zor yüzeye göre hesaplandı, tamamı WCAG AA */
+  --text:#F3F1FA; --text2:#9D99A5; --text3:#7E7B85;
 
   /* Marka */
-  --accent:#2ECC71;       /* çizgi, ikon, vurgu metni */
-  --accent-btn:#1E864A;   /* dolu buton zemini — beyaz metinle 4.6:1 */
-  --on-accent:#FFFFFF;        /* vurgu zemini üzerindeki metin */
-  --ag:rgba(46,204,113,0.16);
+  --accent:#AA7BF3;       /* çizgi, ikon, vurgu metni */
+  --accent-btn:#8C5BD1;   /* dolu buton — beyaz metinle 4.6:1 */
+  --on-accent:#FFFFFF;
+  --ag:rgba(170,123,243,0.14); --hbg:rgba(20,17,25,0.88);
 
-  /* Anlam renkleri */
-  --success:#29B19E; --warn:#EA910A; --info:#489AEB;
-  --purple:#A877EE; --danger:#EC626F;
+  /* Anlam renkleri — SADECE durum bildirimi */
+  --success:#49AB78; --warn:#CE8B05; --danger:#F46F68;
+  --info:#489FE2; --purple:#B185E2;
 
-  /* Yüzey ve örtü */
-  --hbg:rgba(12,16,14,0.90);
-  --shadow-sm-c:rgba(0,0,0,.25); --shadow-md-c:rgba(0,0,0,.45);
-  --shadow-sm:0 1px 3px rgba(0,0,0,.25); --shadow-md:0 4px 14px rgba(0,0,0,.45); --shadow-lg:0 10px 34px rgba(0,0,0,.58);
-  --overlay:rgba(0,0,0,.68);
+  /* Veri renkleri — anlamdan bağımsız, grafikler için */
+  --c1:#A282D8; --c2:#CF74A7; --c3:#D97660; --c4:#BB891F; --c5:#7A9D3F; --c6:#00A586;
+  --s1:#52A4EE; --s2:#06B3C1; --s3:#44B77E; --s4:#B29F25; --s5:#D98939; --s6:#E67B6E;
+
+  /* Doku ve derinlik */
+  --cam:rgba(255,255,255,.045); --isik:rgba(255,255,255,.075); --grain-op:.030;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.28); --shadow-md:0 4px 12px rgba(0,0,0,.42); --shadow-lg:0 12px 32px rgba(0,0,0,.55);
+  --shadow-sm-c:rgba(0,0,0,.28); --shadow-md-c:rgba(0,0,0,.42);
+  --overlay:rgba(0,0,0,.66);
 }
 
-/* ── ROSE — pembe tonlu koyu */
-[data-theme="rose"]{
-  /* Yüzey merdiveni — koyu temada yükseklik açıklıkla anlatılır */
-  --bg:#100C0E; --bg2:#181214; --card:#1F181B; --card2:#2A2024;
-  --border:#413138;
+/* ── BAKIR — sıcak amber-bakır, toprak tonlu */
+[data-theme="bakir"]{
+  /* Yüzey merdiveni — her temanın kendi eğrisi var */
+  --bg:#17100C; --bg2:#211711; --card:#2C1E16; --card2:#39281B;
+  --border:#563C2A;
 
-  /* Metin — en açık yüzeye (card2) göre hesaplandı, hepsi WCAG AA */
-  --text:#F1EEEF; --text2:#A48692; --text3:#876874;
+  /* Metin — en zor yüzeye göre hesaplandı, tamamı WCAG AA */
+  --text:#FCF1E9; --text2:#A6968B; --text3:#86786F;
 
   /* Marka */
-  --accent:#F472B6;       /* çizgi, ikon, vurgu metni */
-  --accent-btn:#E0127E;   /* dolu buton zemini — beyaz metinle 4.6:1 */
-  --on-accent:#FFFFFF;        /* vurgu zemini üzerindeki metin */
-  --ag:rgba(244,114,182,0.16);
+  --accent:#ED9235;       /* çizgi, ikon, vurgu metni */
+  --accent-btn:#AD6300;   /* dolu buton — beyaz metinle 4.6:1 */
+  --on-accent:#FFFFFF;
+  --ag:rgba(237,146,53,0.14); --hbg:rgba(23,16,12,0.88);
 
-  /* Anlam renkleri */
-  --success:#28AB99; --warn:#E28C09; --info:#3F95EA;
-  --purple:#A570ED; --danger:#EA5967;
+  /* Anlam renkleri — SADECE durum bildirimi */
+  --success:#46A976; --warn:#CC8A00; --danger:#F26E67;
+  --info:#469DE1; --purple:#B083E0;
 
-  /* Yüzey ve örtü */
-  --hbg:rgba(16,12,14,0.90);
-  --shadow-sm-c:rgba(0,0,0,.25); --shadow-md-c:rgba(0,0,0,.45);
-  --shadow-sm:0 1px 3px rgba(0,0,0,.25); --shadow-md:0 4px 14px rgba(0,0,0,.45); --shadow-lg:0 10px 34px rgba(0,0,0,.58);
-  --overlay:rgba(0,0,0,.68);
+  /* Veri renkleri — anlamdan bağımsız, grafikler için */
+  --c1:#CA7F33; --c2:#919628; --c3:#27A373; --c4:#069FB4; --c5:#6590DF; --c6:#AF7CCD;
+  --s1:#52A4EE; --s2:#06B3C1; --s3:#44B77E; --s4:#B29F25; --s5:#D98939; --s6:#E67B6E;
+
+  /* Doku ve derinlik */
+  --cam:rgba(255,255,255,.045); --isik:rgba(255,255,255,.075); --grain-op:.030;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.28); --shadow-md:0 4px 12px rgba(0,0,0,.42); --shadow-lg:0 12px 32px rgba(0,0,0,.55);
+  --shadow-sm-c:rgba(0,0,0,.28); --shadow-md-c:rgba(0,0,0,.42);
+  --overlay:rgba(0,0,0,.66);
 }
 
-/* ── OCEAN — mavi tonlu koyu */
-[data-theme="ocean"]{
-  /* Yüzey merdiveni — koyu temada yükseklik açıklıkla anlatılır */
-  --bg:#0C0E10; --bg2:#121518; --card:#171C20; --card2:#1F262B;
-  --border:#313B42;
+/* ── AYDINLIK — nötr yumuşak — kartlar beyaz, zemin gri */
+[data-theme="aydinlik"]{
+  /* Yüzey merdiveni — her temanın kendi eğrisi var */
+  --bg:#F0F2F4; --bg2:#E7EAED; --card:#FFFFFF; --card2:#F3F6FA;
+  --border:#D3DAE2;
 
-  /* Metin — en açık yüzeye (card2) göre hesaplandı, hepsi WCAG AA */
-  --text:#EEF0F1; --text2:#80939F; --text3:#637581;
+  /* Metin — en zor yüzeye göre hesaplandı, tamamı WCAG AA */
+  --text:#181F28; --text2:#586577; --text3:#748090;
 
   /* Marka */
-  --accent:#38BDF8;       /* çizgi, ikon, vurgu metni */
-  --accent-btn:#067CB1;   /* dolu buton zemini — beyaz metinle 4.6:1 */
-  --on-accent:#FFFFFF;        /* vurgu zemini üzerindeki metin */
-  --ag:rgba(56,189,248,0.16);
+  --accent:#C52B30;       /* çizgi, ikon, vurgu metni */
+  --accent-btn:#D53D3D;   /* dolu buton — beyaz metinle 4.6:1 */
+  --on-accent:#FFFFFF;
+  --ag:rgba(197,43,48,0.1); --hbg:rgba(240,242,244,0.9);
 
-  /* Anlam renkleri */
-  --success:#28AD9B; --warn:#E68E0A; --info:#4397EA;
-  --purple:#A673EE; --danger:#EB5D6B;
+  /* Anlam renkleri — SADECE durum bildirimi */
+  --success:#017447; --warn:#8A5C01; --danger:#B73737;
+  --info:#0069A8; --purple:#7D51A9;
 
-  /* Yüzey ve örtü */
-  --hbg:rgba(12,14,16,0.90);
-  --shadow-sm-c:rgba(0,0,0,.25); --shadow-md-c:rgba(0,0,0,.45);
-  --shadow-sm:0 1px 3px rgba(0,0,0,.25); --shadow-md:0 4px 14px rgba(0,0,0,.45); --shadow-lg:0 10px 34px rgba(0,0,0,.58);
-  --overlay:rgba(0,0,0,.68);
+  /* Veri renkleri — anlamdan bağımsız, grafikler için */
+  --c1:#326CB4; --c2:#8159AA; --c3:#A84C74; --c4:#AA5227; --c5:#7F6900; --c6:#2E7A35;
+  --s1:#2179BF; --s2:#00848F; --s3:#008B56; --s4:#857501; --s5:#A86002; --s6:#B65046;
+
+  /* Doku ve derinlik */
+  --cam:rgba(255,255,255,.70); --isik:rgba(255,255,255,.95); --grain-op:.020;
+  --shadow-sm:0 1px 2px rgba(12,16,24,.08); --shadow-md:0 4px 12px rgba(12,16,24,.10); --shadow-lg:0 12px 32px rgba(12,16,24,.14);
+  --shadow-sm-c:rgba(12,16,24,.08); --shadow-md-c:rgba(12,16,24,.10);
+  --overlay:rgba(18,22,30,.42);
 }
 
-/* ── LIGHT — nötr aydınlık, soğuk beyaz */
-[data-theme="light"]{
-  /* Yüzey merdiveni — koyu temada yükseklik açıklıkla anlatılır */
-  --bg:#F7F8FA; --bg2:#EEF0F3; --card:#FFFFFF; --card2:#F4F5F8;
-  --border:#DADDE4;
 
-  /* Metin — en açık yüzeye (card2) göre hesaplandı, hepsi WCAG AA */
-  --text:#1A1F28; --text2:#5F697E; --text3:#7D8699;
-
-  /* Marka */
-  --accent:#E01423;       /* çizgi, ikon, vurgu metni */
-  --accent-btn:#E01423;   /* dolu buton zemini — beyaz metinle 4.6:1 */
-  --on-accent:#FFFFFF;        /* vurgu zemini üzerindeki metin */
-  --ag:rgba(224,20,35,0.12);
-
-  /* Anlam renkleri */
-  --success:#0A7F68; --warn:#A95E09; --info:#196DDD;
-  --purple:#8B4FE0; --danger:#DC1F32;
-
-  /* Yüzey ve örtü */
-  --hbg:rgba(255,255,255,0.92);
-  --shadow-sm-c:rgba(16,20,32,.10); --shadow-md-c:rgba(16,20,32,.14);
-  --shadow-sm:0 1px 3px rgba(16,20,32,.10); --shadow-md:0 4px 14px rgba(16,20,32,.14); --shadow-lg:0 10px 34px rgba(16,20,32,.18);
-  --overlay:rgba(20,24,34,.45);
-}
-
+/* ══════════════════════════════════════════════════════════
+   DOKU KATMANLARI
+   1. Grain — SVG gürültü, sayfa geneline ince film greni
+   2. Işık  — zeminde çok soluk radyal parlaklık
+   Kart bazlı cam ve iç ışık components.css içinde.
+   ══════════════════════════════════════════════════════════ */
 html{scroll-behavior:smooth}
 body{
   font-family:'Outfit',sans-serif;
@@ -209,8 +191,28 @@ body{
   color:var(--text);
   min-height:100vh;
   overflow-x:hidden;
-  /* Tema geçişi yumuşak olsun ama animasyon tercihine saygı duy */
-  transition:background .35s ease,color .35s ease}
+  position:relative;
+  transition:background .3s ease,color .3s ease}
+
+/* Grain — pointer-events:none, hiçbir etkileşimi engellemez */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:1;
+  opacity:var(--grain-op);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* Zemin derinliği */
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, var(--ag), transparent 60%),
+    radial-gradient(ellipse 60% 40% at 100% 100%, var(--ag), transparent 65%)}
+
+/* İçerik doku katmanlarının üstünde kalmalı */
+.hdr,#app-main,#auth-screen,.bottom-nav,.ws-screen,
+.calc-overlay,.modal-overlay,#settings-drawer{position:relative;z-index:2}
+.hdr{z-index:200}
+.bottom-nav{z-index:300}
+
 @media(prefers-reduced-motion:reduce){
   body{transition:none}
   html{scroll-behavior:auto}

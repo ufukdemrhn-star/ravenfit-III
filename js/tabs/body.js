@@ -84,7 +84,7 @@ function renderVucudum(){
 
   var bt=R.bt,dom=bt.ecto>=bt.meso&&bt.ecto>=bt.endo?'Ektomorf':bt.meso>=bt.endo?'Mezomorf':'Endomorf';
   var descs={Ektomorf:'İnce yapılı, hızlı metabolizma. Kilo almak zor ama fit kalmak kolay. Protein ve kalori alımına dikkat et.',Mezomorf:'Atletik yapı, dengeli metabolizma. Kas geliştirmek ve yağ yakmak görece kolay.',Endomorf:'Geniş yapı, yavaş metabolizma. Yağ depolamaya eğilim. Kardio ve kalori kontrolü ön planda olmalı.'};
-  var dcols={Ektomorf:'var(--info)',Mezomorf:'var(--success)',Endomorf:'var(--warn)'};
+  var dcols={Ektomorf:'var(--c1)',Mezomorf:'var(--c2)',Endomorf:'var(--c3)'};
   /* Grafik türü kullanıcı tercihi olarak saklanır (madde 12) */
   var grafikTur = _lsGet('rf_bt_chart','bar');
   document.getElementById('bt-res').innerHTML=
@@ -130,9 +130,9 @@ function mkBTB(name,pct,col){
 
 function _btChartHTML(bt, tur){
   if(tur === 'pie') return _btPieHTML(bt);
-  return mkBTB('Ektomorf',bt.ecto,'var(--info)')
-       + mkBTB('Mezomorf',bt.meso,'var(--success)')
-       + mkBTB('Endomorf',bt.endo,'var(--warn)');
+  return mkBTB('Ektomorf',bt.ecto,'var(--c1)')
+       + mkBTB('Mezomorf',bt.meso,'var(--c2)')
+       + mkBTB('Endomorf',bt.endo,'var(--c3)');
 }
 
 /* SVG halka (donut) grafiği.
@@ -140,9 +140,11 @@ function _btChartHTML(bt, tur){
    dilim uzunluğu = çevre × (yüzde/100), kalan boşluk bırakılır. */
 function _btPieHTML(bt){
   var dilimler = [
-    {ad:'Ektomorf', pct:bt.ecto, renk:'var(--info)'},
-    {ad:'Mezomorf', pct:bt.meso, renk:'var(--success)'},
-    {ad:'Endomorf', pct:bt.endo, renk:'var(--warn)'}
+    /* Kategorik veri renkleri — anlam renkleri DEĞİL.
+       Vücut tipi iyi/kötü değildir, bu yüzden yeşil/turuncu olamaz. */
+    {ad:'Ektomorf', pct:bt.ecto, renk:'var(--c1)'},
+    {ad:'Mezomorf', pct:bt.meso, renk:'var(--c2)'},
+    {ad:'Endomorf', pct:bt.endo, renk:'var(--c3)'}
   ];
   var R_ = 54, KALINLIK = 22;
   var cevre = 2 * Math.PI * R_;

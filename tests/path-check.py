@@ -40,7 +40,8 @@ for f in sorted(glob.glob('css/*.css')):
     css_dizin = os.path.dirname(f)
     for m in re.finditer(r'url\((["\']?)([^"\')]+)\1\)', icerik):
         yol = temizle(m.group(2))
-        if yol.startswith(('http', '//', 'data:', '#')):
+        # data: URI, SVG referansı ve URL-kodlu içerik dosya değildir
+        if not yol or yol.startswith(('http', '//', 'data:', '#', '%23')):
             continue
         css_bulundu += 1
         # CSS url'i CSS dosyasının konumuna göre çözülür

@@ -298,3 +298,67 @@ rengini ve marka rengini birlikte gösteriyor, altında adı yazıyor.
 sıralaması ve sabit renk kaçağı taraması. Denetim listesinde otomatik çalışır.
 
 **Sabit renk: 297 → 29** (kalanlar rozet/dekoratif renkler).
+
+---
+
+## v0.6.0.0 — Tema sistemi profesyonelleştirildi
+
+### Neden yeniden yapıldı
+
+v0.5'te temalar WCAG'i geçiyordu ama görsel olarak amatördü. İki kök sebep:
+
+**1. HSL yanlış renk uzayı.** HSL'de aynı "lightness" farklı renklerde farklı
+parlaklıkta görünür — `hsl(60,80%,50%)` sarı ile `hsl(240,80%,50%)` mavi aynı
+L değerinde ama sarı çok daha parlak algılanır. Bu yüzden temalar tuhaf duruyordu.
+
+**2. Tüm temalara aynı yüzey merdiveni.** Sadece hue döndürülmüştü — bu literally
+bir hue-rotate filtresi. Gerçek temalar kontrast seviyesi, doygunluk eğrisi ve
+nötr sıcaklığıyla da ayrılır.
+
+### Çözüm: OKLCH + tema başına karakter
+
+Temalar `tools/theme_gen.py` ile **OKLCH** renk uzayında üretiliyor —
+algısal olarak uniform, aynı L = aynı algılanan parlaklık.
+
+Her tema kendi yüzey eğrisini kullanır:
+
+| Tema | Yüzey merdiveni (OKLCH L) | Karakter |
+|---|---|---|
+| Gece | 0.175 → 0.212 → 0.245 → 0.288 | nötr soğuk, orta kontrast |
+| Okyanus | 0.160 → 0.200 → 0.238 → 0.285 | derin taban, yüksek kontrast |
+| Menekşe | 0.185 → 0.222 → 0.256 → 0.300 | açık taban, yumuşak |
+| Bakır | 0.180 → 0.216 → 0.250 → 0.293 | sıcak toprak tonu |
+| Aydınlık | 0.960 / 0.935 / **1.000** / 0.972 | zemin gri, kart beyaz |
+
+### Veri renkleri anlam renklerinden ayrıldı
+
+Grafikler `--success` / `--warn` kullanıyordu. İki sorun vardı:
+- **Anlamsal yanlış:** "Mezomorf = yeşil" mezomorfun *iyi* olduğunu ima eder
+- **Tema çakışması:** gül temasında pembe arayüz + yeşil/turuncu grafik
+
+Artık iki ayrı palet var:
+- **`--c1`…`--c6`** kategorik — her temaya özel, tümü aynı algısal ağırlıkta
+- **`--s1`…`--s6`** sıralı — tüm temalarda aynı gradyan (soğuk→sıcak),
+  böylece FFMI barında "düşük/yüksek" algısı tema değişse de bozulmaz
+
+### Doku katmanları
+
+| Katman | Uygulama |
+|---|---|
+| Grain | SVG `feTurbulence`, sayfa geneline film greni (%2–3) |
+| Zemin ışığı | İki radyal gradyan, marka renginin çok soluk hâli |
+| Kart iç ışığı | Üst kenarda 1px aydınlık çizgi — yükseklik hissi |
+| Cam | Modal ve çekmecelerde `backdrop-filter: blur(18px)` |
+
+### Göç
+
+Eski tema kodları otomatik çevrilir: `dark→gece` `ocean→okyanus`
+`violet→menekse` `crimson→bakir` `light→aydinlik`. Kaldırılan temalar
+en yakın karşılığa yönlendirilir (`rose→menekse`, `forest→okyanus`).
+Bilinmeyen değer `gece`'ye düşer.
+
+### Doğrulama
+
+- `tests/theme-check.py` — 5 tema × 38 kontrast kombinasyonu (veri renkleri dahil)
+- `tests/theme-migration.js` — 18 göç senaryosu
+- `tools/tema-onizleme.html` — tüm bileşenleri gösteren canlı önizleme

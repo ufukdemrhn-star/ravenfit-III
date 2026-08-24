@@ -152,7 +152,7 @@
    ══════════════════════════════════════════════════════════ */
 .theme-grid{
   display:grid;
-  grid-template-columns:repeat(4,1fr);
+  grid-template-columns:repeat(5,1fr);
   gap:8px;
   width:100%}
 .theme-card{
@@ -172,7 +172,7 @@
   background:var(--card);
   box-shadow:0 0 0 1px var(--accent) inset}
 
-/* Zemin örneği — temanın gerçek arka plan rengi */
+/* Zemin örneği — temanın gerçek zemin, kart ve marka rengini birlikte gösterir */
 .theme-swatch{
   position:relative;
   width:100%;aspect-ratio:1.35;
@@ -180,11 +180,14 @@
   border:1px solid var(--border);
   display:block;
   overflow:hidden}
+/* İç kare — temanın kart rengi (yüzey merdiveni ipucu) */
+.theme-swatch i{
+  position:absolute;left:5px;top:5px;
+  width:52%;height:46%;border-radius:3px}
 /* Vurgu noktası — temanın marka rengi */
-.theme-dot{
+.theme-swatch b{
   position:absolute;right:5px;bottom:5px;
-  width:11px;height:11px;border-radius:50%;
-  box-shadow:0 0 0 1.5px var(--card2)}
+  width:11px;height:11px;border-radius:50%}
 .theme-name{
   font-size:10px;font-weight:600;
   color:var(--text2);

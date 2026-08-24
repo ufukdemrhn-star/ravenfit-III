@@ -30,6 +30,19 @@ python3 tests/theme-check.py > /tmp/rf_theme.log 2>&1
 sonuc $? "$(grep -o '[0-9]*/[0-9]* geçti' /tmp/rf_theme.log | head -1)"
 grep "❌\|✗" /tmp/rf_theme.log | head -8
 
+# ── 0c. Tema göçü ──────────────────────────────────────────
+baslik "0c. Tema göçü"
+node -e "
+const fs=require('fs');
+const idx=fs.readFileSync('index.html','utf8');
+const files=[...idx.matchAll(/<script src=\"(js\/[^\"?]+)[^\"]*\"/g)].map(m=>m[1]);
+fs.writeFileSync('tests/_combined.tmp.js', files.map(f=>fs.readFileSync(f,'utf8')).join('\n'));
+" 2>/dev/null
+node tests/theme-migration.js > /tmp/rf_goc.log 2>&1
+! grep -q "❌" /tmp/rf_goc.log
+sonuc $? "$(grep -o '[0-9]*/[0-9]* geçti' /tmp/rf_goc.log | head -1)"
+grep "❌" /tmp/rf_goc.log | head -5
+
 # ── 1. JS sözdizimi ────────────────────────────────────────
 baslik "1. JavaScript sözdizimi"
 GECERLI=0; TOPLAM=0

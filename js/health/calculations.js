@@ -408,19 +408,23 @@ function calcAll(){
    (skala "İyi" derken rozet "Atletik" diyordu).
    ══════════════════════════════════════════════════════════ */
 function _ffmiBands(male){
+  /* Renkler SIRALI paletten gelir (--s1..--s6): soğuktan sıcağa.
+     Anlam renkleri kullanılmaz — FFMI bir ölçek, durum bildirimi değil.
+     Sıralı palet tüm temalarda aynı gradyanı kullanır, böylece
+     "düşük/yüksek" algısı tema değişse de bozulmaz. */
   return male
-    ? [{ust:18, ad:'Zayıf',    cls:'bb', renk:'var(--info)', txt:'Kas kütlesi ortalamanın altında. Düzenli direnç antrenmanı ve yeterli protein alımıyla geliştirilebilir.'},
-       {ust:20, ad:'Ortalama', cls:'bb', renk:'var(--info)', txt:'Yetişkin erkekler için ortalama kas kütlesi seviyesindesin.'},
-       {ust:22, ad:'İyi',      cls:'bg', renk:'var(--success)', txt:'Ortalamanın üzerinde kas gelişimi. Düzenli antrenmanın etkisi görülüyor.'},
-       {ust:24, ad:'Çok İyi',  cls:'bg', renk:'var(--success)', txt:'Atletik seviyede kas kütlesi. Güçlü ve dengeli bir fiziğin var.'},
-       {ust:26, ad:'Elit',     cls:'bp', renk:'var(--purple)', txt:'İleri düzey kas gelişimi. Yıllarca disiplinli antrenmanın sonucu.'},
-       {ust:30, ad:'İstisnai', cls:'br', renk:'var(--accent)', txt:'Doğal yollarla ulaşılması son derece nadir bir seviye.'}]
-    : [{ust:14, ad:'Zayıf',    cls:'bb', renk:'var(--info)', txt:'Yağsız kütlen ortalamanın altında. Antrenman ve beslenmeyle ilerleyebilirsin.'},
-       {ust:16, ad:'Ortalama', cls:'bb', renk:'var(--info)', txt:'Kadınlar için ortalama yağsız kütle seviyesindesin.'},
-       {ust:18, ad:'İyi',      cls:'bg', renk:'var(--success)', txt:'Ortalamanın üzerinde kas gelişimi. İyi bir seviyedesin.'},
-       {ust:20, ad:'Çok İyi',  cls:'bg', renk:'var(--success)', txt:'Atletik seviyede kas kütlesi. Güçlü bir fiziğin var.'},
-       {ust:22, ad:'Elit',     cls:'bp', renk:'var(--purple)', txt:'İleri düzey kas gelişimi. Üst düzey bir seviye.'},
-       {ust:26, ad:'İstisnai', cls:'br', renk:'var(--accent)', txt:'Kadınlarda doğal yollarla ulaşılması çok nadir.'}];
+    ? [{ust:18, ad:'Zayıf',    cls:'bb', renk:'var(--s1)', txt:'Kas kütlesi ortalamanın altında. Düzenli direnç antrenmanı ve yeterli protein alımıyla geliştirilebilir.'},
+       {ust:20, ad:'Ortalama', cls:'bb', renk:'var(--s2)', txt:'Yetişkin erkekler için ortalama kas kütlesi seviyesindesin.'},
+       {ust:22, ad:'İyi',      cls:'bg', renk:'var(--s3)', txt:'Ortalamanın üzerinde kas gelişimi. Düzenli antrenmanın etkisi görülüyor.'},
+       {ust:24, ad:'Çok İyi',  cls:'bg', renk:'var(--s4)', txt:'Atletik seviyede kas kütlesi. Güçlü ve dengeli bir fiziğin var.'},
+       {ust:26, ad:'Elit',     cls:'bp', renk:'var(--s5)', txt:'İleri düzey kas gelişimi. Yıllarca disiplinli antrenmanın sonucu.'},
+       {ust:30, ad:'İstisnai', cls:'br', renk:'var(--s6)', txt:'Doğal yollarla ulaşılması son derece nadir bir seviye.'}]
+    : [{ust:14, ad:'Zayıf',    cls:'bb', renk:'var(--s1)', txt:'Yağsız kütlen ortalamanın altında. Antrenman ve beslenmeyle ilerleyebilirsin.'},
+       {ust:16, ad:'Ortalama', cls:'bb', renk:'var(--s2)', txt:'Kadınlar için ortalama yağsız kütle seviyesindesin.'},
+       {ust:18, ad:'İyi',      cls:'bg', renk:'var(--s3)', txt:'Ortalamanın üzerinde kas gelişimi. İyi bir seviyedesin.'},
+       {ust:20, ad:'Çok İyi',  cls:'bg', renk:'var(--s4)', txt:'Atletik seviyede kas kütlesi. Güçlü bir fiziğin var.'},
+       {ust:22, ad:'Elit',     cls:'bp', renk:'var(--s5)', txt:'İleri düzey kas gelişimi. Üst düzey bir seviye.'},
+       {ust:26, ad:'İstisnai', cls:'br', renk:'var(--s6)', txt:'Kadınlarda doğal yollarla ulaşılması çok nadir.'}];
 }
 
 /* Verilen FFMI değerinin hangi banda düştüğünü döndürür. */
