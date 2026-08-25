@@ -696,3 +696,56 @@ button.pd-sayac:active{color:var(--accent)}
   display:flex;align-items:center;gap:3px;
   color:#fff;font-size:10.5px;font-weight:600;
   filter:drop-shadow(0 1px 3px rgba(0,0,0,.7))}
+
+/* ── YORUM EYLEMLERİ ─────────────────────────────────────── */
+.pd-yorum-eylem{display:flex;align-items:center;gap:14px;margin-top:5px}
+.pd-ye-btn{
+  background:none;border:none;padding:2px 0;cursor:pointer;
+  font-family:'Outfit',sans-serif;font-size:11.5px;font-weight:600;
+  color:var(--text3);transition:color .16s;
+  -webkit-tap-highlight-color:transparent}
+.pd-ye-btn:active{color:var(--accent)}
+.pd-ye-btn.aktif{color:var(--accent)}
+.pd-ye-btn.sil{color:var(--text3)}
+.pd-ye-btn.sil:active{color:var(--danger)}
+.pd-ye-btn:disabled{opacity:.5}
+
+/* Yanıtlar — girintili */
+.pd-yorum.yanit{
+  padding:8px 0 8px 0;border-bottom:none;
+  border-left:2px solid var(--border);
+  padding-left:11px;margin-left:2px}
+.pd-yorum.yanit .pd-yorum-av{width:27px;height:27px;font-size:12px}
+.pd-yorum.yanit .pd-yorum-metin{font-size:12.5px}
+.pd-yanitlar{margin-top:8px}
+
+.pd-yanit-ac{
+  background:none;border:none;padding:6px 0 2px;cursor:pointer;
+  font-family:'Outfit',sans-serif;font-size:11.5px;font-weight:600;
+  color:var(--text2);-webkit-tap-highlight-color:transparent}
+.pd-yanit-ac:active{color:var(--accent)}
+
+/* Daha fazla göster */
+.pd-daha{
+  width:100%;margin-top:10px;padding:10px;
+  background:var(--card2);border:1px dashed var(--border);border-radius:10px;
+  font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;
+  color:var(--text2);cursor:pointer;transition:.16s;
+  -webkit-tap-highlight-color:transparent}
+.pd-daha:active{border-color:var(--accent);color:var(--text)}
+.pd-daha.kucuk{padding:7px;font-size:11px;margin-top:6px}
+
+/* Yanıt şeridi */
+.pd-yanit-serit{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:8px 16px;background:var(--card2);
+  border-top:1px solid var(--border);
+  font-size:12px;color:var(--text2)}
+.pd-yanit-serit button{
+  background:none;border:none;cursor:pointer;
+  color:var(--text3);font-size:18px;line-height:1;padding:0 4px}
+
+.pd-yorum-sayi{
+  font-size:10.5px;color:var(--text3);text-align:right;
+  padding:0 16px 8px}
+.pd-yorum-sayi.dolu{color:var(--warn);font-weight:600}

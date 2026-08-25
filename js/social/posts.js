@@ -31,14 +31,20 @@ var GONDERI_TURLERI = [
 ];
 
 /* ── Yeni gönderi durumu ─────────────────────────────────── */
-var _yeniGonderi = { fotograflar:[], tur:'serbest' };
+var _yeniGonderi = { fotograflar:[], tur:'serbest', metin:'', duzenlenenId:null };
 
 function openNewPost(){
   if(!_fbUser || !_fbDb){
     showToast('Gönderi paylaşmak için giriş yapmalısın.','warn');
     return;
   }
-  _yeniGonderi = { fotograflar:[], tur:'serbest' };
+  /* Her açılışta TEMİZ form — önceki metin DOM'da kalmasın (madde 1) */
+  _yeniGonderi = { fotograflar:[], tur:'serbest', metin:'', duzenlenenId:null };
+  _npSonGecerli = '';
+  var baslikEl = document.getElementById('np-baslik');
+  if(baslikEl) baslikEl.textContent = 'Yeni Gönderi';
+  var btn = document.getElementById('np-paylas-btn');
+  if(btn) btn.textContent = 'Paylaş';
   var ov = document.getElementById('new-post-overlay');
   if(!ov) return;
   ov.classList.add('active');
@@ -50,7 +56,8 @@ function closeNewPost(){
   var ov = document.getElementById('new-post-overlay');
   if(ov) ov.classList.remove('active');
   document.body.style.overflow = '';
-  _yeniGonderi = { fotograflar:[], tur:'serbest' };
+  _yeniGonderi = { fotograflar:[], tur:'serbest', metin:'', duzenlenenId:null };
+  _npSonGecerli = '';
 }
 
 function npFotoSec(){
@@ -86,11 +93,16 @@ function npFotoEklendi(olay){
 }
 
 function npFotoSil(i){
+  var t = document.getElementById('np-metin');
+  if(t) _yeniGonderi.metin = t.value;
   _yeniGonderi.fotograflar.splice(i,1);
   _npCiz();
 }
 
 function npTurSec(tur){
+  /* Yeniden çizmeden önce yazılanı sakla */
+  var t = document.getElementById('np-metin');
+  if(t) _yeniGonderi.metin = t.value;
   _yeniGonderi.tur = tur;
   _npCiz();
 }
@@ -111,10 +123,9 @@ function _npCiz(){
   });
   html += '</div>';
 
-  /* Metin */
-  var mevcutMetin = '';
-  var eski = document.getElementById('np-metin');
-  if(eski) mevcutMetin = eski.value;
+  /* Metin — DOM'dan değil DURUMDAN okunur.
+     DOM'dan okunduğunda pencere kapansa bile eski metin kalıyordu. */
+  var mevcutMetin = _yeniGonderi.metin || '';
   html += '<textarea class="fi np-metin" id="np-metin" rows="4" maxlength="' + GONDERI_MAX_METIN + '" ' +
           'placeholder="Ne paylaşmak istersin?" oninput="npMetinSay()">' +
           _npKacir(mevcutMetin) + '</textarea>';
@@ -200,6 +211,8 @@ function npMetinSay(){
     _npSonGecerli = t.value;
   }
 
+  _yeniGonderi.metin = t.value;   /* durumda sakla */
+
   if(s){
     var satirSayisi = t.value ? t.value.split('\n').length : 0;
     s.innerHTML = t.value.length + '/' + GONDERI_MAX_METIN + ' karakter' +
@@ -213,7 +226,62 @@ function _npKacir(s){
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-/* ── Paylaş ──────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════
+   GÖNDERİ DÜZENLEME
+
+   Metin, tür ve fotoğraflar değiştirilebilir. Fotoğraflar
+   alt koleksiyonda ayrı belgelerde durduğu için silinen
+   fotoğrafların belgeleri de temizlenir.
+   ══════════════════════════════════════════════════════════ */
+function openEditPost(postId){
+  if(!_fbDb) return;
+  closePost();
+
+  var ov = document.getElementById('new-post-overlay');
+  if(!ov) return;
+  ov.classList.add('active');
+  document.body.style.overflow = 'hidden';
+
+  var govde = document.getElementById('np-body');
+  if(govde) govde.innerHTML = '<div class="dsc-durum">Yükleniyor...</div>';
+
+  var baslikEl = document.getElementById('np-baslik');
+  if(baslikEl) baslikEl.textContent = 'Gönderiyi Düzenle';
+  var btn = document.getElementById('np-paylas-btn');
+  if(btn) btn.textContent = 'Kaydet';
+
+  Promise.all([
+    _fbDb.collection('posts').doc(postId).get(),
+    gonderiMedyaGetir(postId)
+  ]).then(function(r){
+    var doc = r[0], medya = r[1];
+    if(!doc.exists) throw new Error('Gönderi bulunamadı');
+    var post = doc.data();
+
+    _yeniGonderi = {
+      duzenlenenId: postId,
+      tur: post.tur || 'serbest',
+      metin: post.metin || '',
+      /* Var olan fotoğraflar — tam veri alt koleksiyondan,
+         önizleme ana belgeden gelir */
+      fotograflar: medya.map(function(m, i){
+        return {
+          mevcut: true,
+          tam: {veri:m.veri, genislik:m.genislik, yukseklik:m.yukseklik,
+                bayt:(m.veri||'').length},
+          onizleme: {veri:(post.onizlemeler && post.onizlemeler[i]) || m.veri,
+                     bayt:0}
+        };
+      })
+    };
+    _npSonGecerli = _yeniGonderi.metin;
+    _npCiz();
+  }).catch(function(e){
+    if(govde) govde.innerHTML = '<div class="dsc-durum">' + (e.message||'Açılamadı') + '</div>';
+  });
+}
+
+/* ── Paylaş / Kaydet ─────────────────────────────────────── */
 function npPaylas(){
   var metinEl = document.getElementById('np-metin');
   var metin = metinEl ? metinEl.value.trim() : '';
@@ -233,7 +301,10 @@ function npPaylas(){
   var durum = document.getElementById('np-durum');
   if(durum) durum.textContent = 'Gönderi oluşturuluyor...';
 
-  var postRef = _fbDb.collection('posts').doc();
+  var duzenleme = !!_yeniGonderi.duzenlenenId;
+  var postRef = duzenleme
+    ? _fbDb.collection('posts').doc(_yeniGonderi.duzenlenenId)
+    : _fbDb.collection('posts').doc();
   var postId = postRef.id;
 
   /* Ana belge: metin + küçük önizlemeler (ızgarada gösterilir) */
@@ -242,13 +313,27 @@ function npPaylas(){
     metin: metin,
     tur: _yeniGonderi.tur,
     fotoSayisi: f.length,
-    onizlemeler: f.map(function(x){ return x.onizleme.veri; }),
-    begeni: 0,
-    yorum: 0,
-    tarih: firebase.firestore.FieldValue.serverTimestamp()
+    onizlemeler: f.map(function(x){ return x.onizleme.veri; })
   };
+  if(duzenleme){
+    /* Düzenlemede tarih ve sayaçlar korunur */
+    anaBelge.duzenlendi = firebase.firestore.FieldValue.serverTimestamp();
+  } else {
+    anaBelge.begeni = 0;
+    anaBelge.yorum = 0;
+    anaBelge.tarih = firebase.firestore.FieldValue.serverTimestamp();
+  }
 
-  postRef.set(anaBelge)
+  postRef.set(anaBelge, {merge: duzenleme})
+    .then(function(){
+      if(!duzenleme) return;
+      /* Düzenlemede eski fotoğraf belgeleri silinir — silinen
+         fotoğrafların artıkları kalmasın */
+      if(durum) durum.textContent = 'Fotoğraflar güncelleniyor...';
+      return postRef.collection('media').get().then(function(snap){
+        return Promise.all(snap.docs.map(function(d){ return d.ref.delete(); }));
+      });
+    })
     .then(function(){
       /* Tam fotoğraflar ayrı belgelere — her biri kendi 1 MB bütçesinde */
       if(!f.length) return;
@@ -263,9 +348,10 @@ function npPaylas(){
       }));
     })
     .then(function(){
+      var duzenlendiMi = duzenleme;
       if(btn){ btn.disabled = false; btn.textContent = 'Paylaş'; }
       closeNewPost();
-      showToast('✅ Gönderin paylaşıldı!');
+      showToast(duzenlendiMi ? '✅ Gönderin güncellendi!' : '✅ Gönderin paylaşıldı!');
       /* Profil ızgarasını tazele */
       if(typeof _renderProfilSekmesi === 'function') _renderProfilSekmesi();
       if(typeof renderProfil === 'function') renderProfil();
@@ -433,7 +519,8 @@ function _pdCiz(post, profil, medya){
   html +=   '<button class="dsc-av" style="border:none;padding:0" onclick="closePost();openUserProfile(\'' + post.uid + '\')">' + av + '</button>';
   html +=   '<div class="dsc-bilgi">';
   html +=     '<div class="dsc-nick">@' + (profil.nickname||'') + '</div>';
-  html +=     '<div class="dsc-isim">' + _pdTarih(post.tarih) + '</div>';
+  html +=     '<div class="dsc-isim">' + _pdTarih(post.tarih) +
+              (post.duzenlendi ? ' · düzenlendi' : '') + '</div>';
   html +=   '</div>';
   if(tur) html += '<span class="pd-tur">' + tur.ikon + ' ' + tur.ad + '</span>';
   html += '</div>';
@@ -475,6 +562,7 @@ function _pdCiz(post, profil, medya){
   html +=   '<button class="pd-eylem" id="pd-begen-btn" onclick="pdBegen()">♡ Beğen</button>';
   html +=   '<button class="pd-eylem" onclick="pdYorumaOdaklan()">💬 Yorum</button>';
   if(benimMi){
+    html += '<button class="pd-eylem" onclick="openEditPost(\'' + post.id + '\')">✏️ Düzenle</button>';
     html += '<button class="pd-eylem sil" onclick="gonderiSil(\'' + post.id + '\')">🗑 Sil</button>';
   }
   html += '</div>';
@@ -490,12 +578,14 @@ function _pdCiz(post, profil, medya){
   html += '<div class="pd-yorumlar" id="pd-yorumlar"></div>';
 
   /* Yorum yazma */
+  html += '<div class="pd-yanit-serit" id="pd-yanit-serit" style="display:none"></div>';
   html += '<div class="pd-yorum-yaz">';
   html +=   '<input type="text" id="pd-yorum-input" placeholder="Yorum yaz..." ' +
             'maxlength="' + YORUM_MAX + '" oninput="pdYorumSay()" ' +
             'onkeydown="if(event.key===\'Enter\')pdYorumGonder()">';
   html +=   '<button id="pd-yorum-btn" onclick="pdYorumGonder()" disabled>Gönder</button>';
   html += '</div>';
+  html += '<div class="pd-yorum-sayi" id="pd-yorum-sayi" style="display:none"></div>';
 
   el.innerHTML = html;
 
@@ -677,66 +767,237 @@ function pdBegenenler(){
     });
 }
 
-/* ── Yorumlar ────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════
+   YORUMLAR — ağaç yapısı, sayfalama, beğeni, yanıt
+
+   Yorumlar tek koleksiyonda tutulur; ustYorum alanı hiyerarşiyi
+   kurar. Tek okumayla tüm ağaç gelir, istemcide gruplanır.
+
+   Görünürlük:
+     • İlk açılışta 5 üst yorum
+     • Yanıtlar gizli — "N yanıtı gör" ile açılır
+   ══════════════════════════════════════════════════════════ */
+
+var _pdYorumlar = [];          /* tüm yorumlar (düz liste) */
+var _pdYorumProfiller = {};    /* uid → profil */
+var _pdYorumBegeni = {};       /* yorumId → beğeni sayısı */
+var _pdGorunenSayi = YORUM_SAYFA;
+var _pdAcikYanitlar = {};      /* ustYorumId → true (yanıtları açık) */
+var _pdYanitHedef = null;      /* yanıt yazılan yorum */
 
 function _pdYorumlariCiz(postId){
   var el = document.getElementById('pd-yorumlar');
   if(!el) return;
   el.innerHTML = '<div class="pd-yorum-durum">Yorumlar yükleniyor...</div>';
 
-  yorumlariGetir(postId, 100).then(function(liste){
-    var sayacEl = document.getElementById('pd-yorum-sayac');
-    if(sayacEl) sayacEl.textContent = liste.length + ' yorum';
+  _pdGorunenSayi = YORUM_SAYFA;
+  _pdAcikYanitlar = {};
+  _pdYanitHedef = null;
 
-    if(!liste.length){
+  Promise.all([
+    yorumlariGetir(postId, 200),
+    yorumBegenileriGetir(postId)
+  ]).then(function(r){
+    _pdYorumlar = r[0];
+    _pdYorumBegeni = r[1];
+
+    var sayacEl = document.getElementById('pd-yorum-sayac');
+    if(sayacEl) sayacEl.textContent = _pdYorumlar.length + ' yorum';
+
+    if(!_pdYorumlar.length){
       el.innerHTML = '<div class="pd-yorum-durum">Henüz yorum yok. İlk yorumu sen yaz.</div>';
       return;
     }
 
-    /* Yorum sahiplerinin profillerini topluca getir */
+    /* Yazar profillerini topluca getir — yorum başına ayrı sorgu atma */
     var uidler = [];
-    liste.forEach(function(y){ if(uidler.indexOf(y.uid) < 0) uidler.push(y.uid); });
+    _pdYorumlar.forEach(function(y){ if(uidler.indexOf(y.uid) < 0) uidler.push(y.uid); });
 
     Promise.all(uidler.map(function(u){
       return profilGetir(u).catch(function(){ return {uid:u, nickname:'kullanıcı'}; });
     })).then(function(profiller){
-      var harita = {};
-      profiller.forEach(function(p){ if(p) harita[p.uid] = p; });
-
-      var benimGonderim = _fbUser && _acikGonderi && _acikGonderi.uid === _fbUser.uid;
-
-      el.innerHTML = liste.map(function(y){
-        var p = harita[y.uid] || {};
-        var bas = (p.isim || p.nickname || '?').charAt(0).toUpperCase();
-        var av = p.avatar
-          ? '<img src="' + p.avatar + '" alt="">'
-          : '<span>' + bas + '</span>';
-        /* Yorum sahibi veya gönderi sahibi silebilir */
-        var silebilir = _fbUser && (y.uid === _fbUser.uid || benimGonderim);
-        return '<div class="pd-yorum">' +
-                 '<button class="pd-yorum-av" onclick="closePost();openUserProfile(\'' + y.uid + '\')">' +
-                   av + '</button>' +
-                 '<div class="pd-yorum-govde">' +
-                   '<div class="pd-yorum-ust">' +
-                     '<span class="pd-yorum-nick">@' + (p.nickname||'kullanıcı') + '</span>' +
-                     '<span class="pd-yorum-tarih">' + _pdTarih(y.tarih) + '</span>' +
-                   '</div>' +
-                   '<div class="pd-yorum-metin">' + _npKacir(y.metin) + '</div>' +
-                 '</div>' +
-                 (silebilir
-                   ? '<button class="pd-yorum-sil" onclick="pdYorumSil(\'' + y.id + '\')" ' +
-                     'aria-label="Yorumu sil">&times;</button>'
-                   : '') +
-               '</div>';
-      }).join('');
+      _pdYorumProfiller = {};
+      profiller.forEach(function(p){ if(p) _pdYorumProfiller[p.uid] = p; });
+      _pdYorumListesiCiz();
     });
   });
+}
+
+function _pdYorumListesiCiz(){
+  var el = document.getElementById('pd-yorumlar');
+  if(!el) return;
+
+  /* Üst yorumlar ve yanıtları ayır */
+  var ustler = _pdYorumlar.filter(function(y){ return !y.ustYorum; });
+  var yanitlar = {};
+  _pdYorumlar.forEach(function(y){
+    if(!y.ustYorum) return;
+    (yanitlar[y.ustYorum] = yanitlar[y.ustYorum] || []).push(y);
+  });
+
+  var gosterilecek = ustler.slice(0, _pdGorunenSayi);
+  var kalan = ustler.length - gosterilecek.length;
+
+  var html = gosterilecek.map(function(y){
+    var alt = yanitlar[y.id] || [];
+    return _pdYorumHTML(y, alt, false);
+  }).join('');
+
+  if(kalan > 0){
+    html += '<button class="pd-daha" onclick="pdDahaFazlaYorum()">' +
+            '▼ ' + kalan + ' yorum daha göster</button>';
+  } else if(ustler.length > YORUM_SAYFA){
+    html += '<button class="pd-daha" onclick="pdYorumlariKisalt()">' +
+            '▲ Daha az göster</button>';
+  }
+
+  el.innerHTML = html;
+}
+
+/* Tek yorumun HTML'i. yanit=true ise girintili çizilir. */
+function _pdYorumHTML(y, altYorumlar, yanitMi){
+  var p = _pdYorumProfiller[y.uid] || {};
+  var bas = (p.isim || p.nickname || '?').charAt(0).toUpperCase();
+  var av = p.avatar ? '<img src="' + p.avatar + '" alt="">' : '<span>' + bas + '</span>';
+
+  var benimGonderim = _fbUser && _acikGonderi && _acikGonderi.uid === _fbUser.uid;
+  var silebilir = _fbUser && (y.uid === _fbUser.uid || benimGonderim);
+
+  var begeniSayisi = _pdYorumBegeni[y.id] || 0;
+  var begendim = _yorumBegeniOnbellek[y.id] === true;
+
+  var html = '<div class="pd-yorum' + (yanitMi ? ' yanit' : '') + '" id="y-' + y.id + '">';
+  html +=   '<button class="pd-yorum-av" onclick="closePost();openUserProfile(\'' + y.uid + '\')">' + av + '</button>';
+  html +=   '<div class="pd-yorum-govde">';
+  html +=     '<div class="pd-yorum-ust">';
+  html +=       '<span class="pd-yorum-nick">@' + (p.nickname||'kullanıcı') + '</span>';
+  html +=       '<span class="pd-yorum-tarih">' + _pdTarih(y.tarih) + '</span>';
+  html +=     '</div>';
+  html +=     '<div class="pd-yorum-metin">' + _npKacir(y.metin) + '</div>';
+
+  /* Eylem satırı: beğen · yanıtla · sil */
+  html +=     '<div class="pd-yorum-eylem">';
+  html +=       '<button class="pd-ye-btn' + (begendim ? ' aktif' : '') + '" ' +
+                'id="yb-' + y.id + '" onclick="pdYorumBegen(\'' + y.id + '\')">' +
+                (begendim ? '♥' : '♡') + '<span id="ybs-' + y.id + '">' +
+                (begeniSayisi ? ' ' + begeniSayisi : '') + '</span></button>';
+  if(!yanitMi){
+    html +=     '<button class="pd-ye-btn" onclick="pdYanitla(\'' + y.id + '\')">Yanıtla</button>';
+  }
+  if(silebilir){
+    html +=     '<button class="pd-ye-btn sil" onclick="pdYorumSil(\'' + y.id + '\')">Sil</button>';
+  }
+  html +=     '</div>';
+
+  /* Yanıtlar */
+  if(altYorumlar && altYorumlar.length){
+    var acik = _pdAcikYanitlar[y.id];
+    html += '<button class="pd-yanit-ac" onclick="pdYanitlariAc(\'' + y.id + '\')">' +
+            (acik ? '▲ Yanıtları gizle'
+                  : '▼ ' + altYorumlar.length + ' yanıtı gör') + '</button>';
+    if(acik){
+      var gosterilen = altYorumlar.slice(0, _pdAcikYanitlar[y.id + '_sayi'] || YANIT_SAYFA);
+      html += '<div class="pd-yanitlar">';
+      html += gosterilen.map(function(a){ return _pdYorumHTML(a, null, true); }).join('');
+      var kalanYanit = altYorumlar.length - gosterilen.length;
+      if(kalanYanit > 0){
+        html += '<button class="pd-daha kucuk" onclick="pdDahaFazlaYanit(\'' + y.id + '\')">' +
+                '▼ ' + kalanYanit + ' yanıt daha</button>';
+      }
+      html += '</div>';
+    }
+  }
+
+  html +=   '</div>';
+  html += '</div>';
+  return html;
+}
+
+function pdDahaFazlaYorum(){
+  _pdGorunenSayi += YORUM_SAYFA * 2;
+  _pdYorumListesiCiz();
+}
+
+function pdYorumlariKisalt(){
+  _pdGorunenSayi = YORUM_SAYFA;
+  _pdYorumListesiCiz();
+  var el = document.getElementById('pd-yorumlar');
+  if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function pdYanitlariAc(ustId){
+  _pdAcikYanitlar[ustId] = !_pdAcikYanitlar[ustId];
+  if(_pdAcikYanitlar[ustId]) _pdAcikYanitlar[ustId + '_sayi'] = YANIT_SAYFA;
+  _pdYorumListesiCiz();
+}
+
+function pdDahaFazlaYanit(ustId){
+  _pdAcikYanitlar[ustId + '_sayi'] = (_pdAcikYanitlar[ustId + '_sayi'] || YANIT_SAYFA) + YANIT_SAYFA * 2;
+  _pdYorumListesiCiz();
+}
+
+/* ── Yorum beğenisi ──────────────────────────────────────── */
+function pdYorumBegen(yorumId){
+  if(!_acikGonderi) return;
+  var b = document.getElementById('yb-' + yorumId);
+  if(b) b.disabled = true;
+
+  yorumBegeniDegistir(yorumId, _acikGonderi.id).then(function(begendi){
+    if(b){
+      b.disabled = false;
+      b.classList.toggle('aktif', begendi);
+      var sayi = (_pdYorumBegeni[yorumId] || 0) + (begendi ? 1 : -1);
+      _pdYorumBegeni[yorumId] = Math.max(0, sayi);
+      b.innerHTML = (begendi ? '♥' : '♡') +
+        '<span id="ybs-' + yorumId + '">' +
+        (_pdYorumBegeni[yorumId] ? ' ' + _pdYorumBegeni[yorumId] : '') + '</span>';
+    }
+  }).catch(function(e){
+    if(b) b.disabled = false;
+    showToast('❌ ' + e.message, 'error');
+  });
+}
+
+/* ── Yanıtlama ───────────────────────────────────────────── */
+function pdYanitla(yorumId){
+  var y = _pdYorumlar.find(function(x){ return x.id === yorumId; });
+  if(!y) return;
+  _pdYanitHedef = yorumId;
+
+  var p = _pdYorumProfiller[y.uid] || {};
+  var serit = document.getElementById('pd-yanit-serit');
+  if(serit){
+    serit.innerHTML = '<span>@' + (p.nickname||'kullanıcı') + ' kullanıcısına yanıt</span>' +
+                      '<button onclick="pdYanitIptal()" aria-label="İptal">&times;</button>';
+    serit.style.display = 'flex';
+  }
+  var inp = document.getElementById('pd-yorum-input');
+  if(inp){ inp.focus(); inp.scrollIntoView({behavior:'smooth', block:'center'}); }
+}
+
+function pdYanitIptal(){
+  _pdYanitHedef = null;
+  var serit = document.getElementById('pd-yanit-serit');
+  if(serit){ serit.style.display = 'none'; serit.innerHTML = ''; }
 }
 
 function pdYorumSay(){
   var inp = document.getElementById('pd-yorum-input');
   var btn = document.getElementById('pd-yorum-btn');
+  var say = document.getElementById('pd-yorum-sayi');
   if(inp && btn) btn.disabled = !inp.value.trim();
+  if(inp && say){
+    var n = inp.value.length;
+    /* Sayaç yalnızca sınıra yaklaşınca görünür — sürekli
+       görünmesi yazma alanını kalabalıklaştırıyor */
+    if(n > YORUM_MAX - 80){
+      say.textContent = n + '/' + YORUM_MAX;
+      say.style.display = 'block';
+      say.className = n >= YORUM_MAX ? 'pd-yorum-sayi dolu' : 'pd-yorum-sayi';
+    } else {
+      say.style.display = 'none';
+    }
+  }
 }
 
 function pdYorumaOdaklan(){
@@ -754,10 +1015,18 @@ function pdYorumGonder(){
 
   if(btn){ btn.disabled = true; btn.textContent = '...'; }
 
-  yorumEkle(_acikGonderi.id, metin).then(function(){
+  var hedef = _pdYanitHedef;
+  yorumEkle(_acikGonderi.id, metin, hedef).then(function(){
     inp.value = '';
     if(btn){ btn.textContent = 'Gönder'; btn.disabled = true; }
+    pdYanitIptal();
     _pdYorumlariCiz(_acikGonderi.id);
+    /* Yanıt eklendiyse o dalı açık getir */
+    if(hedef) setTimeout(function(){
+      _pdAcikYanitlar[hedef] = true;
+      _pdAcikYanitlar[hedef + '_sayi'] = YANIT_SAYFA;
+      _pdYorumListesiCiz();
+    }, 400);
   }).catch(function(e){
     if(btn){ btn.textContent = 'Gönder'; btn.disabled = false; }
     showToast('❌ ' + e.message, 'error');

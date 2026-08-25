@@ -32,7 +32,12 @@ function kol(ad, ust){
       api._f=[];return Promise.resolve({data:()=>({count:l.length})});
     }};},
     get(){
-      let l=Object.keys(kap).map(id=>({id,data:()=>kap[id]}));
+      /* Gerçek Firestore'da QueryDocumentSnapshot.ref vardır —
+         kod d.ref.delete() kullanıyor, sahte de sağlamalı */
+      let l=Object.keys(kap).map(id=>({
+        id, data:()=>kap[id],
+        ref:{delete:()=>{delete kap[id];return Promise.resolve();}}
+      }));
       api._f.forEach(([f,op,v])=>{l=l.filter(d=>d.data()[f]===v)});
       api._f=[];
       return Promise.resolve({empty:!l.length,docs:l,size:l.length,forEach:(fn)=>l.forEach(fn)});
@@ -98,20 +103,50 @@ begendimMi(PID).then(b=>{
   return yorumEkle(PID,'   ').then(()=>{t('Boş yorum engellendi',false);})
     .catch(e=>{t('Boş yorum engellendi', e.message.includes('boş'));});
 }).then(()=>{
-  return yorumEkle(PID,'x'.repeat(301)).then(()=>{t('Uzun yorum engellendi',false);})
-    .catch(e=>{t('Uzun yorum engellendi', e.message.includes('300'));});
+  return yorumEkle(PID,'x'.repeat(401)).then(()=>{t('Uzun yorum engellendi',false);})
+    .catch(e=>{t('Uzun yorum engellendi', e.message.includes('400'));});
 }).then(()=>{
-  console.log('\n▸ Yorum silme');
+
+  console.log('\n▸ Yanıtlar');
   return yorumlariGetir(PID);
-}).then(l=>yorumSil(PID,l[0].id))
-.then(()=>yorumlariGetir(PID))
-.then(l=>{
-  t('Yorum silindi', l.length===1, l.length);
+}).then(l=>{
+  const ustId=l[0].id;
+  return yorumEkle(PID,'Bu bir yanıt',ustId).then(()=>ustId);
+}).then(ustId=>{
+  return yorumlariGetir(PID).then(l=>{
+    const yanit=l.find(y=>y.ustYorum===ustId);
+    t('Yanıt eklendi', !!yanit, 'ustYorum yok');
+    t('ustYorum doğru', yanit && yanit.ustYorum===ustId);
+    const ustler=l.filter(y=>!y.ustYorum);
+    t('Üst yorumlar ayrılıyor', ustler.length>=1, ustler.length);
+    return ustId;
+  });
+}).then(ustId=>{
+  console.log('\n▸ Yorum beğenisi');
+  return yorumBegendimMi(ustId).then(b=>{
+    t('Başlangıçta beğenilmemiş', b===false);
+    return yorumBegeniDegistir(ustId, PID);
+  }).then(b=>{
+    t('Yorum beğenildi', b===true);
+    return yorumBegenileriGetir(PID);
+  }).then(sayim=>{
+    t('Toplu beğeni sayımı', sayim[ustId]===1, JSON.stringify(sayim));
+    return yorumBegeniDegistir(ustId, PID);
+  }).then(b=>{
+    t('Beğeni geri alındı', b===false);
+    return ustId;
+  });
+}).then(ustId=>{
+  console.log('\n▸ Üst yorum silinince yanıtlar da silinir');
+  return yorumSil(PID, ustId).then(()=>yorumlariGetir(PID));
+}).then(l=>{
+  t('Yetim yanıt kalmadı', !l.some(y=>y.ustYorum), l.filter(y=>y.ustYorum).length+' yetim');
 
   console.log('\n▸ Oturum temizliği');
-  _begeniOnbellek={p1:true};
+  _begeniOnbellek={p1:true}; _yorumBegeniOnbellek={y1:true};
   etkilesimOnbellegiTemizle();
   t('Beğeni önbelleği temizlendi', Object.keys(_begeniOnbellek).length===0);
+  t('Yorum beğeni önbelleği temizlendi', Object.keys(_yorumBegeniOnbellek).length===0);
 
   console.log('\n'+'─'.repeat(48));
   console.log(`📊 ETKİLEŞİM: ${pass}/${pass+fail} geçti`);
