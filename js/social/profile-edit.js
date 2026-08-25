@@ -13,9 +13,9 @@
    Instagram karşılaştırması: 150 karakter, satır sınırı yok.
    Biz görsel düzeni korumak için satır sınırı koyuyoruz ama
    bütçeyi gerçekçi tutuyoruz. */
-var PE_BIO_SINIR      = 150;   /* toplam karakter — Instagram ile aynı */
-var PE_BIO_SATIR      = 8;     /* en fazla satır (bölünmeler dahil) */
-var PE_BIO_SATIR_UZUN = 34;    /* satır başına karakter */
+var PE_BIO_SINIR      = 150;   /* toplam karakter */
+var PE_BIO_SATIR      = 6;     /* en fazla satır */
+var PE_BIO_SATIR_UZUN = 35;    /* satır başına karakter */
 var PE_ISIM_SINIR = 30;
 
 function openProfileEdit(){
@@ -54,6 +54,7 @@ function openProfileEdit(){
 
   var ov = document.getElementById('profile-edit-overlay');
   if(ov){ ov.classList.add('active'); document.body.style.overflow = 'hidden'; }
+  _bioSonGecerli = (getYerelProfil().bio || '');
   peBioSay();
 }
 
@@ -68,84 +69,106 @@ function _kacir(s){
     .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-/* Biyografiyi sınırlar içinde tutar.
-   Üç kural birlikte uygulanır:
-     • en fazla 150 karakter
-     • en fazla 6 satır
-     • her satır en fazla 30 karakter (uzun satır otomatik bölünür)
-   Ayrıca ardışık boş satırlar tekile indirilir — kullanıcı
-   boşlukla profili şişiremesin. */
-function _bioDuzelt(metin, yazarken){
-  var satirlar = String(metin || '').split('\n');
-  var cikti = [];
+/* ══════════════════════════════════════════════════════════
+   BİYOGRAFİ SINIRLARI
+
+   Kurallar (basit ve öngörülebilir):
+     • Toplam en fazla 150 karakter
+     • Satır başına en fazla 35 karakter — aşınca alt satıra iner
+     • En fazla 6 satır
+     • Boş satır serbest (bölüm ayırıcı olarak kullanılabilir)
+
+   ÖNEMLİ TASARIM KARARI:
+   Metin her tuş vuruşunda YENİDEN YAZILMAZ. Önceki sürüm bunu
+   yapıyordu ve imleç zıplıyor, Enter çalışmıyor, boşluk
+   koyulamıyordu. Bunun yerine sınırı AŞAN girdi ENGELLENİR:
+   metin geçersizse bir önceki geçerli hâline dönülür.
+   Kullanıcı yazarken hiçbir şey kendiliğinden değişmez.
+   ══════════════════════════════════════════════════════════ */
+
+/* Metnin sınırlara uyup uymadığını söyler. */
+function _bioGecerliMi(metin){
+  var m = String(metin || '');
+  if(m.length > PE_BIO_SINIR) return false;
+  var satirlar = m.split('\n');
+  if(satirlar.length > PE_BIO_SATIR) return false;
   for(var i=0;i<satirlar.length;i++){
-    var st = satirlar[i].replace(/\s+$/,'');       /* satır sonu boşluklarını at */
-    /* Uzun satırı kelime sınırından böl */
-    while(st.length > PE_BIO_SATIR_UZUN){
-      var kes = st.lastIndexOf(' ', PE_BIO_SATIR_UZUN);
-      if(kes <= 0) kes = PE_BIO_SATIR_UZUN;        /* boşluk yoksa sert kes */
-      cikti.push(st.slice(0, kes).replace(/\s+$/,''));
-      st = st.slice(kes).replace(/^\s+/,'');
-      if(cikti.length >= PE_BIO_SATIR) break;
-    }
-    if(cikti.length >= PE_BIO_SATIR) break;
-    cikti.push(st);
+    if(satirlar[i].length > PE_BIO_SATIR_UZUN) return false;
   }
-
-  /* Üç veya daha fazla ardışık boş satırı ikiye indir.
-     Tek boş satır bölüm ayırıcı olarak meşrudur — kullanıcı
-     paragraf arası boşluk bırakabilmeli. */
-  var temiz = [];
-  var ardisik = 0;
-  for(var j=0;j<cikti.length;j++){
-    if(cikti[j] === ''){
-      ardisik++;
-      if(ardisik > 1) continue;      /* ikiden fazlasını at */
-    } else {
-      ardisik = 0;
-    }
-    temiz.push(cikti[j]);
-  }
-
-  /* Baştaki boş satırlar her zaman atılır */
-  while(temiz.length && temiz[0] === '') temiz.shift();
-
-  /* Sondaki boş satırlar:
-       yazarken → KORUNUR, yoksa Enter'a basınca imleç ilerlemiyor
-       kaydederken → atılır */
-  if(!yazarken){
-    while(temiz.length && temiz[temiz.length-1] === '') temiz.pop();
-  } else {
-    /* Yazarken bile en fazla 1 boş satır sonda kalabilir */
-    while(temiz.length > 1 &&
-          temiz[temiz.length-1] === '' && temiz[temiz.length-2] === ''){
-      temiz.pop();
-    }
-  }
-
-  var sonuc = temiz.slice(0, PE_BIO_SATIR).join('\n');
-  if(sonuc.length > PE_BIO_SINIR) sonuc = sonuc.slice(0, PE_BIO_SINIR);
-  return sonuc;
+  return true;
 }
+
+/* Kaydederken uygulanan son temizlik.
+   Sadece baştaki/sondaki boş satırları atar — içerikteki
+   boş satırlara dokunmaz, kullanıcı onları bilerek koymuştur. */
+function _bioTemizle(metin){
+  var satirlar = String(metin || '').split('\n')
+    .map(function(x){ return x.replace(/\s+$/,''); });
+  while(satirlar.length && satirlar[0] === '') satirlar.shift();
+  while(satirlar.length && satirlar[satirlar.length-1] === '') satirlar.pop();
+  return satirlar.slice(0, PE_BIO_SATIR).join('\n').slice(0, PE_BIO_SINIR);
+}
+
+var _bioSonGecerli = '';   /* son geçerli metin — geri dönüş noktası */
 
 function peBioSay(){
   var t = document.getElementById('pe-bio');
   var s = document.getElementById('pe-bio-sayac');
-  if(!t || !s) return;
+  if(!t) return;
 
-  var imlec = t.selectionStart;
-  var duzeltilmis = _bioDuzelt(t.value, true);   /* yazarken */
-  if(duzeltilmis !== t.value){
-    t.value = duzeltilmis;
-    try { t.setSelectionRange(Math.min(imlec, duzeltilmis.length),
-                              Math.min(imlec, duzeltilmis.length)); } catch(e){}
+  /* Satır 35 karakteri aştıysa, taşan kısmı alt satıra AKTAR.
+     Bu tek istisna: kullanıcı yazmaya devam edebilsin diye
+     otomatik alt satıra geçiş yapılır. Satır bütçesi doluysa
+     bu da yapılmaz ve giriş engellenir. */
+  var _s = t.value.split('\n');
+  var _tasan = -1;
+  for(var _i=0;_i<_s.length;_i++){
+    if(_s[_i].length > PE_BIO_SATIR_UZUN){ _tasan = _i; break; }
+  }
+  if(_tasan >= 0 && _s.length < PE_BIO_SATIR && t.value.length <= PE_BIO_SINIR){
+    var satir = _s[_tasan];
+    /* Kelimeyi bölmemek için son boşluktan kes */
+    var kes = satir.lastIndexOf(' ', PE_BIO_SATIR_UZUN);
+    if(kes <= 0) kes = PE_BIO_SATIR_UZUN;
+    var ust = satir.slice(0, kes).replace(/\s+$/,'');
+    var alt = satir.slice(kes).replace(/^\s+/,'');
+    _s.splice(_tasan, 1, ust, alt + (_s[_tasan+1] !== undefined ? '' : ''));
+    var imlecOnce = t.selectionStart;
+    t.value = _s.join('\n');
+    /* İmleci taşan metnin sonuna taşı — yazmaya devam edebilsin */
+    var yeniKonum = imlecOnce + 1;
+    try { t.setSelectionRange(Math.min(yeniKonum, t.value.length),
+                              Math.min(yeniKonum, t.value.length)); } catch(e){}
+    _bioSonGecerli = t.value;
   }
 
-  var satir = t.value ? t.value.split('\n').length : 0;
-  s.innerHTML = t.value.length + ' / ' + PE_BIO_SINIR + ' karakter' +
-                ' &nbsp;·&nbsp; ' + satir + ' / ' + PE_BIO_SATIR + ' satır';
-  s.className = (t.value.length >= PE_BIO_SINIR || satir >= PE_BIO_SATIR)
-                ? 'pe-sayac dolu' : 'pe-sayac';
+  /* Sınır aşıldıysa son geçerli hâle dön — metni yeniden yazma */
+  if(!_bioGecerliMi(t.value)){
+    var imlec = t.selectionStart;
+    t.value = _bioSonGecerli;
+    var yeniImlec = Math.min(imlec, _bioSonGecerli.length);
+    try { t.setSelectionRange(yeniImlec, yeniImlec); } catch(e){}
+    /* Neden engellendiğini göster */
+    if(s) s.classList.add('uyari');
+    setTimeout(function(){ if(s) s.classList.remove('uyari'); }, 450);
+  } else {
+    _bioSonGecerli = t.value;
+  }
+
+  if(!s) return;
+  var satirlar = t.value ? t.value.split('\n') : [];
+  var enUzun = 0;
+  satirlar.forEach(function(l){ if(l.length > enUzun) enUzun = l.length; });
+
+  s.innerHTML =
+    t.value.length + '/' + PE_BIO_SINIR + ' karakter' +
+    ' &nbsp;·&nbsp; ' + satirlar.length + '/' + PE_BIO_SATIR + ' satır' +
+    ' &nbsp;·&nbsp; satır ' + enUzun + '/' + PE_BIO_SATIR_UZUN;
+
+  var dolu = t.value.length >= PE_BIO_SINIR ||
+             satirlar.length >= PE_BIO_SATIR ||
+             enUzun >= PE_BIO_SATIR_UZUN;
+  s.className = dolu ? 'pe-sayac dolu' : 'pe-sayac';
 }
 
 /* Kullanıcı adı kuralları — anlık geri bildirim */
@@ -193,7 +216,7 @@ function saveProfileEdit(){
   function _bitir(){
     p.nickname = yeniNick;
     p.isim = document.getElementById('pe-isim').value.trim();
-    p.bio  = _bioDuzelt(document.getElementById('pe-bio').value, false);  /* kaydederken */
+    p.bio  = _bioTemizle(document.getElementById('pe-bio').value);
     saveYerelProfil(p);
 
     /* İsim U'ya da yazılır — uygulamanın diğer yerleri oradan okuyor */

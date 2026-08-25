@@ -297,3 +297,7 @@
 .bp-ad{font-size:10px;font-weight:600;color:var(--text);line-height:1.3}
 .bp-alt{font-size:8.5px;color:var(--text3);margin-top:3px;line-height:1.3}
 @media(max-width:380px){.bp-grid{grid-template-columns:repeat(2,1fr)}}
+.pe-sayac.uyari{color:var(--danger);font-weight:700;
+  animation:peUyari .45s ease}
+@keyframes peUyari{0%,100%{transform:translateX(0)}
+  25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}

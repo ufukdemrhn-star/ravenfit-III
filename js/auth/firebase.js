@@ -147,8 +147,14 @@ function _nickEmailCoz(nick){
   });
 }
 
+/* Girişte yazılan kullanıcı adı.
+   Oturum açıldıktan sonra hesabın GERÇEK adıyla karşılaştırılır —
+   bkz. onUserLoggedIn içindeki doğrulama. */
+var _denenenNick = null;
+
 function doLogin(){
   var nick=document.getElementById('auth-nick').value.trim().toLowerCase();
+  _denenenNick = nick;
   var pass=document.getElementById('auth-pass').value;
   var errEl=document.getElementById('auth-err');
   errEl.style.color='var(--accent)';errEl.textContent='';
@@ -391,6 +397,33 @@ function onUserLoggedIn(user){
         var d=doc.data();
         /* Kullanıcı adını göster */
         var nick=d.nickname||(user.email?user.email.replace('@ravenfit.app',''):'');
+
+        /* ── ESKİ KULLANICI ADI KONTROLÜ ──────────────────────
+           Auth e-postası kayıt anındaki kullanıcı adından türetilir
+           ve hiç değişmez. Kullanıcı adını değiştiren biri için
+           ESKİ ad hâlâ geçerli bir e-postaya çözümlenir ve giriş
+           teknik olarak başarılı olur.
+
+           Bu yüzden oturum açıldıktan sonra yazılan adın hesabın
+           güncel adıyla eşleştiği doğrulanır. Eşleşmiyorsa oturum
+           kapatılır. */
+        if(_denenenNick && nick && _denenenNick !== nick.toLowerCase()){
+          var _yanlisAd = _denenenNick;
+          _denenenNick = null;
+          console.warn('Eski kullanıcı adıyla giriş denendi:', _yanlisAd, '→ güncel:', nick);
+          _fbAuth.signOut().then(function(){
+            showAuthScreen();
+            var eEl = document.getElementById('auth-err');
+            if(eEl){
+              eEl.style.color = 'var(--danger)';
+              eEl.textContent = 'Bu kullanıcı adı artık kullanılmıyor. Güncel adınla giriş yap.';
+            }
+            var nEl = document.getElementById('auth-nick');
+            if(nEl) nEl.value = '';
+          });
+          return;
+        }
+        _denenenNick = null;
         /* Eşleme yoksa oluştur — kullanıcı adı değiştirme bu belgeye
            dayanıyor, eski hesaplarda henüz yok. Sessizce eklenir. */
         if(nick){
@@ -522,7 +555,7 @@ function onUserLoggedIn(user){
 /* ── Çıkış Sonrası ────────────────────────────────────── */
 
 function onUserLoggedOut(){
-  _redsAcknowledged=false;_bulkAcknowledged=false;
+  _redsAcknowledged=false;_bulkAcknowledged=false;_denenenNick=null;
   _clearUserLocalData();
   /* Yıkımları görsel temizle */
   document.getElementById('bottom-nav').classList.remove('visible');

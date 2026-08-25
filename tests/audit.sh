@@ -120,6 +120,13 @@ node tests/bio-limit.js > /tmp/rf_bio.log 2>&1
 sonuc $? "$(grep -o '[0-9]*/[0-9]* geçti' /tmp/rf_bio.log | head -1)"
 grep "❌" /tmp/rf_bio.log | head -5
 
+# ── 4g. Kullanıcı adı değiştirme ───────────────────────────
+baslik "4g. Kullanıcı adı değiştirme"
+node tests/nickname-change.js > /tmp/rf_nick.log 2>&1
+! grep -q "❌" /tmp/rf_nick.log
+sonuc $? "$(grep -o '[0-9]*/[0-9]* geçti' /tmp/rf_nick.log | head -1)"
+grep "❌" /tmp/rf_nick.log | head -5
+
 # ── 5. DOM ID denetimi ─────────────────────────────────────
 baslik "5. DOM ID denetimi"
 python3 tests/dom-check.py > /tmp/rf_dom.log 2>&1
