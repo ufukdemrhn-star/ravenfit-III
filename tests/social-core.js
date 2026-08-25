@@ -151,6 +151,19 @@ new Promise(r=>setTimeout(r,10)).then(()=>{
   t('fitness bulunuyor', !!fit && fit.icon==='🏋️', fit?fit.icon:'yok');
   t('BRANCH_DEFS["fitness"] undefined (eski hata)', BRANCH_DEFS['fitness']===undefined);
 
+  console.log('\n▸ Avatar zinciri');
+  const fs=require('fs'), yol=__dirname+'/../js/';
+  const av=fs.readFileSync(yol+'profile/avatar.js','utf8');
+  const pf=fs.readFileSync(yol+'social/profiles.js','utf8');
+  const sy=fs.readFileSync(yol+'social/profile-sync.js','utf8');
+  const up=fs.readFileSync(yol+'social/user-profile.js','utf8');
+  t('Yükleme sıkıştırıyor', av.includes("gorselSikistir(file, 'avatar')"));
+  t('setAvatar YEREL KAYDEDIYOR', av.includes("_lsSet('avatar', b64OrNull)"));
+  t('profilNesnesi avatarı okuyor', pf.includes("_lsGet('avatar')"));
+  t('Yayında boyut koruması', sy.includes('400 * 1024'));
+  t('Başkasının profili avatar gösteriyor', up.includes('p.avatar'));
+  t('Eski avatar onarımı var', av.includes('function avatarOnar'));
+
   console.log('\n'+'─'.repeat(48));
   console.log(`📊 SOSYAL ÇEKİRDEK: ${pass}/${pass+fail} geçti`);
   if(fail===0) console.log('🎉 Sosyal katman çalışıyor!'); else process.exitCode=1;

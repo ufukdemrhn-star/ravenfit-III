@@ -48,12 +48,24 @@ function _profilYayinla(){
       });
     }
 
+    /* Avatar boyut koruması.
+       Firestore belge sınırı 1 MB. Eski sürümlerden kalan büyük
+       avatarlar (sıkıştırma öncesi) belgenin TAMAMINI yazılamaz
+       hâle getirir — profil sessizce güncellenmez. Bu yüzden
+       aşırı büyük avatar profile yazılmaz. */
+    var avatar = p.avatar || '';
+    if(avatar.length > 400 * 1024){
+      console.warn('Avatar çok büyük (' + Math.round(avatar.length/1024) +
+                   ' KB), profile yazılmadı. Fotoğrafı yeniden yükle.');
+      avatar = '';
+    }
+
     var belge = {
       nickname:   nick,
       onekler:    onekler.slice(0, 60),      /* Firestore dizi sınırı için kırp */
       isim:       p.isim || '',
       bio:        p.bio || '',
-      avatar:     p.avatar || '',
+      avatar:     avatar,
       branslar:   p.branslar || [],
       rozetler:   (typeof getRozetVitrini === 'function') ? getRozetVitrini() : [],
       istatistik: p.istatistik || {},        /* SADECE paylaşılanlar */
@@ -67,8 +79,15 @@ function _profilYayinla(){
     };
 
     _fbDb.collection('profiles').doc(_fbUser.uid).set(belge, {merge:true})
+      .then(function(){
+        /* Kendi profilimiz değiştiyse önbellekten düşür */
+        if(_profilOnbellek) delete _profilOnbellek[_fbUser.uid];
+      })
       .catch(function(e){
         console.warn('Profil yayınlanamadı:', e && e.message);
+        if(typeof showToast === 'function'){
+          showToast('⚠️ Profil buluta gönderilemedi.','warn');
+        }
       });
   } catch(e){
     console.warn('Profil hazırlanamadı:', e && e.message);

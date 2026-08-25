@@ -1,4 +1,4 @@
-RavenFit — Güncelleme 0.8.1.0
+RavenFit — Güncelleme 0.8.2.0
 ==============================================
 
 10 dosya değişti (toplam 104 dosya).

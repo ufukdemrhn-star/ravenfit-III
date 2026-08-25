@@ -411,6 +411,8 @@ function onUserLoggedIn(user){
           var _yanlisAd = _denenenNick;
           _denenenNick = null;
         /* Açık profili yayınla — arama ve profil görüntüleme için */
+        /* Eski büyük avatarları küçült — sessiz, tek seferlik */
+        if(typeof avatarOnar === 'function') setTimeout(avatarOnar, 800);
         if(typeof yayinlaProfil === 'function') setTimeout(yayinlaProfil, 1500);
           console.warn('Eski kullanıcı adıyla giriş denendi:', _yanlisAd, '→ güncel:', nick);
           _fbAuth.signOut().then(function(){
