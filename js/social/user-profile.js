@@ -208,6 +208,7 @@ function _upSekmeCiz(){
             ad + ' henüz gönderi paylaşmamış.</div>';
         var pe = document.getElementById('up-c-post');
         if(pe) pe.textContent = _sayiKisalt(liste.length);
+        if(typeof gonderiIstatistikDoldur === 'function') gonderiIstatistikDoldur(liste);
       });
     }
   } else if(_upSekme === 'programs'){

@@ -356,8 +356,30 @@ function gonderiIzgarasi(liste, sahibiMiyim){
                : '<div class="pr-grid-yazi">' + (tur?tur.ikon+' ':'') +
                  _npKacir((g.metin||'').slice(0,80)) + '</div>') +
              coklu +
+             '<span class="pr-grid-stat" id="gs-' + g.id + '"></span>' +
            '</div>';
   }).join('') + '</div>';
+}
+
+/* Izgaradaki beğeni ve yorum sayılarını doldurur.
+   Ayrı çağrılır çünkü sayımlar asenkron gelir — ızgara
+   beklemeden çizilsin, sayılar sonra düşsün. */
+function gonderiIstatistikDoldur(liste){
+  (liste || []).forEach(function(g){
+    var el = document.getElementById('gs-' + g.id);
+    if(!el) return;
+    Promise.all([
+      begeniSay(g.id).catch(function(){ return 0; }),
+      yorumSay(g.id).catch(function(){ return 0; })
+    ]).then(function(r){
+      var b = r[0], y = r[1];
+      if(!b && !y){ el.textContent = ''; return; }
+      var parcalar = [];
+      if(b) parcalar.push('♥ ' + b);
+      if(y) parcalar.push('💬 ' + y);
+      el.textContent = parcalar.join('  ');
+    });
+  });
 }
 
 /* ── Gönderi detay ───────────────────────────────────────── */
@@ -448,13 +470,31 @@ function _pdCiz(post, profil, medya){
     }
   }
 
-  /* Eylemler */
+  /* Eylem çubuğu */
   html += '<div class="pd-eylemler">';
-  html +=   '<button class="pd-eylem" onclick="showToast(\'Beğeni yakında eklenecek.\',\'warn\')">♡ Beğen</button>';
-  html +=   '<button class="pd-eylem" onclick="showToast(\'Yorumlar yakında eklenecek.\',\'warn\')">💬 Yorum</button>';
+  html +=   '<button class="pd-eylem" id="pd-begen-btn" onclick="pdBegen()">♡ Beğen</button>';
+  html +=   '<button class="pd-eylem" onclick="pdYorumaOdaklan()">💬 Yorum</button>';
   if(benimMi){
     html += '<button class="pd-eylem sil" onclick="gonderiSil(\'' + post.id + '\')">🗑 Sil</button>';
   }
+  html += '</div>';
+
+  /* Sayaç şeridi */
+  html += '<div class="pd-sayaclar">';
+  html +=   '<button class="pd-sayac" id="pd-begeni-sayac" onclick="pdBegenenler()">0 beğeni</button>';
+  html +=   '<span class="pd-sayac-ayrac">·</span>';
+  html +=   '<span class="pd-sayac" id="pd-yorum-sayac">0 yorum</span>';
+  html += '</div>';
+
+  /* Yorumlar */
+  html += '<div class="pd-yorumlar" id="pd-yorumlar"></div>';
+
+  /* Yorum yazma */
+  html += '<div class="pd-yorum-yaz">';
+  html +=   '<input type="text" id="pd-yorum-input" placeholder="Yorum yaz..." ' +
+            'maxlength="' + YORUM_MAX + '" oninput="pdYorumSay()" ' +
+            'onkeydown="if(event.key===\'Enter\')pdYorumGonder()">';
+  html +=   '<button id="pd-yorum-btn" onclick="pdYorumGonder()" disabled>Gönder</button>';
   html += '</div>';
 
   el.innerHTML = html;
@@ -468,6 +508,10 @@ function _pdCiz(post, profil, medya){
     _pdKaydirmaDinle();
   }
   _pdNoktaGuncelle();
+
+  /* Beğeni ve yorumları yükle */
+  _pdBegeniDurumu(post.id);
+  _pdYorumlariCiz(post.id);
 }
 
 function _pdTarih(ts){
@@ -560,4 +604,172 @@ function pdMetinAc(){
   var acik = !m.classList.contains('katli');
   m.classList.toggle('katli', acik);
   b.textContent = acik ? '… devamını gör' : '▲ daha az göster';
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   GÖNDERİ ETKİLEŞİMLERİ — beğeni ve yorum arayüzü
+   ══════════════════════════════════════════════════════════ */
+
+function _pdBegeniDurumu(postId){
+  begendimMi(postId).then(_pdBegeniButon);
+  begeniSay(postId).then(function(n){
+    var e = document.getElementById('pd-begeni-sayac');
+    if(e) e.textContent = n + ' beğeni';
+  });
+}
+
+function _pdBegeniButon(begendi){
+  var b = document.getElementById('pd-begen-btn');
+  if(!b) return;
+  b.innerHTML = begendi ? '♥ Beğenildi' : '♡ Beğen';
+  b.classList.toggle('begenili', begendi);
+}
+
+function pdBegen(){
+  if(!_acikGonderi) return;
+  var postId = _acikGonderi.id;
+  var b = document.getElementById('pd-begen-btn');
+  if(b) b.disabled = true;
+
+  begeniDegistir(postId).then(function(begendi){
+    if(b) b.disabled = false;
+    _pdBegeniButon(begendi);
+    begeniSay(postId).then(function(n){
+      var e = document.getElementById('pd-begeni-sayac');
+      if(e) e.textContent = n + ' beğeni';
+    });
+  }).catch(function(e){
+    if(b) b.disabled = false;
+    showToast('❌ ' + e.message, 'error');
+  });
+}
+
+/* Beğenenler listesi */
+function pdBegenenler(){
+  if(!_acikGonderi) return;
+  var postId = _acikGonderi.id;
+
+  var baslik = document.getElementById('fl-baslik');
+  if(baslik) baslik.textContent = 'Beğenenler';
+  var govde = document.getElementById('fl-body');
+  if(govde) govde.innerHTML = '<div class="dsc-durum">Yükleniyor...</div>';
+
+  var ov = document.getElementById('follow-list-overlay');
+  if(ov){ ov.classList.add('active'); }
+
+  begenenleriGetir(postId, 50)
+    .then(profilleriGetir)
+    .then(function(liste){
+      if(!govde) return;
+      if(!liste.length){
+        govde.innerHTML = '<div class="dsc-durum">Henüz beğeni yok.</div>';
+        return;
+      }
+      govde.innerHTML = liste.map(function(p){
+        var bas = (p.isim || p.nickname || '?').charAt(0).toUpperCase();
+        var av = p.avatar ? '<img src="' + p.avatar + '" alt="">' : '<span>' + bas + '</span>';
+        return '<button class="dsc-satir" onclick="closeFollowList();closePost();openUserProfile(\'' + p.uid + '\')">' +
+                 '<div class="dsc-av">' + av + '</div>' +
+                 '<div class="dsc-bilgi"><div class="dsc-nick">@' + (p.nickname||'') + '</div>' +
+                 '<div class="dsc-isim">' + (p.isim||'') + '</div></div></button>';
+      }).join('');
+    });
+}
+
+/* ── Yorumlar ────────────────────────────────────────────── */
+
+function _pdYorumlariCiz(postId){
+  var el = document.getElementById('pd-yorumlar');
+  if(!el) return;
+  el.innerHTML = '<div class="pd-yorum-durum">Yorumlar yükleniyor...</div>';
+
+  yorumlariGetir(postId, 100).then(function(liste){
+    var sayacEl = document.getElementById('pd-yorum-sayac');
+    if(sayacEl) sayacEl.textContent = liste.length + ' yorum';
+
+    if(!liste.length){
+      el.innerHTML = '<div class="pd-yorum-durum">Henüz yorum yok. İlk yorumu sen yaz.</div>';
+      return;
+    }
+
+    /* Yorum sahiplerinin profillerini topluca getir */
+    var uidler = [];
+    liste.forEach(function(y){ if(uidler.indexOf(y.uid) < 0) uidler.push(y.uid); });
+
+    Promise.all(uidler.map(function(u){
+      return profilGetir(u).catch(function(){ return {uid:u, nickname:'kullanıcı'}; });
+    })).then(function(profiller){
+      var harita = {};
+      profiller.forEach(function(p){ if(p) harita[p.uid] = p; });
+
+      var benimGonderim = _fbUser && _acikGonderi && _acikGonderi.uid === _fbUser.uid;
+
+      el.innerHTML = liste.map(function(y){
+        var p = harita[y.uid] || {};
+        var bas = (p.isim || p.nickname || '?').charAt(0).toUpperCase();
+        var av = p.avatar
+          ? '<img src="' + p.avatar + '" alt="">'
+          : '<span>' + bas + '</span>';
+        /* Yorum sahibi veya gönderi sahibi silebilir */
+        var silebilir = _fbUser && (y.uid === _fbUser.uid || benimGonderim);
+        return '<div class="pd-yorum">' +
+                 '<button class="pd-yorum-av" onclick="closePost();openUserProfile(\'' + y.uid + '\')">' +
+                   av + '</button>' +
+                 '<div class="pd-yorum-govde">' +
+                   '<div class="pd-yorum-ust">' +
+                     '<span class="pd-yorum-nick">@' + (p.nickname||'kullanıcı') + '</span>' +
+                     '<span class="pd-yorum-tarih">' + _pdTarih(y.tarih) + '</span>' +
+                   '</div>' +
+                   '<div class="pd-yorum-metin">' + _npKacir(y.metin) + '</div>' +
+                 '</div>' +
+                 (silebilir
+                   ? '<button class="pd-yorum-sil" onclick="pdYorumSil(\'' + y.id + '\')" ' +
+                     'aria-label="Yorumu sil">&times;</button>'
+                   : '') +
+               '</div>';
+      }).join('');
+    });
+  });
+}
+
+function pdYorumSay(){
+  var inp = document.getElementById('pd-yorum-input');
+  var btn = document.getElementById('pd-yorum-btn');
+  if(inp && btn) btn.disabled = !inp.value.trim();
+}
+
+function pdYorumaOdaklan(){
+  var inp = document.getElementById('pd-yorum-input');
+  if(inp){ inp.focus(); inp.scrollIntoView({behavior:'smooth', block:'center'}); }
+}
+
+function pdYorumGonder(){
+  if(!_acikGonderi) return;
+  var inp = document.getElementById('pd-yorum-input');
+  var btn = document.getElementById('pd-yorum-btn');
+  if(!inp) return;
+  var metin = inp.value.trim();
+  if(!metin) return;
+
+  if(btn){ btn.disabled = true; btn.textContent = '...'; }
+
+  yorumEkle(_acikGonderi.id, metin).then(function(){
+    inp.value = '';
+    if(btn){ btn.textContent = 'Gönder'; btn.disabled = true; }
+    _pdYorumlariCiz(_acikGonderi.id);
+  }).catch(function(e){
+    if(btn){ btn.textContent = 'Gönder'; btn.disabled = false; }
+    showToast('❌ ' + e.message, 'error');
+  });
+}
+
+function pdYorumSil(yorumId){
+  if(!_acikGonderi) return;
+  var postId = _acikGonderi.id;
+  showConfirm('Yorumu Sil', 'Bu yorum kalıcı olarak silinecek.', function(){
+    yorumSil(postId, yorumId)
+      .then(function(){ _pdYorumlariCiz(postId); showToast('Yorum silindi.'); })
+      .catch(function(e){ showToast('❌ ' + e.message, 'error'); });
+  }, 'Sil');
 }

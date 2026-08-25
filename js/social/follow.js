@@ -176,4 +176,5 @@ function sosyalOnbellegiTemizle(){
   if(typeof _upProfil !== 'undefined') _upProfil = null;
   if(typeof _upUid !== 'undefined') _upUid = null;
   if(typeof _kesfetSorgu !== 'undefined') _kesfetSorgu = '';
+  if(typeof etkilesimOnbellegiTemizle === 'function') etkilesimOnbellegiTemizle();
 }

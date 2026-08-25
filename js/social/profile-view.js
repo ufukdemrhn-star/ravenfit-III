@@ -202,6 +202,7 @@ function _renderProfilSekmesi(){
       gonderileriGetir(_fbUser.uid, 30).then(function(liste){
         el.innerHTML = gonderiIzgarasi(liste, true);
         _sayacYaz('pr-c-post', liste.length);
+        if(typeof gonderiIstatistikDoldur === 'function') gonderiIstatistikDoldur(liste);
       });
     } else {
       el.innerHTML = gonderiIzgarasi([], true);
