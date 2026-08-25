@@ -80,10 +80,15 @@ function _dscListele(liste, bosMesaj){
       : '<span>' + bas + '</span>';
     var onayli = p.onay === 'onayli'
       ? ' <span class="dsc-onay" title="Onaylı hesap">✔</span>' : '';
+    /* BRANCH_DEFS bir DİZİdir, nesne değil — id ile aranmalı.
+       Önceki sürüm BRANCH_DEFS[b] yazıyordu ve hep undefined
+       dönüyordu; bu yüzden herkeste '•' görünüyordu. */
     var branslar = (p.branslar || []).slice(0,3).map(function(b){
-      var ad = (typeof BRANCH_DEFS !== 'undefined' && BRANCH_DEFS[b])
-               ? BRANCH_DEFS[b].icon : '•';
-      return '<span class="dsc-brans">' + ad + '</span>';
+      var tanim = (typeof BRANCH_DEFS !== 'undefined')
+        ? BRANCH_DEFS.find(function(x){ return x.id === b; }) : null;
+      return tanim
+        ? '<span class="dsc-brans" title="' + tanim.label + '">' + tanim.icon + '</span>'
+        : '';
     }).join('');
 
     return '<button class="dsc-satir" onclick="openUserProfile(\'' + p.uid + '\')">' +

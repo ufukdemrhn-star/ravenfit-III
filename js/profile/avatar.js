@@ -9,7 +9,13 @@ function triggerAvatarUpload(){
   document.getElementById('avatar-file-input').click();
 }
 
-function handleAvatarUpload(inp){
+/* HTML'den onchange="handleAvatarUpload(event)" ile çağrılır.
+   Parametre bir Event nesnesidir, input değil — dosyalara
+   event.target.files üzerinden erişilir. Önceki sürüm inp.files
+   okuyordu ve undefined dönüyordu; fotoğraf hiç seçilemiyordu. */
+function handleAvatarUpload(olay){
+  var inp = (olay && olay.target) ? olay.target : olay;
+  if(!inp || !inp.files) return;
   var file=inp.files[0];if(!file)return;
   if(file.size>2*1024*1024){showToast('❌ Fotoğraf 2MB\'dan küçük olmalı.');return;}
   var reader=new FileReader();
@@ -24,9 +30,12 @@ function handleAvatarUpload(inp){
           showToast('⚠️ Fotoğraf cihaza kaydedildi ama buluta yüklenemedi.','warn');
         });
     }
+    if(typeof yayinlaProfil === 'function') yayinlaProfil();
     showToast('✅ Profil fotoğrafı güncellendi!');
   };
   reader.readAsDataURL(file);
+  /* Aynı dosya tekrar seçilebilsin diye input sıfırlanır */
+  try { inp.value = ''; } catch(e){}
 }
 
 function setAvatar(b64OrNull){

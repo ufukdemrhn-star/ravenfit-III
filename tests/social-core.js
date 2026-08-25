@@ -112,8 +112,12 @@ new Promise(r=>setTimeout(r,10)).then(()=>{
 }).then(ediyor=>{
   t('Takip edildi', ediyor===true);
   t('follows belgesi oluştu', 'u1_u2' in takipler);
-  t('Hedefin takipçisi +1', profiller['u2'].takipci===1, profiller['u2'].takipci);
-  t('Benim takibim +1', profiller['u1'].takip===1, profiller['u1'].takip);
+  return takipciSay('u2');
+}).then(n=>{
+  t('Takipçi SAYIMI = 1', n===1, n);
+  return takipSay('u1');
+}).then(n=>{
+  t('Takip SAYIMI = 1', n===1, n);
   return takipEdiyorMuyum('u2');
 }).then(e=>{
   t('Durum doğru okunuyor', e===true);
@@ -121,7 +125,9 @@ new Promise(r=>setTimeout(r,10)).then(()=>{
 }).then(ediyor=>{
   t('Takip bırakıldı', ediyor===false);
   t('follows belgesi silindi', !('u1_u2' in takipler));
-  t('Takipçi sayacı -1', profiller['u2'].takipci===0, profiller['u2'].takipci);
+  return takipciSay('u2');
+}).then(n=>{
+  t('Takipçi SAYIMI = 0', n===0, n);
 
   console.log('\n▸ Kendini takip koruması');
   return takipDegistir('u1').then(()=>{t('Kendini takip engellendi',false);})
@@ -132,6 +138,19 @@ new Promise(r=>setTimeout(r,10)).then(()=>{
 }).then(p=>{
   t('Profil okundu', p.nickname==='ttt2');
   t('uid eklendi', p.uid==='u2');
+  console.log('\n▸ Önbellek temizliği (oturum sızıntısı)');
+  _takipOnbellek['u2']=true;
+  _profilOnbellek['u2']={nickname:'ttt2'};
+  sosyalOnbellegiTemizle();
+  t('Takip önbelleği temizlendi', Object.keys(_takipOnbellek).length===0);
+  t('Profil önbelleği temizlendi', Object.keys(_profilOnbellek).length===0);
+
+  console.log('\n▸ Branş ikonu (dizi araması)');
+  t('BRANCH_DEFS dizi', Array.isArray(BRANCH_DEFS));
+  const fit = BRANCH_DEFS.find(x=>x.id==='fitness');
+  t('fitness bulunuyor', !!fit && fit.icon==='🏋️', fit?fit.icon:'yok');
+  t('BRANCH_DEFS["fitness"] undefined (eski hata)', BRANCH_DEFS['fitness']===undefined);
+
   console.log('\n'+'─'.repeat(48));
   console.log(`📊 SOSYAL ÇEKİRDEK: ${pass}/${pass+fail} geçti`);
   if(fail===0) console.log('🎉 Sosyal katman çalışıyor!'); else process.exitCode=1;

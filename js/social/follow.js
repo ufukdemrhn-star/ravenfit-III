@@ -55,8 +55,6 @@ function takipDegistir(hedefUid){
         ref.delete()
           .then(function(){
             _takipOnbellek[hedefUid] = false;
-            _sayacDegistir(hedefUid, 'takipci', -1);
-            _sayacDegistir(_fbUser.uid, 'takip', -1);
             cozumle(false);
           })
           .catch(function(e){ reddet(new Error('Takip bırakılamadı.')); });
@@ -69,8 +67,6 @@ function takipDegistir(hedefUid){
         })
           .then(function(){
             _takipOnbellek[hedefUid] = true;
-            _sayacDegistir(hedefUid, 'takipci', +1);
-            _sayacDegistir(_fbUser.uid, 'takip', +1);
             cozumle(true);
           })
           .catch(function(e){ reddet(new Error('Takip edilemedi.')); });
@@ -79,21 +75,49 @@ function takipDegistir(hedefUid){
   });
 }
 
-/* Sayacı artır/azalt.
-   Not: Firestore increment atomiktir — iki cihazdan aynı anda
-   takip edilse bile sayaç şaşmaz. */
-function _sayacDegistir(uid, alan, miktar){
-  if(!_fbDb) return;
-  var guncelleme = {};
-  guncelleme[alan] = firebase.firestore.FieldValue.increment(miktar);
-  _fbDb.collection('profiles').doc(uid).set(guncelleme, {merge:true})
-    .then(function(){
-      /* Önbelleği de güncelle ki ekran hemen doğru göstersin */
-      if(_profilOnbellek && _profilOnbellek[uid]){
-        _profilOnbellek[uid][alan] = Math.max(0, (_profilOnbellek[uid][alan]||0) + miktar);
-      }
-    })
-    .catch(function(e){ console.warn('Sayaç güncellenemedi:', e && e.message); });
+/* ──────────────────────────────────────────────────────────
+   SAYAÇLAR — YAZILMAZ, SAYILIR
+
+   Önceki sürüm takipçi sayısını profiles/{hedefUid} belgesine
+   yazmaya çalışıyordu. Ama güvenlik kuralı gereği bir kullanıcı
+   BAŞKASININ profil belgesine yazamaz — işlem sessizce reddediliyor,
+   sayaç hiç artmıyordu.
+
+   Çözüm: sayaçları saklamak yerine follows koleksiyonundan
+   saymak. Firestore'un count() toplaması bunun için tasarlanmıştır;
+   belge okumaz, yalnızca sayar — ucuzdur.
+   ────────────────────────────────────────────────────────── */
+
+/* Bu kişiyi kaç kişi takip ediyor? */
+function takipciSay(uid){
+  return _follows_say('takipEdilen', uid);
+}
+
+/* Bu kişi kaç kişiyi takip ediyor? */
+function takipSay(uid){
+  return _follows_say('takipEden', uid);
+}
+
+function _follows_say(alan, uid){
+  return new Promise(function(cozumle){
+    if(!_fbDb) return cozumle(0);
+    var sorgu = _fbDb.collection('follows').where(alan, '==', uid);
+    /* count() destekleniyorsa kullan — çok daha ucuz */
+    if(typeof sorgu.count === 'function'){
+      sorgu.count().get()
+        .then(function(snap){ cozumle(snap.data().count || 0); })
+        .catch(function(){ _follows_sayYedek(sorgu, cozumle); });
+    } else {
+      _follows_sayYedek(sorgu, cozumle);
+    }
+  });
+}
+
+/* count() yoksa belgeleri çekip say */
+function _follows_sayYedek(sorgu, cozumle){
+  sorgu.limit(500).get()
+    .then(function(snap){ cozumle(snap.size !== undefined ? snap.size : (snap.docs||[]).length); })
+    .catch(function(){ cozumle(0); });
 }
 
 /* Takipçi listesi — beni takip edenler */
@@ -133,4 +157,23 @@ function profilleriGetir(uidler){
   })).then(function(liste){
     return liste.filter(Boolean);
   });
+}
+
+
+/* ──────────────────────────────────────────────────────────
+   ÖNBELLEK TEMİZLİĞİ
+
+   Takip durumu ve profiller bellekte tutulur. Kullanıcı çıkış
+   yapıp başka hesapla girerse bu veriler önceki oturumdan
+   sızar: "zaten takip ediyorsun" gibi yanlış durumlar oluşur.
+   Çıkışta mutlaka temizlenmeli.
+   ────────────────────────────────────────────────────────── */
+function sosyalOnbellegiTemizle(){
+  _takipOnbellek = {};
+  if(typeof _profilOnbellek !== 'undefined'){
+    for(var k in _profilOnbellek) delete _profilOnbellek[k];
+  }
+  if(typeof _upProfil !== 'undefined') _upProfil = null;
+  if(typeof _upUid !== 'undefined') _upUid = null;
+  if(typeof _kesfetSorgu !== 'undefined') _kesfetSorgu = '';
 }

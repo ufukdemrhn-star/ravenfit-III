@@ -79,9 +79,9 @@ function _profilYayinla(){
 
 var _profilOnbellek = {};   /* uid → profil, tekrar okumayı önler */
 
-function profilGetir(uid){
+function profilGetir(uid, tazele){
   return new Promise(function(cozumle, reddet){
-    if(_profilOnbellek[uid]) return cozumle(_profilOnbellek[uid]);
+    if(!tazele && _profilOnbellek[uid]) return cozumle(_profilOnbellek[uid]);
     if(!_fbDb) return reddet(new Error('Bağlantı yok'));
     _fbDb.collection('profiles').doc(uid).get()
       .then(function(doc){

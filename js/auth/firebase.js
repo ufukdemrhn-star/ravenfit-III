@@ -558,6 +558,10 @@ function onUserLoggedIn(user){
 
 function onUserLoggedOut(){
   _redsAcknowledged=false;_bulkAcknowledged=false;_denenenNick=null;
+  /* Sosyal önbelleği temizle — önceki hesabın takip durumu ve
+     profilleri yeni oturuma sızmasın (bkz. js/social/follow.js) */
+  if(typeof sosyalOnbellegiTemizle === 'function') sosyalOnbellegiTemizle();
+  if(typeof closeUserProfile === 'function') closeUserProfile();
   _clearUserLocalData();
   /* Yıkımları görsel temizle */
   document.getElementById('bottom-nav').classList.remove('visible');
