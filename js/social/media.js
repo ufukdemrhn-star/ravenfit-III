@@ -16,6 +16,37 @@
    değişmez — yalnızca bu dosyadaki fonksiyonlar değişir.
    ══════════════════════════════════════════════════════════ */
 
+/* ──────────────────────────────────────────────────────────
+   EN-BOY ORANI SINIRI
+
+   Sınırsız oran arayüzü bozar: 6:1 bir panorama ızgarada
+   ezilir, 1:5 bir dikey fotoğraf ekranı doldurur.
+
+   Sınır her iki yönde 4:3:
+     yatay  → en fazla 4:3  (1.333)
+     dikey  → en fazla 3:4  (0.750)
+   Daha uç oranlar ORTADAN kırpılır — konu genelde ortadadır.
+   Kare ve arası oranlar dokunulmadan geçer.
+   ────────────────────────────────────────────────────────── */
+var ORAN_MAX_YATAY = 4/3;   /* 1.333 */
+var ORAN_MAX_DIKEY = 3/4;   /* 0.750 */
+
+/* Kırpma penceresini hesaplar. Kırpma gerekmiyorsa null döner. */
+function _kirpmaHesapla(g, y){
+  var oran = g / y;
+  if(oran > ORAN_MAX_YATAY){
+    /* Çok geniş — yanlardan kırp */
+    var yeniG = Math.round(y * ORAN_MAX_YATAY);
+    return {sx: Math.round((g - yeniG)/2), sy: 0, sw: yeniG, sh: y, yon:'yatay'};
+  }
+  if(oran < ORAN_MAX_DIKEY){
+    /* Çok uzun — üstten ve alttan kırp */
+    var yeniY = Math.round(g / ORAN_MAX_DIKEY);
+    return {sx: 0, sy: Math.round((y - yeniY)/2), sw: g, sh: yeniY, yon:'dikey'};
+  }
+  return null;
+}
+
 /* Sıkıştırma profilleri — boyut ve kalite dengesi ölçülerek seçildi */
 var GORSEL_PROFIL = {
   avatar:  { boyut: 400,  kalite: 0.80, adi: 'avatar'    },  /* ~50 KB  */
@@ -48,18 +79,27 @@ function gorselSikistir(dosya, profilAdi){
       var img = new Image();
       img.onerror = function(){ reddet(new Error('Görsel çözümlenemedi')); };
       img.onload = function(){
-        /* Uzun kenarı hedef boyuta indir, oranı koru */
-        var olcek = Math.min(1, p.boyut / Math.max(img.width, img.height));
-        var g = Math.round(img.width  * olcek);
-        var y = Math.round(img.height * olcek);
+        /* 1) Oran sınırı — gerekirse ortadan kırp */
+        var kirp = (profilAdi === 'avatar')
+          ? _avatarKareKirp(img.width, img.height)
+          : _kirpmaHesapla(img.width, img.height);
+        var kaynakG = kirp ? kirp.sw : img.width;
+        var kaynakY = kirp ? kirp.sh : img.height;
+        var kaynakX = kirp ? kirp.sx : 0;
+        var kaynakYk = kirp ? kirp.sy : 0;
+
+        /* 2) Uzun kenarı hedef boyuta indir, oranı koru */
+        var olcek = Math.min(1, p.boyut / Math.max(kaynakG, kaynakY));
+        var g = Math.round(kaynakG * olcek);
+        var y = Math.round(kaynakY * olcek);
 
         var tuval = document.createElement('canvas');
         tuval.width = g; tuval.height = y;
         var ctx = tuval.getContext('2d');
-        /* Küçültmede kalite kaybını azalt */
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = 'high';
-        ctx.drawImage(img, 0, 0, g, y);
+        /* 9 parametreli çizim: kaynak penceresi → hedef tuval */
+        ctx.drawImage(img, kaynakX, kaynakYk, kaynakG, kaynakY, 0, 0, g, y);
 
         /* Kaliteyi kademeli düşürerek sınırın altına in */
         var kalite = p.kalite;
@@ -78,7 +118,9 @@ function gorselSikistir(dosya, profilAdi){
           veri: veri,
           genislik: g, yukseklik: y,
           bayt: veri.length,
-          kalite: Math.round(kalite * 100)
+          kalite: Math.round(kalite * 100),
+          kirpildi: !!kirp,
+          kirpYon: kirp ? kirp.yon : null
         });
       };
       img.src = e.target.result;
@@ -90,6 +132,12 @@ function gorselSikistir(dosya, profilAdi){
 /* Bir dosyadan hem tam görsel hem önizleme üretir.
    Önizleme ızgarada gösterilir — tam görsel sadece gönderi
    açıldığında yüklenir, böylece akış hızlı kalır. */
+/* Avatar kare olmalı — profil dairesi içinde bozulmasın */
+function _avatarKareKirp(g, y){
+  var k = Math.min(g, y);
+  return {sx: Math.round((g-k)/2), sy: Math.round((y-k)/2), sw: k, sh: k, yon:'kare'};
+}
+
 function gorselCiftiUret(dosya){
   return Promise.all([
     gorselSikistir(dosya, 'tam'),

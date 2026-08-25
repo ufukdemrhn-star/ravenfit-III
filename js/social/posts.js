@@ -19,7 +19,9 @@
    ══════════════════════════════════════════════════════════ */
 
 var GONDERI_MAX_FOTO = 5;
-var GONDERI_MAX_METIN = 500;
+var GONDERI_MAX_METIN = 500;   /* toplam karakter */
+var GONDERI_MAX_SATIR = 20;    /* en fazla satır */
+var GONDERI_SATIR_UZUN = 60;   /* satır başına karakter */
 
 var GONDERI_TURLERI = [
   {id:'serbest',   ad:'Serbest',   ikon:'💬'},
@@ -72,19 +74,13 @@ function npFotoEklendi(olay){
     dosyalar = dosyalar.slice(0, bosYer);
   }
 
-  var durum = document.getElementById('np-durum');
-  if(durum) durum.textContent = 'Fotoğraflar işleniyor...';
-
-  Promise.all(dosyalar.map(function(d){ return gorselCiftiUret(d); }))
-    .then(function(sonuclar){
-      sonuclar.forEach(function(s){ _yeniGonderi.fotograflar.push(s); });
-      if(durum) durum.textContent = '';
-      _npCiz();
-    })
-    .catch(function(e){
-      if(durum) durum.textContent = '';
-      showToast('❌ ' + (e && e.message || 'Fotoğraf işlenemedi.'),'error');
-    });
+  /* Otomatik kırpma yerine KULLANICI SEÇER:
+     oranı ve kırpma konumunu kendisi belirler. */
+  kirpiciAc(dosyalar, function(sonuclar){
+    sonuclar.forEach(function(s){ _yeniGonderi.fotograflar.push(s); });
+    _npCiz();
+    if(sonuclar.length) showToast('✅ ' + sonuclar.length + ' fotoğraf eklendi.');
+  });
 
   try { inp.value=''; } catch(e){}
 }
@@ -151,10 +147,66 @@ function _npCiz(){
   }
 }
 
+/* ── Metin sınırları ─────────────────────────────────────
+   Biyografideki yaklaşımın aynısı: metin yeniden yazılmaz,
+   sınırı aşan girdi engellenir. Satır 60 karakteri aşarsa
+   kelime sınırından alt satıra aktarılır. */
+var _npSonGecerli = '';
+
+function _npGecerliMi(metin){
+  var m = String(metin || '');
+  if(m.length > GONDERI_MAX_METIN) return false;
+  var satirlar = m.split('\n');
+  if(satirlar.length > GONDERI_MAX_SATIR) return false;
+  for(var i=0;i<satirlar.length;i++){
+    if(satirlar[i].length > GONDERI_SATIR_UZUN) return false;
+  }
+  return true;
+}
+
 function npMetinSay(){
   var t = document.getElementById('np-metin');
   var s = document.getElementById('np-sayac');
-  if(t && s) s.textContent = t.value.length + ' / ' + GONDERI_MAX_METIN;
+  if(!t) return;
+
+  /* Uzun satırı alt satıra aktar */
+  var sat = t.value.split('\n');
+  var tasan = -1;
+  for(var i=0;i<sat.length;i++){
+    if(sat[i].length > GONDERI_SATIR_UZUN){ tasan = i; break; }
+  }
+  if(tasan >= 0 && sat.length < GONDERI_MAX_SATIR && t.value.length <= GONDERI_MAX_METIN){
+    var satir = sat[tasan];
+    var kes = satir.lastIndexOf(' ', GONDERI_SATIR_UZUN);
+    if(kes <= 0) kes = GONDERI_SATIR_UZUN;
+    var imlecOnce = t.selectionStart;
+    sat.splice(tasan, 1,
+      satir.slice(0, kes).replace(/\s+$/,''),
+      satir.slice(kes).replace(/^\s+/,''));
+    t.value = sat.join('\n');
+    var yeni = Math.min(imlecOnce + 1, t.value.length);
+    try { t.setSelectionRange(yeni, yeni); } catch(e){}
+    _npSonGecerli = t.value;
+  }
+
+  /* Sınır aşıldıysa son geçerli hâle dön */
+  if(!_npGecerliMi(t.value)){
+    var im = t.selectionStart;
+    t.value = _npSonGecerli;
+    var k = Math.min(im, _npSonGecerli.length);
+    try { t.setSelectionRange(k, k); } catch(e){}
+    if(s){ s.classList.add('uyari'); setTimeout(function(){ s.classList.remove('uyari'); }, 450); }
+  } else {
+    _npSonGecerli = t.value;
+  }
+
+  if(s){
+    var satirSayisi = t.value ? t.value.split('\n').length : 0;
+    s.innerHTML = t.value.length + '/' + GONDERI_MAX_METIN + ' karakter' +
+                  ' &nbsp;·&nbsp; ' + satirSayisi + '/' + GONDERI_MAX_SATIR + ' satır';
+    s.className = (t.value.length >= GONDERI_MAX_METIN || satirSayisi >= GONDERI_MAX_SATIR)
+                  ? 'np-sayac dolu' : 'np-sayac';
+  }
 }
 
 function _npKacir(s){
@@ -364,21 +416,36 @@ function _pdCiz(post, profil, medya){
   if(tur) html += '<span class="pd-tur">' + tur.ikon + ' ' + tur.ad + '</span>';
   html += '</div>';
 
-  /* Fotoğraflar */
+  /* Fotoğraflar — masaüstünde ok butonlarıyla, mobilde kaydırarak */
   if(medya && medya.length){
-    html += '<div class="pd-medya">';
+    html += '<div class="pd-galeri">';
+    html +=   '<div class="pd-medya" id="pd-medya">';
     medya.forEach(function(m){
       html += '<img src="' + m.veri + '" alt="" loading="lazy">';
     });
-    html += '</div>';
+    html +=   '</div>';
     if(medya.length > 1){
-      html += '<div class="pd-medya-not">' + medya.length + ' fotoğraf · yana kaydır</div>';
+      /* Masaüstünde dokunmatik kaydırma yok — ok butonları şart */
+      html += '<button class="pd-ok sol" onclick="pdKaydir(-1)" aria-label="Önceki">‹</button>';
+      html += '<button class="pd-ok sag" onclick="pdKaydir(1)" aria-label="Sonraki">›</button>';
+      html += '<div class="pd-noktalar" id="pd-noktalar">';
+      for(var i=0;i<medya.length;i++){
+        html += '<span class="pd-nokta' + (i===0?' act':'') + '" onclick="pdGit(' + i + ')"></span>';
+      }
+      html += '</div>';
     }
+    html += '</div>';
   }
 
-  /* Metin */
+  /* Metin — 3 satırdan uzunsa katlanır */
   if(post.metin){
-    html += '<div class="pd-metin">' + _npKacir(post.metin) + '</div>';
+    var satirlar = post.metin.split('\n');
+    var uzun = satirlar.length > 3 || post.metin.length > 180;
+    html += '<div class="pd-metin' + (uzun ? ' katli' : '') + '" id="pd-metin">' +
+              _npKacir(post.metin) + '</div>';
+    if(uzun){
+      html += '<button class="pd-devam" id="pd-devam" onclick="pdMetinAc()">… devamını gör</button>';
+    }
   }
 
   /* Eylemler */
@@ -391,6 +458,16 @@ function _pdCiz(post, profil, medya){
   html += '</div>';
 
   el.innerHTML = html;
+
+  /* Galeri her açılışta İLK fotoğraftan başlar (madde 4).
+     Tarayıcı kaydırma konumunu koruyabildiği için açıkça sıfırlanır. */
+  _pdIndex = 0;
+  var g = document.getElementById('pd-medya');
+  if(g){
+    g.scrollLeft = 0;
+    _pdKaydirmaDinle();
+  }
+  _pdNoktaGuncelle();
 }
 
 function _pdTarih(ts){
@@ -425,4 +502,62 @@ function gonderiSil(postId){
           showToast('❌ Silinemedi: ' + (e && e.message || ''),'error');
         });
     }, 'Evet, Sil');
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   GÖNDERİ GALERİSİ
+
+   Mobilde parmakla kaydırılır. Masaüstünde dokunmatik kaydırma
+   olmadığı için ok butonları ve nokta göstergesi eklendi.
+   ══════════════════════════════════════════════════════════ */
+var _pdIndex = 0;
+
+function pdKaydir(yon){
+  var el = document.getElementById('pd-medya');
+  if(!el) return;
+  var toplam = el.children.length;
+  _pdIndex = Math.max(0, Math.min(toplam - 1, _pdIndex + yon));
+  pdGit(_pdIndex);
+}
+
+function pdGit(i){
+  var el = document.getElementById('pd-medya');
+  if(!el) return;
+  _pdIndex = i;
+  el.scrollTo({left: el.clientWidth * i, behavior:'smooth'});
+  _pdNoktaGuncelle();
+}
+
+function _pdNoktaGuncelle(){
+  document.querySelectorAll('#pd-noktalar .pd-nokta').forEach(function(n, i){
+    n.classList.toggle('act', i === _pdIndex);
+  });
+  /* Uçlardaki okları gizle */
+  var el = document.getElementById('pd-medya');
+  var toplam = el ? el.children.length : 0;
+  var sol = document.querySelector('.pd-ok.sol');
+  var sag = document.querySelector('.pd-ok.sag');
+  if(sol) sol.style.visibility = _pdIndex <= 0 ? 'hidden' : 'visible';
+  if(sag) sag.style.visibility = _pdIndex >= toplam-1 ? 'hidden' : 'visible';
+}
+
+/* Parmakla kaydırınca göstergeyi güncelle */
+function _pdKaydirmaDinle(){
+  var el = document.getElementById('pd-medya');
+  if(!el) return;
+  el.onscroll = function(){
+    var i = Math.round(el.scrollLeft / Math.max(1, el.clientWidth));
+    if(i !== _pdIndex){ _pdIndex = i; _pdNoktaGuncelle(); }
+  };
+}
+
+/* Açıklamayı aç/kapa */
+function pdMetinAc(){
+  var m = document.getElementById('pd-metin');
+  var b = document.getElementById('pd-devam');
+  if(!m || !b) return;
+  var acik = !m.classList.contains('katli');
+  m.classList.toggle('katli', acik);
+  b.textContent = acik ? '… devamını gör' : '▲ daha az göster';
 }

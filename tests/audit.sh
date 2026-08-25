@@ -141,6 +141,13 @@ node tests/posts.js > /tmp/rf_post.log 2>&1
 sonuc $? "$(grep -o '[0-9]*/[0-9]* geçti' /tmp/rf_post.log | head -1)"
 grep "❌" /tmp/rf_post.log | head -5
 
+# ── 4j. Fotoğraf kırpıcı ───────────────────────────────────
+baslik "4j. Fotoğraf kırpıcı"
+node tests/cropper.js > /tmp/rf_crop.log 2>&1
+! grep -q "❌" /tmp/rf_crop.log
+sonuc $? "$(grep -o '[0-9]*/[0-9]* geçti' /tmp/rf_crop.log | head -1)"
+grep "❌" /tmp/rf_crop.log | head -5
+
 # ── 5. DOM ID denetimi ─────────────────────────────────────
 baslik "5. DOM ID denetimi"
 python3 tests/dom-check.py > /tmp/rf_dom.log 2>&1
