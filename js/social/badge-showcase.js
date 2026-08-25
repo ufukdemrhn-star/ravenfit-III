@@ -26,6 +26,7 @@ function getRozetVitrini(){
 function saveRozetVitrini(liste){
   _lsSet('rf_badge_showcase', JSON.stringify((liste||[]).slice(0, ROZET_VITRIN_SINIRI)));
   if(typeof saveData === 'function') saveData();
+  if(typeof yayinlaProfil === 'function') yayinlaProfil();
 }
 
 /* ── Profildeki rozet şeridi ─────────────────────────────── */

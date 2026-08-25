@@ -410,6 +410,8 @@ function onUserLoggedIn(user){
         if(_denenenNick && nick && _denenenNick !== nick.toLowerCase()){
           var _yanlisAd = _denenenNick;
           _denenenNick = null;
+        /* Açık profili yayınla — arama ve profil görüntüleme için */
+        if(typeof yayinlaProfil === 'function') setTimeout(yayinlaProfil, 1500);
           console.warn('Eski kullanıcı adıyla giriş denendi:', _yanlisAd, '→ güncel:', nick);
           _fbAuth.signOut().then(function(){
             showAuthScreen();

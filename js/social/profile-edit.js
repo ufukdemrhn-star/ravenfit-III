@@ -228,6 +228,7 @@ function saveProfileEdit(){
     if(nickEl) nickEl.textContent = '@' + yeniNick;
     if(typeof setAvatarInitials === 'function') setAvatarInitials(yeniNick);
 
+    if(typeof yayinlaProfil === 'function') yayinlaProfil();   /* açık profili güncelle */
     if(btn){ btn.disabled = false; btn.textContent = 'Kaydet'; }
     closeProfileEdit();
     showToast('✅ Profilin güncellendi.');

@@ -74,6 +74,10 @@ def main():
         # Çıplak referans: argüman olarak geçirme  fn(a, otherFn)  veya  = otherFn;
         for m in re.finditer(r'[(,=:]\s*([A-Za-z_]\w*)\s*[,);\]]', code):
             if m.group(1) in all_fns: found.add(m.group(1))
+        # Üçlü operatör:  kosul ? fnA : fnB
+        for m in re.finditer(r'\?\s*([A-Za-z_]\w*)\s*:\s*([A-Za-z_]\w*)', code):
+            for g in (m.group(1), m.group(2)):
+                if g in all_fns: found.add(g)
         return found
 
     # ── Kök küme ──
@@ -96,6 +100,7 @@ def main():
     HAZIRLANAN = {
         'gorselSikistir', 'gorselCiftiUret', 'baytMetni',   # Faz P6 — gönderi
         'profilNesnesiUret',                                # Faz P5 — açık profil
+        'profilGetirNick',                                  # @kullanıcıadı bağlantıları için
     }
     roots |= HAZIRLANAN & all_fns
 

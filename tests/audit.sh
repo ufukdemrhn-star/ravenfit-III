@@ -127,6 +127,13 @@ node tests/nickname-change.js > /tmp/rf_nick.log 2>&1
 sonuc $? "$(grep -o '[0-9]*/[0-9]* geçti' /tmp/rf_nick.log | head -1)"
 grep "❌" /tmp/rf_nick.log | head -5
 
+# ── 4h. Sosyal çekirdek ────────────────────────────────────
+baslik "4h. Sosyal çekirdek"
+node tests/social-core.js > /tmp/rf_sosyal.log 2>&1
+! grep -q "❌" /tmp/rf_sosyal.log
+sonuc $? "$(grep -o '[0-9]*/[0-9]* geçti' /tmp/rf_sosyal.log | head -1)"
+grep "❌" /tmp/rf_sosyal.log | head -5
+
 # ── 5. DOM ID denetimi ─────────────────────────────────────
 baslik "5. DOM ID denetimi"
 python3 tests/dom-check.py > /tmp/rf_dom.log 2>&1

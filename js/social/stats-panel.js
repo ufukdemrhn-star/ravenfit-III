@@ -187,6 +187,7 @@ function spKaydet(){
   savePaylasimAyarlari(_spAyarlar);
   saveVitrinAlanlari(_spVitrin);
   if(typeof saveData === 'function') saveData();
+  if(typeof yayinlaProfil === 'function') yayinlaProfil();   /* açık profili güncelle */
   closeStatsPanel();
   showToast('✅ Paylaşım ayarların kaydedildi.');
   if(typeof renderProfil === 'function') renderProfil();
