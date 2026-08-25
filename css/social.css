@@ -236,16 +236,45 @@
 .bs-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .bs-sayac{font-size:11.5px;color:var(--text2)}
 .bs-bos{font-size:12px;color:var(--text3);text-align:center;padding:14px 8px;line-height:1.6}
-.bs-serit{display:flex;gap:10px;overflow-x:auto;padding:2px 0 4px;-webkit-overflow-scrolling:touch}
-.bs-serit::-webkit-scrollbar{display:none}
-.bs-rozet{flex:0 0 auto;width:66px;text-align:center}
+/* Rozet şeridi — 5 rozet mevcut genişliğe EŞİT dağılır.
+   Önceki hâli sabit genişlikli ve sola yaslıydı: geniş ekranda
+   sağda boşluk kalıyor, dar ekranda taşıyordu.
+
+   Çözüm: grid + minmax(0,1fr). Sütunlar mevcut alanı paylaşır,
+   minmax(0,...) taşmayı engeller. Rozet boyutu clamp() ile
+   ekran genişliğine göre ölçeklenir — ayrı mobil kuralı gerekmez. */
+.bs-serit{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(0, 1fr));
+  gap:6px;
+  padding:2px 0 4px;
+  justify-items:center}
+/* En fazla 5 sütun — 5'ten az rozet varsa ortalanır */
+.bs-serit[data-adet="1"]{grid-template-columns:repeat(1,minmax(0,1fr));max-width:100px;margin:0 auto}
+.bs-serit[data-adet="2"]{grid-template-columns:repeat(2,minmax(0,1fr));max-width:200px;margin:0 auto}
+.bs-serit[data-adet="3"]{grid-template-columns:repeat(3,minmax(0,1fr));max-width:300px;margin:0 auto}
+.bs-serit[data-adet="4"]{grid-template-columns:repeat(4,minmax(0,1fr))}
+.bs-serit[data-adet="5"]{grid-template-columns:repeat(5,minmax(0,1fr))}
+
+.bs-rozet{
+  width:100%;min-width:0;text-align:center;
+  display:flex;flex-direction:column;align-items:center}
 .bs-ikon{
-  width:52px;height:52px;margin:0 auto 6px;border-radius:50%;
+  /* Ekran genişliğine göre 40–56px arası ölçeklenir */
+  width:clamp(40px, 12vw, 56px);
+  height:clamp(40px, 12vw, 56px);
+  margin:0 auto 6px;border-radius:50%;
   background:var(--card2);border:2px solid var(--accent);
-  display:flex;align-items:center;justify-content:center;font-size:24px;
-  box-shadow:0 0 0 3px var(--ag)}
-.bs-ad{font-size:9.5px;font-weight:600;color:var(--text);line-height:1.25}
-.bs-tarih{font-size:8px;color:var(--text3);margin-top:2px}
+  display:flex;align-items:center;justify-content:center;
+  font-size:clamp(18px, 5.5vw, 25px);
+  box-shadow:0 0 0 3px var(--ag);flex-shrink:0}
+.bs-ad{
+  font-size:clamp(8px, 2.5vw, 10px);font-weight:600;color:var(--text);
+  line-height:1.25;width:100%;
+  overflow:hidden;text-overflow:ellipsis;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.bs-tarih{font-size:8px;color:var(--text3);margin-top:2px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%}
 
 /* ── ROZET SEÇİM EKRANI ──────────────────────────────────── */
 .bp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:6px}

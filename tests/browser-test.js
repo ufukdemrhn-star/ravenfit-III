@@ -310,7 +310,7 @@
 
   /* Yüklenen CSS dosyası sayısı */
   var cssLink = document.querySelectorAll('link[rel="stylesheet"][href^="css/"]');
-  t('8 CSS modülü yüklü', cssLink.length === 8, cssLink.length + ' bulundu');
+  t('9 CSS modülü yüklü', cssLink.length === 9, cssLink.length + ' bulundu');
 
   /* Önbellek kırıcı sürüm damgası var mı? */
   var surumluCss = 0;
@@ -425,7 +425,7 @@
      ═══════════════════════════════════════════════════ */
   head('5g — Tema sistemi');
 
-  t('7 tema tanımlı', typeof TEMALAR !== 'undefined' && TEMALAR.length === 7,
+  t('5 tema tanımlı', typeof TEMALAR !== 'undefined' && TEMALAR.length === 5,
     typeof TEMALAR !== 'undefined' ? TEMALAR.length + ' tema' : 'TEMALAR yok');
 
   /* Her temanın değişkenleri gerçekten yükleniyor mu? */
@@ -448,7 +448,7 @@
 
   /* Tema kartları ve seçili işaret */
   var kartlar = document.querySelectorAll('.theme-card');
-  t('7 tema kartı çizildi', kartlar.length === 7, kartlar.length + ' kart');
+  t('5 tema kartı çizildi', kartlar.length === 5, kartlar.length + ' kart');
   var secili = document.querySelectorAll('.theme-card.act');
   t('Tek tema seçili işaretli', secili.length === 1, secili.length + ' seçili');
 
@@ -458,9 +458,14 @@
 
   /* Bilinmeyen tema dark'a düşmeli */
   applyTheme('boyle-bir-tema-yok');
-  t('Bilinmeyen tema dark\'a düşüyor',
-    kok.getAttribute('data-theme') === 'dark',
+  t('Bilinmeyen tema gece\'ye düşüyor',
+    kok.getAttribute('data-theme') === 'gece',
     kok.getAttribute('data-theme'));
+  /* Eski tema kodları göç etmeli */
+  applyTheme('dark');
+  t('Eski "dark" → gece', kok.getAttribute('data-theme') === 'gece');
+  applyTheme('ocean');
+  t('Eski "ocean" → okyanus', kok.getAttribute('data-theme') === 'okyanus');
   applyTheme(oncekiTema);
 
   /* ═══════════════════════════════════════════════════

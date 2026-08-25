@@ -57,7 +57,7 @@ function renderRozetVitrini(){
         : 'Henüz rozet kazanmadın. Antrenman yaparak kazanmaya başla.') +
       '</div>';
   } else {
-    html += '<div class="bs-serit">';
+    html += '<div class="bs-serit" data-adet="' + vitrin.length + '">';
     vitrin.forEach(function(id){
       var b = defs.find(function(x){ return x.id === id; });
       if(!b) return;

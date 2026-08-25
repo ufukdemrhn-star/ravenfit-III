@@ -126,6 +126,27 @@ function exitGuestMode(){
 
 /* ── Giriş Yap ───────────────────────────────────────── */
 
+/* Kullanıcı adından giriş e-postasını çözer.
+   1) nicknames/{nick} belgesine bak — kullanıcı adı değiştirilmişse
+      Auth e-postası farklıdır, doğru adres oradadır.
+   2) Belge yoksa eski davranışa dön: nickToEmail(nick)
+      Böylece eşleme oluşturulmamış eski hesaplar da çalışır. */
+function _nickEmailCoz(nick){
+  return new Promise(function(cozumle){
+    var varsayilan = nickToEmail(nick);
+    if(!_fbDb) return cozumle(varsayilan);
+    _fbDb.collection('nicknames').doc(nick).get()
+      .then(function(doc){
+        if(doc.exists){
+          var d = doc.data() || {};
+          return cozumle(d.email || varsayilan);
+        }
+        cozumle(varsayilan);
+      })
+      .catch(function(){ cozumle(varsayilan); });
+  });
+}
+
 function doLogin(){
   var nick=document.getElementById('auth-nick').value.trim().toLowerCase();
   var pass=document.getElementById('auth-pass').value;
@@ -133,7 +154,6 @@ function doLogin(){
   errEl.style.color='var(--accent)';errEl.textContent='';
   if(!nick||!pass){errEl.textContent='Kullanıcı adı ve şifre gerekli.';return;}
   if(nick.length<3){errEl.textContent='Kullanıcı adı en az 3 karakter olmalı.';return;}
-  var email=nickToEmail(nick);
   var btn=document.getElementById('auth-btn-login');
   btn.textContent='Giriş yapılıyor...';btn.disabled=true;
   /* Eğer misafirken bir veri varsa, giriş yapmadan önce temizle
@@ -142,6 +162,11 @@ function doLogin(){
   if(hadGuestData){
     _clearUserLocalData();
   }
+  /* Kullanıcı adı → e-posta çözümlemesi.
+     Kullanıcı adını değiştirenlerde Auth e-postası eski hâlinde
+     kaldığı için nicknames koleksiyonundan bakılır. Eşleme yoksa
+     (eski hesaplar) doğrudan türetme kullanılır. */
+  _nickEmailCoz(nick).then(function(email){
   _fbAuth.signInWithEmailAndPassword(email,pass)
     .then(function(){btn.textContent='Giriş Yap';btn.disabled=false;})
     .catch(function(e){
@@ -154,6 +179,7 @@ function doLogin(){
       };
       errEl.textContent=msgs[e.code]||'Hata: '+e.message;
     });
+  });
 }
 
 /* ── Kayıt Ol ────────────────────────────────────────── */
@@ -258,6 +284,13 @@ function doRegister(){
       _fbDb.collection('users').doc(cred.user.uid)
         .set({nickname:nick,created:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})
         .catch(function(e){ console.warn('Kullanıcı adı kaydedilemedi:', e && e.message); });
+      /* Kullanıcı adı → e-posta eşlemesi.
+         Giriş bu koleksiyondan çözümlenir; kullanıcı adı sonradan
+         değişse bile Auth e-postası sabit kalabilsin diye. */
+      _fbDb.collection('nicknames').doc(nick)
+        .set({uid:cred.user.uid, email:cred.user.email,
+              guncelleme:firebase.firestore.FieldValue.serverTimestamp()})
+        .catch(function(e){ console.warn('Kullanıcı adı eşlemesi kurulamadı:', e && e.message); });
     })
     .catch(function(e){
       btn.textContent='Kayıt Ol';btn.disabled=false;
@@ -358,6 +391,18 @@ function onUserLoggedIn(user){
         var d=doc.data();
         /* Kullanıcı adını göster */
         var nick=d.nickname||(user.email?user.email.replace('@ravenfit.app',''):'');
+        /* Eşleme yoksa oluştur — kullanıcı adı değiştirme bu belgeye
+           dayanıyor, eski hesaplarda henüz yok. Sessizce eklenir. */
+        if(nick){
+          _fbDb.collection('nicknames').doc(nick).get().then(function(nd){
+            if(!nd.exists){
+              _fbDb.collection('nicknames').doc(nick)
+                .set({uid:user.uid, email:user.email,
+                      guncelleme:firebase.firestore.FieldValue.serverTimestamp()})
+                .catch(function(){});
+            }
+          }).catch(function(){});
+        }
         var nickEl=document.getElementById('user-email-display');
         if(nickEl)nickEl.textContent='@'+nick;
         setAvatarInitials(nick);
