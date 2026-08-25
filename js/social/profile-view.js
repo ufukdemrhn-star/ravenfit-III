@@ -66,6 +66,9 @@ function _renderKendiProfil(){
       takipciSay(_fbUser.uid).then(function(n){ _sayacYaz('pr-c-followers', n); });
       takipSay(_fbUser.uid).then(function(n){ _sayacYaz('pr-c-following', n); });
     }
+    if(typeof gonderiSay === 'function'){
+      gonderiSay(_fbUser.uid).then(function(n){ _sayacYaz('pr-c-post', n); });
+    }
   }
 
   /* Avatar */
@@ -194,10 +197,15 @@ function _renderProfilSekmesi(){
   if(!el) return;
 
   if(_profilSekmesi === 'posts'){
-    el.innerHTML = '<div class="pr-tab-bos"><span class="ikon">📷</span>' +
-      'Henüz gönderi yok.' +
-      (kendiProfilimMi() ? '<br>İlk gönderini paylaş.' : '') +
-      '</div>';
+    el.innerHTML = '<div class="dsc-durum">Yükleniyor...</div>';
+    if(_fbUser && typeof gonderileriGetir === 'function'){
+      gonderileriGetir(_fbUser.uid, 30).then(function(liste){
+        el.innerHTML = gonderiIzgarasi(liste, true);
+        _sayacYaz('pr-c-post', liste.length);
+      });
+    } else {
+      el.innerHTML = gonderiIzgarasi([], true);
+    }
   } else if(_profilSekmesi === 'programs'){
     el.innerHTML = '<div class="pr-tab-bos"><span class="ikon">🏋️</span>' +
       '<strong>Antrenman Programları</strong><br>' +

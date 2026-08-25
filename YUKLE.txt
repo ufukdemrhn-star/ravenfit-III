@@ -1,7 +1,7 @@
-RavenFit — Güncelleme 0.8.2.0
+RavenFit — Güncelleme 0.9.0.0
 ==============================================
 
-10 dosya değişti (toplam 104 dosya).
+7 dosya değişti (toplam 106 dosya).
 Bu paketi açıp KLASÖR YAPISINI KORUYARAK depona yükle.
 Aynı yoldaki dosyaların üzerine yaz.
 
@@ -9,13 +9,10 @@ DEĞİŞENLER:
 
   GÜNCEL css/social.css
   GÜNCEL index.html
-  GÜNCEL js/auth/firebase.js
-  GÜNCEL js/profile/avatar.js
-  GÜNCEL js/social/discover.js
-  GÜNCEL js/social/follow.js
-  GÜNCEL js/social/profile-sync.js
+  YENİ  js/social/posts.js
   GÜNCEL js/social/profile-view.js
-  YENİ  js/social/user-profile.js
-  GÜNCEL tests/social-core.js
+  GÜNCEL js/social/user-profile.js
+  GÜNCEL tests/audit.sh
+  YENİ  tests/posts.js
 
 Yükledikten sonra: Ctrl + Shift + R

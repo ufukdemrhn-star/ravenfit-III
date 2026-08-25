@@ -134,6 +134,13 @@ node tests/social-core.js > /tmp/rf_sosyal.log 2>&1
 sonuc $? "$(grep -o '[0-9]*/[0-9]* geçti' /tmp/rf_sosyal.log | head -1)"
 grep "❌" /tmp/rf_sosyal.log | head -5
 
+# ── 4i. Gönderi sistemi ────────────────────────────────────
+baslik "4i. Gönderi sistemi"
+node tests/posts.js > /tmp/rf_post.log 2>&1
+! grep -q "❌" /tmp/rf_post.log
+sonuc $? "$(grep -o '[0-9]*/[0-9]* geçti' /tmp/rf_post.log | head -1)"
+grep "❌" /tmp/rf_post.log | head -5
+
 # ── 5. DOM ID denetimi ─────────────────────────────────────
 baslik "5. DOM ID denetimi"
 python3 tests/dom-check.py > /tmp/rf_dom.log 2>&1

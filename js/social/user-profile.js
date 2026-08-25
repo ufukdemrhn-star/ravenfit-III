@@ -199,8 +199,17 @@ function _upSekmeCiz(){
   if(!el) return;
   var ad = _upProfil ? ('@' + (_upProfil.nickname||'')) : 'Bu kullanıcı';
   if(_upSekme === 'posts'){
-    el.innerHTML = '<div class="pr-tab-bos"><span class="ikon">📷</span>' +
-                   ad + ' henüz gönderi paylaşmamış.</div>';
+    el.innerHTML = '<div class="dsc-durum">Yükleniyor...</div>';
+    if(typeof gonderileriGetir === 'function'){
+      gonderileriGetir(_upUid, 30).then(function(liste){
+        el.innerHTML = liste.length
+          ? gonderiIzgarasi(liste, false)
+          : '<div class="pr-tab-bos"><span class="ikon">📷</span>' +
+            ad + ' henüz gönderi paylaşmamış.</div>';
+        var pe = document.getElementById('up-c-post');
+        if(pe) pe.textContent = _sayiKisalt(liste.length);
+      });
+    }
   } else if(_upSekme === 'programs'){
     el.innerHTML = '<div class="pr-tab-bos"><span class="ikon">🏋️</span>' +
                    '<strong>Antrenman Programları</strong><br>' +
@@ -221,8 +230,12 @@ function _upSayaclar(){
   takipSay(_upUid).then(function(n){
     var e = document.getElementById('up-c-following'); if(e) e.textContent = _sayiKisalt(n);
   });
-  var pe = document.getElementById('up-c-post');
-  if(pe) pe.textContent = '0';
+  if(typeof gonderiSay === 'function'){
+    gonderiSay(_upUid).then(function(n){
+      var pe = document.getElementById('up-c-post');
+      if(pe) pe.textContent = _sayiKisalt(n);
+    });
+  }
 }
 
 function _upTakipDurumu(){
