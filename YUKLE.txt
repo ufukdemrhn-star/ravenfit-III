@@ -1,4 +1,4 @@
-RavenFit — Güncelleme 0.9.3.0
+RavenFit — Güncelleme 0.9.4.0
 ==============================================
 
 5 dosya değişti (toplam 110 dosya).
@@ -11,6 +11,6 @@ DEĞİŞENLER:
   GÜNCEL index.html
   GÜNCEL js/social/interactions.js
   GÜNCEL js/social/posts.js
-  GÜNCEL tests/interactions.js
+  GÜNCEL tests/layout-check.py
 
 Yükledikten sonra: Ctrl + Shift + R

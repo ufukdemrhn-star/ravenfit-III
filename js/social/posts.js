@@ -507,6 +507,10 @@ function _pdCiz(post, profil, medya){
   var el = document.getElementById('pd-body');
   if(!el) return;
 
+  /* Üst başlıktaki kullanıcı adı */
+  var hn = document.getElementById('pd-header-nick');
+  if(hn) hn.textContent = '@' + (profil.nickname || '');
+
   var bas = (profil.isim || profil.nickname || '?').charAt(0).toUpperCase();
   var av = profil.avatar ? '<img src="' + profil.avatar + '" alt="">' : '<span>' + bas + '</span>';
   var tur = GONDERI_TURLERI.find(function(t){ return t.id === post.tur; });

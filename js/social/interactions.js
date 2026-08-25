@@ -18,7 +18,7 @@
    ══════════════════════════════════════════════════════════ */
 
 var YORUM_MAX = 400;         /* yorum karakter sınırı */
-var YORUM_SAYFA = 5;         /* ilk açılışta gösterilen yorum sayısı */
+var YORUM_SAYFA = 3;         /* ilk açılışta gösterilen yorum sayısı */
 var YANIT_SAYFA = 3;         /* ilk açılışta gösterilen yanıt sayısı */
 var _begeniOnbellek = {};   /* postId → true/false */
 

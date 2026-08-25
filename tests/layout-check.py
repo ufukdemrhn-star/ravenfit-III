@@ -77,6 +77,9 @@ BEKLENEN = {
     '.calc-overlay':            'fixed',
     '.warmup-overlay':          'fixed',
     '.ws-rest-overlay':         'fixed',
+    '.up-screen':               'fixed',   # kullanıcı profili
+    '.pd-screen':               'fixed',   # gönderi detayı
+    '.cr-overlay':              'fixed',   # fotoğraf kırpıcı
 }
 
 for sec, beklenen in BEKLENEN.items():
@@ -128,6 +131,10 @@ SIRA = [
     ('.settings-drawer-overlay',599),
     ('.settings-drawer',       600),
     ('.calc-overlay',          800),
+    ('.up-screen',             820),   # kullanıcı profili
+    ('.pd-screen',             840),   # gönderi detayı — profilin üstünde
+    ('.sp-overlay',            850),   # paylaşımlı pencereler
+    ('.cr-overlay',            900),   # kırpıcı en üstte
 ]
 onceki = -1
 bozuk = []

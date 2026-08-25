@@ -637,7 +637,7 @@ button.pd-sayac:active{color:var(--accent)}
 .pd-sayac-ayrac{color:var(--text3)}
 
 /* Yorum listesi */
-.pd-yorumlar{padding:10px 16px 4px}
+.pd-yorumlar{padding:10px 16px 14px}
 .pd-yorum-durum{
   font-size:12.5px;color:var(--text3);text-align:center;
   padding:18px 0;line-height:1.6}
@@ -749,3 +749,48 @@ button.pd-sayac:active{color:var(--accent)}
   font-size:10.5px;color:var(--text3);text-align:right;
   padding:0 16px 8px}
 .pd-yorum-sayi.dolu{color:var(--warn);font-weight:600}
+
+
+/* ══════════════════════════════════════════════════════════
+   GÖNDERİ DETAYI — TAM EKRAN
+
+   Önceki hâli ortada duran bir pencereydi; kenarlardan zemin
+   görünüyor, içerik dar kalıyordu. Instagram deseni: kendi
+   katmanı, üstte sabit başlık, altında kayan içerik.
+   ══════════════════════════════════════════════════════════ */
+.pd-screen{
+  position:fixed;inset:0;z-index:840;
+  background:var(--bg);
+  display:none;flex-direction:column;overflow:hidden}
+.pd-screen.active{display:flex}
+
+.pd-header{
+  display:flex;align-items:center;gap:8px;
+  padding:11px 12px;flex-shrink:0;
+  background:var(--hbg);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  max-width:640px;width:100%;margin:0 auto;box-sizing:border-box}
+.pd-header-orta{flex:1;min-width:0;text-align:center}
+.pd-header-baslik{font-size:15px;font-weight:700;color:var(--text);line-height:1.2}
+.pd-header-alt{
+  font-size:12px;color:var(--text2);line-height:1.2;margin-top:1px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.pd-scroll{
+  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  max-width:640px;width:100%;margin:0 auto;box-sizing:border-box}
+
+/* Tam ekranda medya kenardan kenara */
+.pd-screen .pd-galeri{margin:0}
+.pd-screen .pd-medya img{max-height:none;aspect-ratio:auto}
+
+/* Yazar satırı tam ekranda üstte, medyanın altında değil */
+.pd-yazar{padding:14px 16px 12px}
+
+/* Yorum yazma çubuğu ekranın altına yapışır */
+.pd-screen .pd-yorum-yaz{
+  position:sticky;bottom:0;z-index:3;
+  background:var(--hbg);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.pd-screen .pd-yanit-serit{position:sticky;bottom:58px;z-index:3}
