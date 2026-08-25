@@ -113,14 +113,17 @@
    İSTATİSTİK PAYLAŞIM PANELİ
    iOS tarzı anahtarlar, satır ikonları, tema renginde.
    ══════════════════════════════════════════════════════════ */
+/* Not: padding sabit 20px iken küçük ekranlarda pencere üste yaslanıyordu.
+   Güvenli alan (safe-area) ve daha küçük dikey boşlukla tam ortalanır. */
 .sp-overlay{
   position:fixed;inset:0;z-index:850;
   background:var(--overlay);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  display:none;align-items:center;justify-content:center;padding:20px}
+  display:none;align-items:center;justify-content:center;
+  padding:max(16px, env(safe-area-inset-top,0px)) 16px max(16px, env(safe-area-inset-bottom,0px))}
 .sp-overlay.active{display:flex}
 .sp-sheet{
   background:var(--card);border:1px solid var(--border);border-radius:20px;
-  width:100%;max-width:440px;max-height:88vh;
+  width:100%;max-width:440px;max-height:min(88vh, 720px);margin:auto;
   display:flex;flex-direction:column;overflow:hidden;
   box-shadow:var(--shadow-lg);position:relative}
 
@@ -227,3 +230,41 @@
 .pe-yardim.tamam{color:var(--success)}
 .pe-bio-alan{resize:vertical;min-height:88px;line-height:1.6;font-size:14px}
 .pe-sayac{font-size:11px;color:var(--text3);text-align:right;margin-top:5px}
+.pe-sayac.dolu{color:var(--warn);font-weight:600}
+
+/* ── ROZET VİTRİNİ ───────────────────────────────────────── */
+.bs-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.bs-sayac{font-size:11.5px;color:var(--text2)}
+.bs-bos{font-size:12px;color:var(--text3);text-align:center;padding:14px 8px;line-height:1.6}
+.bs-serit{display:flex;gap:10px;overflow-x:auto;padding:2px 0 4px;-webkit-overflow-scrolling:touch}
+.bs-serit::-webkit-scrollbar{display:none}
+.bs-rozet{flex:0 0 auto;width:66px;text-align:center}
+.bs-ikon{
+  width:52px;height:52px;margin:0 auto 6px;border-radius:50%;
+  background:var(--card2);border:2px solid var(--accent);
+  display:flex;align-items:center;justify-content:center;font-size:24px;
+  box-shadow:0 0 0 3px var(--ag)}
+.bs-ad{font-size:9.5px;font-weight:600;color:var(--text);line-height:1.25}
+.bs-tarih{font-size:8px;color:var(--text3);margin-top:2px}
+
+/* ── ROZET SEÇİM EKRANI ──────────────────────────────────── */
+.bp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:6px}
+.bp-hucre{
+  position:relative;background:var(--card2);border:1.5px solid var(--border);
+  border-radius:12px;padding:12px 6px 10px;cursor:pointer;
+  font-family:'Outfit',sans-serif;text-align:center;
+  transition:.16s;-webkit-tap-highlight-color:transparent}
+.bp-hucre:active{transform:scale(.96)}
+.bp-hucre.sec{border-color:var(--accent);background:var(--card);
+  box-shadow:0 0 0 1px var(--accent) inset}
+.bp-hucre.kilit{opacity:.42;cursor:default}
+.bp-hucre.kilit:active{transform:none}
+.bp-tik{
+  position:absolute;top:5px;right:5px;
+  width:19px;height:19px;border-radius:50%;
+  background:var(--accent-btn);color:var(--on-accent);
+  font-size:11px;font-weight:700;line-height:19px}
+.bp-ikon{font-size:26px;margin-bottom:5px;line-height:1}
+.bp-ad{font-size:10px;font-weight:600;color:var(--text);line-height:1.3}
+.bp-alt{font-size:8.5px;color:var(--text3);margin-top:3px;line-height:1.3}
+@media(max-width:380px){.bp-grid{grid-template-columns:repeat(2,1fr)}}

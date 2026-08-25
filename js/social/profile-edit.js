@@ -3,7 +3,9 @@
    Profil düzenleme (isim, kullanıcı adı, biyografi)
    ══════════════════════════════════════════════════════════ */
 
-var PE_BIO_SINIR = 160;
+var PE_BIO_SINIR      = 150;   /* toplam karakter */
+var PE_BIO_SATIR      = 6;     /* en fazla satır */
+var PE_BIO_SATIR_UZUN = 30;    /* satır başına karakter */
 var PE_ISIM_SINIR = 30;
 
 function openProfileEdit(){
@@ -22,7 +24,7 @@ function openProfileEdit(){
           'style="padding-left:28px" value="' + _kacir(nick) + '" ' +
           'oninput="peNickKontrol()" autocomplete="off" autocapitalize="none">' +
       '</div>' +
-      '<div class="pe-yardim" id="pe-nick-yardim">Harf, rakam, alt çizgi ve nokta kullanabilirsin.</div>' +
+      '<div class="pe-yardim" id="pe-nick-yardim">Giriş yaparken bu adı kullanırsın. Değiştirirsen giriş adın da değişir.</div>' +
     '</div>' +
 
     '<div class="fg" style="margin-bottom:14px">' +
@@ -35,7 +37,7 @@ function openProfileEdit(){
     '<div class="fg">' +
       '<label class="fl">Biyografi</label>' +
       '<textarea class="fi pe-bio-alan" id="pe-bio" maxlength="' + PE_BIO_SINIR + '" ' +
-        'rows="4" placeholder="Kendini kısaca anlat..." ' +
+        'rows="6" placeholder="Kendini kısaca anlat..." ' +
         'oninput="peBioSay()">' + _kacir(p.bio || '') + '</textarea>' +
       '<div class="pe-sayac" id="pe-bio-sayac">0 / ' + PE_BIO_SINIR + '</div>' +
     '</div>';
@@ -56,10 +58,62 @@ function _kacir(s){
     .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+/* Biyografiyi sınırlar içinde tutar.
+   Üç kural birlikte uygulanır:
+     • en fazla 150 karakter
+     • en fazla 6 satır
+     • her satır en fazla 30 karakter (uzun satır otomatik bölünür)
+   Ayrıca ardışık boş satırlar tekile indirilir — kullanıcı
+   boşlukla profili şişiremesin. */
+function _bioDuzelt(metin){
+  var satirlar = String(metin || '').split('\n');
+  var cikti = [];
+  for(var i=0;i<satirlar.length;i++){
+    var st = satirlar[i].replace(/\s+$/,'');       /* satır sonu boşlukları at */
+    /* Uzun satırı böl */
+    while(st.length > PE_BIO_SATIR_UZUN){
+      var kes = st.lastIndexOf(' ', PE_BIO_SATIR_UZUN);
+      if(kes <= 0) kes = PE_BIO_SATIR_UZUN;        /* boşluk yoksa sert kes */
+      cikti.push(st.slice(0, kes).replace(/\s+$/,''));
+      st = st.slice(kes).replace(/^\s+/,'');
+      if(cikti.length >= PE_BIO_SATIR) break;
+    }
+    if(cikti.length >= PE_BIO_SATIR) break;
+    cikti.push(st);
+  }
+  /* Ardışık boş satırları teke indir */
+  var temiz = [];
+  for(var j=0;j<cikti.length;j++){
+    if(cikti[j] === '' && temiz.length && temiz[temiz.length-1] === '') continue;
+    temiz.push(cikti[j]);
+  }
+  /* Baştaki ve sondaki boş satırları at */
+  while(temiz.length && temiz[0] === '') temiz.shift();
+  while(temiz.length && temiz[temiz.length-1] === '') temiz.pop();
+
+  var sonuc = temiz.slice(0, PE_BIO_SATIR).join('\n');
+  if(sonuc.length > PE_BIO_SINIR) sonuc = sonuc.slice(0, PE_BIO_SINIR);
+  return sonuc;
+}
+
 function peBioSay(){
   var t = document.getElementById('pe-bio');
   var s = document.getElementById('pe-bio-sayac');
-  if(t && s) s.textContent = t.value.length + ' / ' + PE_BIO_SINIR;
+  if(!t || !s) return;
+
+  var imlec = t.selectionStart;
+  var duzeltilmis = _bioDuzelt(t.value);
+  if(duzeltilmis !== t.value){
+    t.value = duzeltilmis;
+    try { t.setSelectionRange(Math.min(imlec, duzeltilmis.length),
+                              Math.min(imlec, duzeltilmis.length)); } catch(e){}
+  }
+
+  var satir = t.value ? t.value.split('\n').length : 0;
+  s.innerHTML = t.value.length + ' / ' + PE_BIO_SINIR + ' karakter' +
+                ' &nbsp;·&nbsp; ' + satir + ' / ' + PE_BIO_SATIR + ' satır';
+  s.className = (t.value.length >= PE_BIO_SINIR || satir >= PE_BIO_SATIR)
+                ? 'pe-sayac dolu' : 'pe-sayac';
 }
 
 /* Kullanıcı adı kuralları — anlık geri bildirim */
@@ -97,17 +151,123 @@ function saveProfileEdit(){
     showToast('❌ Kullanıcı adını düzelt.','error');
     return;
   }
+  var yeniNick = document.getElementById('pe-nick').value.trim().toLowerCase();
+  var eskiNick = (_lsGet('nickname') || '').toLowerCase();
   var p = getYerelProfil();
-  p.nickname = document.getElementById('pe-nick').value.trim().toLowerCase();
-  p.isim     = document.getElementById('pe-isim').value.trim();
-  p.bio      = document.getElementById('pe-bio').value.trim();
-  saveYerelProfil(p);
 
-  /* İsim U'ya da yazılır — uygulamanın diğer yerleri oradan okuyor */
-  if(typeof U !== 'undefined' && p.isim){ U.name = p.isim; }
-  if(typeof saveData === 'function') saveData();
+  var btn = document.getElementById('pe-kaydet');
+  if(btn){ btn.disabled = true; btn.textContent = 'Kaydediliyor...'; }
 
-  closeProfileEdit();
-  showToast('✅ Profilin güncellendi.');
-  renderProfil();
+  function _bitir(){
+    p.nickname = yeniNick;
+    p.isim = document.getElementById('pe-isim').value.trim();
+    p.bio  = _bioDuzelt(document.getElementById('pe-bio').value);
+    saveYerelProfil(p);
+
+    /* İsim U'ya da yazılır — uygulamanın diğer yerleri oradan okuyor */
+    if(typeof U !== 'undefined' && p.isim){ U.name = p.isim; }
+    if(typeof saveData === 'function') saveData();
+
+    /* Hesabım bölümündeki kullanıcı adını da güncelle */
+    var nickEl = document.getElementById('user-email-display');
+    if(nickEl) nickEl.textContent = '@' + yeniNick;
+    if(typeof setAvatarInitials === 'function') setAvatarInitials(yeniNick);
+
+    if(btn){ btn.disabled = false; btn.textContent = 'Kaydet'; }
+    closeProfileEdit();
+    showToast('✅ Profilin güncellendi.');
+    renderProfil();
+  }
+
+  function _hata(mesaj){
+    if(btn){ btn.disabled = false; btn.textContent = 'Kaydet'; }
+    var yrd = document.getElementById('pe-nick-yardim');
+    if(yrd){ yrd.textContent = mesaj; yrd.className = 'pe-yardim hata'; }
+    showToast('❌ ' + mesaj, 'error');
+  }
+
+  /* Kullanıcı adı değişmediyse doğrudan kaydet */
+  if(yeniNick === eskiNick){ return _bitir(); }
+
+  /* Değişti — benzersizlik ve giriş bilgisi güncellenmeli */
+  _nickBostaMi(yeniNick).then(function(bosta){
+    if(!bosta){ return _hata('Bu kullanıcı adı zaten alınmış.'); }
+    _nickDegistir(yeniNick)
+      .then(_bitir)
+      .catch(function(e){ _hata(e.message); });
+  });
+}
+
+/* ══════════════════════════════════════════════════════════
+   KULLANICI ADI DEĞİŞTİRME
+
+   Giriş sistemi kullanıcı adından e-posta türetiyor:
+     nickToEmail('raven') → 'raven@ravenfit.app'
+
+   Bu yüzden kullanıcı adı değişince Firebase Auth e-postası da
+   değişmeli — aksi halde kullanıcı yeni adıyla giriş yapamaz.
+
+   Üç adım, sırayla ve her biri başarısız olabilir:
+     1. Benzersizlik kontrolü (Firestore)
+     2. Auth e-postası güncelleme (yakın zamanda giriş gerektirir)
+     3. Firestore nickname alanı güncelleme
+   ══════════════════════════════════════════════════════════ */
+
+/* Kullanıcı adı başkasında var mı? */
+function _nickBostaMi(nick){
+  return new Promise(function(cozumle){
+    if(!_fbDb || !_fbUser){ return cozumle(true); }   /* çevrimdışı — izin ver */
+    _fbDb.collection('users').where('nickname','==',nick).limit(2).get()
+      .then(function(snap){
+        var baskasi = false;
+        snap.forEach(function(d){ if(d.id !== _fbUser.uid) baskasi = true; });
+        cozumle(!baskasi);
+      })
+      .catch(function(e){
+        console.warn('Kullanıcı adı kontrolü başarısız:', e && e.message);
+        cozumle(true);   /* kontrol edilemezse engelleme */
+      });
+  });
+}
+
+/* Kullanıcı adını her yerde günceller */
+function _nickDegistir(yeniNick){
+  return new Promise(function(cozumle, reddet){
+    if(!_fbUser || !_fbDb){
+      /* Misafir veya çevrimdışı — sadece yerel */
+      _lsSet('nickname', yeniNick);
+      return cozumle({yerel:true});
+    }
+
+    var yeniMail = nickToEmail(yeniNick);
+    if(_fbUser.email === yeniMail){
+      /* Sadece büyük/küçük harf farkı — Auth'a dokunma */
+      return _fbDb.collection('users').doc(_fbUser.uid)
+        .set({nickname:yeniNick},{merge:true})
+        .then(function(){ _lsSet('nickname', yeniNick); cozumle({}); })
+        .catch(reddet);
+    }
+
+    _fbUser.updateEmail(yeniMail)
+      .then(function(){
+        return _fbDb.collection('users').doc(_fbUser.uid)
+          .set({nickname:yeniNick},{merge:true});
+      })
+      .then(function(){
+        _lsSet('nickname', yeniNick);
+        cozumle({});
+      })
+      .catch(function(e){
+        var kod = e && e.code;
+        if(kod === 'auth/requires-recent-login'){
+          reddet(new Error('Güvenlik için önce çıkış yapıp tekrar giriş yapman gerekiyor.'));
+        } else if(kod === 'auth/email-already-in-use'){
+          reddet(new Error('Bu kullanıcı adı zaten alınmış.'));
+        } else if(kod === 'auth/invalid-email'){
+          reddet(new Error('Bu kullanıcı adı kullanılamıyor.'));
+        } else {
+          reddet(new Error('Kullanıcı adı değiştirilemedi: ' + (e && e.message || 'bilinmeyen hata')));
+        }
+      });
+  });
 }

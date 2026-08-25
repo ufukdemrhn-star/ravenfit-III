@@ -47,7 +47,12 @@ var YEDEK_ANAHTARLARI = [
   'rf_pr_plates',          /* PR testi plaka ayarları */
   'rf_theme',              /* tema */
   'rf_unit',               /* birim (kg/lb) */
-  'rf_level_mode'          /* seviye modu */
+  'rf_level_mode',         /* seviye modu */
+  'rf_profile',            /* sosyal profil: isim, bio, kullanıcı adı */
+  'rf_share_stats',        /* paylaşılan istatistikler */
+  'rf_showcase',           /* vitrin seçimi */
+  'rf_badge_showcase',     /* sergilenen rozetler */
+  'rf_bt_chart'            /* grafik türü tercihi */
 ];
 
 function exportData(){

@@ -294,7 +294,9 @@ function _clearUserLocalData(){
   /* localStorage temizle (kullanıcıya özel olanları) */
   var keysToRemove=['rf_data','rf_entries','rf_workout_logs','rf_custom_workouts',
                     'rf_branches','rf_supplements_used','rf_badges','rf_pr_plates',
-                    'rf_water_today','avatar','nickname'];
+                    'rf_water_today','avatar','nickname',
+                    'rf_profile','rf_share_stats','rf_showcase',
+                    'rf_badge_showcase','rf_bt_chart'];
   keysToRemove.forEach(function(k){
     try{ _lsRemove(k); }catch(e){}
   });
@@ -399,6 +401,34 @@ function onUserLoggedIn(user){
         if(d.rf_level_mode){
           try{ _lsSet('rf_level_mode',d.rf_level_mode); }catch(e){}
         }
+        /* ── Sosyal profil verileri (madde 6) ──
+           Bio, kullanıcı adı, paylaşılan istatistikler ve vitrin
+           seçimleri de cihazlar arası taşınır. */
+        if(d.rf_profile && d.rf_profile.length > 2){
+          try{ _lsSet('rf_profile', d.rf_profile); }catch(e){}
+        }
+        if(d.rf_share_stats && d.rf_share_stats.length > 2){
+          try{ _lsSet('rf_share_stats', d.rf_share_stats); }catch(e){}
+        }
+        if(d.rf_showcase && d.rf_showcase.length > 2){
+          try{ _lsSet('rf_showcase', d.rf_showcase); }catch(e){}
+        }
+        if(d.rf_badge_showcase && d.rf_badge_showcase.length > 2){
+          try{ _lsSet('rf_badge_showcase', d.rf_badge_showcase); }catch(e){}
+        }
+        if(d.rf_bt_chart){
+          try{ _lsSet('rf_bt_chart', d.rf_bt_chart); }catch(e){}
+        }
+        /* Kullanıcı adı Firestore'daki değerden gelir — tek kaynak */
+        if(d.nickname){
+          try{
+            _lsSet('nickname', d.nickname);
+            var _p = {};
+            try{ _p = JSON.parse(_lsGet('rf_profile')||'{}'); }catch(e){}
+            _p.nickname = d.nickname;
+            _lsSet('rf_profile', JSON.stringify(_p));
+          }catch(e){}
+        }
       }
       /* MİGRASYON: Firebase'de veri yok ama localStorage'da var → yükle */
       if(!fbHasData){
@@ -483,6 +513,12 @@ function saveToFirebase(){
     var themeStr=_lsGet('rf_theme')||'dark';
     var unitStr=_lsGet('rf_unit')||'kg';
     var levelModeStr=_lsGet('rf_level_mode')||'auto';
+    /* Sosyal profil verileri — cihazlar arası senkron (madde 6) */
+    var profileStr=_lsGet('rf_profile')||'{}';
+    var shareStr=_lsGet('rf_share_stats')||'{}';
+    var showcaseStr=_lsGet('rf_showcase')||'[]';
+    var badgeShowStr=_lsGet('rf_badge_showcase')||'[]';
+    var btChartStr=_lsGet('rf_bt_chart')||'bar';
     _fbDb.collection('users').doc(_fbUser.uid).set({
       rf_data:dataStr,
       rf_entries:entriesStr,
@@ -494,6 +530,11 @@ function saveToFirebase(){
       rf_theme:themeStr,
       rf_unit:unitStr,
       rf_level_mode:levelModeStr,
+      rf_profile:profileStr,
+      rf_share_stats:shareStr,
+      rf_showcase:showcaseStr,
+      rf_badge_showcase:badgeShowStr,
+      rf_bt_chart:btChartStr,
       updated:firebase.firestore.FieldValue.serverTimestamp()
     },{merge:true})
     .then(function(){/* ok */})

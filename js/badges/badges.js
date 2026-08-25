@@ -187,39 +187,7 @@ function _spawnConfetti(){
 
 /* ── Profil rozetleri render ── */
 
-function renderProfileBadges(){
-  var el=document.getElementById('profil-badges');
-  if(!el) return;
-  var defs=_getBadgeDefs();
-  var earned=getEarnedBadges();
-
-  if(!defs.length){
-    el.innerHTML='<div style="font-size:12px;color:var(--text2)">Rozet verileri yükleniyor...</div>';
-    return;
-  }
-
-  var earnedCount=0;
-  var html='<div class="badge-grid">';
-  defs.forEach(function(badge){
-    var record=earned.find(function(e){return e.id===badge.id;});
-    var isEarned=!!record;
-    if(isEarned) earnedCount++;
-    html+='<div class="badge-cell '+(isEarned?'earned':'locked')+'">';
-    html+='<div class="badge-cell-icon">'+(isEarned?badge.icon:'🔒')+'</div>';
-    html+='<div class="badge-cell-name">'+badge.name_tr+'</div>';
-    if(isEarned&&record.date){
-      html+='<div class="badge-cell-date">'+record.date+'</div>';
-    } else {
-      html+='<div class="badge-cell-date" style="font-size:8px;color:var(--text3)">'+badge.desc_tr+'</div>';
-    }
-    html+='</div>';
-  });
-  html+='</div>';
-
-  /* Özet */
-  var pct=defs.length>0?Math.round(earnedCount/defs.length*100):0;
-  html+='<div style="margin-top:8px;font-size:10px;color:var(--text3);text-align:center">'+
-    '🏅 '+earnedCount+' / '+defs.length+' rozet kazanıldı ('+pct+'%)</div>';
-
-  el.innerHTML=html;
-}
+/* Eski "tüm rozetleri göster" işlevi kaldırıldı.
+   Yerini js/social/badge-showcase.js içindeki vitrin sistemi aldı:
+   profilde kullanıcının seçtiği en fazla 5 rozet görünür,
+   tamamı seçim ekranında listelenir. */

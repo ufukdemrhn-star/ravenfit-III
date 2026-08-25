@@ -209,13 +209,22 @@ body::after{
 
 /* İçerik doku katmanlarının üstünde kalmalı.
 
-   ÖNEMLİ: Burada position ATANMAZ. Önceki sürümde bu kural
-   position:relative veriyordu ve #settings-drawer gibi ID
-   seçicileri, sınıflarındaki position:fixed'i eziyordu —
-   çekmece sabit katman olmaktan çıkıp sayfa akışına giriyordu.
-   z-index yalnızca konumlandırılmış öğelerde çalışır, bu öğelerin
-   hepsinin zaten kendi position değeri var. */
-#app-main,#auth-screen{position:relative;z-index:2}
+   ⚠️ BURAYA z-index YAZMA — İKİ KEZ HATA YAPILDI:
+
+   1) position:relative yazılmıştı → #settings-drawer gibi ID
+      seçicileri sınıflarındaki position:fixed'i eziyordu.
+
+   2) z-index:2 yazılmıştı → #app-main bir YIĞIN BAĞLAMI
+      (stacking context) yarattı. İçindeki tüm katmanlar o bağlama
+      hapsoldu: calc-overlay'in z-index:800'ü, dışarıdaki
+      .hdr'nin z-index:200'ünü geçemedi. Hesaplayıcıların ve
+      antrenman ekranının kapatma butonu başlığın altında kaldı.
+
+   Doku katmanları zaten body::before/after ile z-index 0-1'de.
+   İçerik onların üstünde kalmak için yalnızca KONUMLANDIRILMIŞ
+   olmalı — yığın bağlamı yaratmadan. isolation:isolate yerine
+   sade position:relative yeterli ve güvenli. */
+#app-main,#auth-screen{position:relative}
 
 @media(prefers-reduced-motion:reduce){
   body{transition:none}

@@ -122,7 +122,6 @@ for i, iv, idf, c, cv, cf in catisma:
 print('\n▸ Katman sıralaması (z-index)')
 
 SIRA = [
-    ('#app-main',                2),
     ('.hdr',                   200),
     ('.bottom-nav',            300),
     ('.ws-screen',             400),
@@ -146,6 +145,34 @@ kontrol('Katman sıralaması doğru', not bozuk, '; '.join(bozuk[:3]))
 if not bozuk:
     for sec, b in SIRA:
         print(f'  ✅ {sec:<26} z-index:{b}')
+
+# ── 3b. Yığın bağlamı tuzağı ────────────────────────────────
+print('\n▸ Yığın bağlamı (stacking context) tuzağı')
+print('  Bir kapsayıcıya z-index verilirse içindeki tüm katmanlar')
+print('  o bağlama hapsolur ve dışarıdaki öğelerle yarışamaz.\n')
+
+# Overlay'leri barındıran kapsayıcılar z-index ALMAMALI
+KAPSAYICILAR = ['#app-main', '#auth-screen', '.main', 'body']
+tuzak = []
+for kap in KAPSAYICILAR:
+    z = etkin_deger(kap, 'z-index')
+    if z and z[2] not in ('auto', '0'):
+        tuzak.append(f'{kap}: z-index:{z[2]} ({z[3]})')
+kontrol('Kapsayıcılar yığın bağlamı yaratmıyor', not tuzak, '; '.join(tuzak))
+if not tuzak:
+    for kap in KAPSAYICILAR:
+        print(f'  ✅ {kap:<20} z-index yok')
+
+# Diğer yığın bağlamı yaratıcıları
+RISKLI_OZELLIK = ['transform', 'filter', 'opacity', 'isolation', 'will-change',
+                  'backdrop-filter', 'contain', 'mix-blend-mode']
+riskli = []
+for kap in ['#app-main', '.main']:
+    for oz in RISKLI_OZELLIK:
+        v = etkin_deger(kap, oz)
+        if v and v[2] not in ('none', 'normal', '1', 'auto'):
+            riskli.append(f'{kap}: {oz}:{v[2]}')
+kontrol('Kapsayıcılarda riskli özellik yok', not riskli, '; '.join(riskli))
 
 # ── 4. Doku katmanı arayüzü kapatmıyor mu? ──────────────────
 print('\n▸ Doku katmanı')

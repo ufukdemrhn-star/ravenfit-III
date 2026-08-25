@@ -95,9 +95,10 @@ function switchMain(id){
   document.getElementById('ms-'+id).classList.add('active');
   document.getElementById('bnav-'+id).classList.add('active');
   if(id==='profil'){
-    renderProfilMlist();renderProfileBadges();renderConditionsSummary();
+    renderProfilMlist();renderConditionsSummary();
     /* Sosyal profil başlığı ve istatistik vitrini */
     if(typeof renderProfil==='function') renderProfil();
+    if(typeof renderRozetVitrini==='function') renderRozetVitrini();
   }
   if(id==='vucudum')setTimeout(drawCharts,100);
   if(id==='antrenman')renderWorkoutHome();

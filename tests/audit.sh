@@ -113,6 +113,13 @@ node tests/privacy-lock.js > /tmp/rf_kilit.log 2>&1
 sonuc $? "$(grep -o '[0-9]*/[0-9]* geçti' /tmp/rf_kilit.log | head -1)"
 grep "❌" /tmp/rf_kilit.log | head -5
 
+# ── 4f. Biyografi sınırı ───────────────────────────────────
+baslik "4f. Biyografi sınırı"
+node tests/bio-limit.js > /tmp/rf_bio.log 2>&1
+! grep -q "❌" /tmp/rf_bio.log
+sonuc $? "$(grep -o '[0-9]*/[0-9]* geçti' /tmp/rf_bio.log | head -1)"
+grep "❌" /tmp/rf_bio.log | head -5
+
 # ── 5. DOM ID denetimi ─────────────────────────────────────
 baslik "5. DOM ID denetimi"
 python3 tests/dom-check.py > /tmp/rf_dom.log 2>&1
