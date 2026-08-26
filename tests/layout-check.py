@@ -80,6 +80,7 @@ BEKLENEN = {
     '.up-screen':               'fixed',   # kullanıcı profili
     '.pd-screen':               'fixed',   # gönderi detayı
     '.cr-overlay':              'fixed',   # fotoğraf kırpıcı
+    '.fd-screen':               'fixed',   # ana akış
 }
 
 for sec, beklenen in BEKLENEN.items():
@@ -131,6 +132,7 @@ SIRA = [
     ('.settings-drawer-overlay',599),
     ('.settings-drawer',       600),
     ('.calc-overlay',          800),
+    ('.fd-screen',             810),   # ana akış
     ('.up-screen',             820),   # kullanıcı profili
     ('.pd-screen',             840),   # gönderi detayı — profilin üstünde
     ('.sp-overlay',            850),   # paylaşımlı pencereler

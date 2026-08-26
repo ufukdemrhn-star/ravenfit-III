@@ -1,7 +1,7 @@
-RavenFit — Güncelleme 0.9.4.0
+RavenFit — Güncelleme 1.0.0.0
 ==============================================
 
-5 dosya değişti (toplam 110 dosya).
+7 dosya değişti (toplam 112 dosya).
 Bu paketi açıp KLASÖR YAPISINI KORUYARAK depona yükle.
 Aynı yoldaki dosyaların üzerine yaz.
 
@@ -9,8 +9,10 @@ DEĞİŞENLER:
 
   GÜNCEL css/social.css
   GÜNCEL index.html
-  GÜNCEL js/social/interactions.js
+  YENİ  js/social/feed.js
   GÜNCEL js/social/posts.js
+  GÜNCEL tests/audit.sh
+  YENİ  tests/feed.js
   GÜNCEL tests/layout-check.py
 
 Yükledikten sonra: Ctrl + Shift + R

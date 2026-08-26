@@ -794,3 +794,84 @@ button.pd-sayac:active{color:var(--accent)}
   background:var(--hbg);
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
 .pd-screen .pd-yanit-serit{position:sticky;bottom:58px;z-index:3}
+
+/* ══════════════════════════════════════════════════════════
+   ANA AKIŞ
+   ══════════════════════════════════════════════════════════ */
+.fd-screen{
+  position:fixed;inset:0;z-index:810;
+  background:var(--bg);
+  display:none;flex-direction:column;overflow:hidden}
+.fd-screen.active{display:flex}
+
+.fd-header{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 12px;flex-shrink:0;
+  background:var(--hbg);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  max-width:640px;width:100%;margin:0 auto;box-sizing:border-box}
+
+.fd-sekmeler{
+  flex:1;display:flex;gap:4px;justify-content:center;
+  background:var(--card2);border-radius:11px;padding:3px}
+.fd-sekme{
+  flex:1;padding:8px 10px;border-radius:9px;border:none;cursor:pointer;
+  background:none;font-family:'Outfit',sans-serif;
+  font-size:13px;font-weight:600;color:var(--text2);
+  transition:.18s;-webkit-tap-highlight-color:transparent}
+.fd-sekme.act{background:var(--card);color:var(--text);box-shadow:var(--shadow-sm)}
+
+.fd-body{
+  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:12px 12px calc(24px + env(safe-area-inset-bottom,0px));
+  max-width:640px;width:100%;margin:0 auto;box-sizing:border-box}
+
+/* Gönderi kartı */
+.fd-kart{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:15px;margin-bottom:12px;overflow:hidden;
+  position:relative;box-shadow:var(--shadow-sm)}
+.fd-kart::before{
+  content:'';position:absolute;top:0;left:14px;right:14px;height:1px;
+  background:linear-gradient(90deg,transparent,var(--isik),transparent);
+  pointer-events:none}
+
+.fd-yazar{display:flex;align-items:center;gap:11px;padding:12px 14px 10px}
+
+.fd-medya{position:relative;cursor:pointer;background:var(--bg2)}
+.fd-medya img{width:100%;display:block;max-height:70vh;object-fit:cover}
+.fd-coklu{
+  position:absolute;top:9px;right:9px;
+  background:rgba(0,0,0,.6);color:#fff;
+  font-size:11px;font-weight:600;padding:3px 8px;border-radius:12px}
+
+.fd-metin{
+  padding:12px 14px 4px;font-size:13.5px;line-height:1.55;
+  color:var(--text);cursor:pointer;white-space:pre-wrap;word-break:break-word;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+
+.fd-eylemler{display:flex;gap:6px;padding:10px 14px 12px}
+.fd-eylem{
+  display:flex;align-items:center;gap:2px;
+  padding:7px 13px;border-radius:20px;
+  background:var(--card2);border:1px solid var(--border);
+  font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;
+  color:var(--text2);cursor:pointer;transition:.16s;
+  -webkit-tap-highlight-color:transparent}
+.fd-eylem span{font-size:12.5px}
+.fd-eylem.aktif{
+  color:var(--accent);
+  border-color:color-mix(in srgb,var(--accent) 45%,transparent);
+  background:var(--ag)}
+.fd-eylem:active{transform:scale(.96)}
+.fd-eylem:disabled{opacity:.5}
+
+.fd-bos{
+  text-align:center;padding:56px 24px;
+  color:var(--text3);font-size:13px;line-height:1.7}
+.fd-bos .ikon{font-size:40px;display:block;margin-bottom:12px;opacity:.5}
+.fd-bos strong{
+  display:block;font-size:16px;color:var(--text);
+  margin-bottom:6px;font-weight:700}
+.fd-bos .btn{margin-top:18px;display:inline-block;width:auto;padding:10px 22px}

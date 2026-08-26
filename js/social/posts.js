@@ -355,6 +355,7 @@ function npPaylas(){
       /* Profil ızgarasını tazele */
       if(typeof _renderProfilSekmesi === 'function') _renderProfilSekmesi();
       if(typeof renderProfil === 'function') renderProfil();
+      if(typeof akisYenile === 'function') akisYenile();
     })
     .catch(function(e){
       if(btn){ btn.disabled = false; btn.textContent = 'Paylaş'; }
