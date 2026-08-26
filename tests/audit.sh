@@ -50,6 +50,13 @@ node tests/theme-migration.js > /tmp/rf_goc.log 2>&1
 sonuc $? "$(grep -o '[0-9]*/[0-9]* geçti' /tmp/rf_goc.log | head -1)"
 grep "❌" /tmp/rf_goc.log | head -5
 
+# ── 0d. Giriş kancaları ────────────────────────────────────
+baslik "0d. Giriş kancaları"
+python3 tests/login-hooks.py > /tmp/rf_hook.log 2>&1
+! grep -q "❌" /tmp/rf_hook.log
+sonuc $? "$(grep -o '[0-9]*/[0-9]* geçti' /tmp/rf_hook.log | head -1)"
+grep "❌" /tmp/rf_hook.log | head -5
+
 # ── 1. JS sözdizimi ────────────────────────────────────────
 baslik "1. JavaScript sözdizimi"
 GECERLI=0; TOPLAM=0

@@ -1,7 +1,7 @@
-RavenFit — Güncelleme 1.2.0.1
+RavenFit — Güncelleme 1.2.0.2
 ==============================================
 
-15 dosya değişti (toplam 120 dosya).
+16 dosya değişti (toplam 121 dosya).
 Bu paketi açıp KLASÖR YAPISINI KORUYARAK depona yükle.
 Aynı yoldaki dosyaların üzerine yaz.
 
@@ -21,6 +21,7 @@ DEĞİŞENLER:
   YENİ  tests/admin-panel.js
   GÜNCEL tests/audit.sh
   GÜNCEL tests/layout-check.py
+  YENİ  tests/login-hooks.py
   GÜNCEL tests/theme-check.py
 
 Yükledikten sonra: Ctrl + Shift + R

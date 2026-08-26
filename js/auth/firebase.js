@@ -410,18 +410,6 @@ function onUserLoggedIn(user){
         if(_denenenNick && nick && _denenenNick !== nick.toLowerCase()){
           var _yanlisAd = _denenenNick;
           _denenenNick = null;
-        /* Açık profili yayınla — arama ve profil görüntüleme için */
-        /* Eski büyük avatarları küçült — sessiz, tek seferlik */
-        if(typeof avatarOnar === 'function') setTimeout(avatarOnar, 800);
-        /* ── ONAY DURUMUNU BULUTTAN AL ────────────────────────
-           Onay/rol kararını YÖNETİCİ verir, kullanıcı değil.
-           Tek doğru kaynak profiles/{uid}; yerel kopya ondan
-           güncellenir. Aksi hâlde yönetici onayladığında
-           kullanıcı hiçbir değişiklik görmez. */
-        if(typeof _onayDurumunuEsitle === 'function') setTimeout(_onayDurumunuEsitle, 900);
-        /* Yöneticilik kontrolü — panel girişi buna göre görünür */
-        if(typeof yoneticiKontrolEt === 'function') setTimeout(yoneticiKontrolEt, 600);
-        if(typeof yayinlaProfil === 'function') setTimeout(yayinlaProfil, 1800);
           console.warn('Eski kullanıcı adıyla giriş denendi:', _yanlisAd, '→ güncel:', nick);
           _fbAuth.signOut().then(function(){
             showAuthScreen();
@@ -436,6 +424,18 @@ function onUserLoggedIn(user){
           return;
         }
         _denenenNick = null;
+        /* ── GİRİŞ SONRASI ARKA PLAN İŞLERİ ───────────────────
+           Sırayla ve gecikmeli çalışır; ilk açılışı yavaşlatmasın. */
+        /* Eski büyük avatarları küçült — sessiz, tek seferlik */
+        if(typeof avatarOnar === 'function') setTimeout(avatarOnar, 800);
+        /* Yöneticilik kontrolü — panel girişi buna göre görünür */
+        if(typeof yoneticiKontrolEt === 'function') setTimeout(yoneticiKontrolEt, 600);
+        /* Onay/rol kararını YÖNETİCİ verir; tek doğru kaynak
+           profiles/{uid} belgesidir, yerel kopya ondan güncellenir. */
+        if(typeof _onayDurumunuEsitle === 'function') setTimeout(_onayDurumunuEsitle, 900);
+        /* Açık profili yayınla — arama ve profil görüntüleme için */
+        if(typeof yayinlaProfil === 'function') setTimeout(yayinlaProfil, 1800);
+
         /* Eşleme yoksa oluştur — kullanıcı adı değiştirme bu belgeye
            dayanıyor, eski hesaplarda henüz yok. Sessizce eklenir. */
         if(nick){
