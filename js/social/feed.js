@@ -31,6 +31,16 @@ function openFeed(){
   ov.classList.add('active');
   document.body.style.overflow = 'hidden';
   _akisYukle();
+  /* Başlıktaki bildirim rozetini tazele */
+  if(typeof okunmamisSay === 'function'){
+    okunmamisSay().then(function(n){
+      var e = document.getElementById('fd-bildirim-rozet');
+      if(e){
+        e.textContent = n > 99 ? '99+' : String(n);
+        e.style.display = n > 0 ? 'flex' : 'none';
+      }
+    });
+  }
 }
 
 function closeFeed(){

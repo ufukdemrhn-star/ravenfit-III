@@ -203,6 +203,7 @@ function adminOnayla(uid){
         }, {merge:true})
       ])
         .then(function(){
+          if(typeof bildirimGonder === 'function') bildirimGonder(uid, 'onay');
           showToast('✅ Başvuru onaylandı.');
           _adminYukle();
         })

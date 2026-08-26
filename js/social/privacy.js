@@ -179,6 +179,7 @@ function takipIstegiGonder(hedefUid){
     })
       .then(function(){
         _takipIstekOnbellek[hedefUid] = 'beklemede';
+        if(typeof bildirimGonder === 'function') bildirimGonder(hedefUid, 'takipIstegi');
         cozumle('beklemede');
       })
       .catch(function(){ reddet(new Error('İstek gönderilemedi.')); });
@@ -223,7 +224,10 @@ function takipIstegiKabul(isteyenUid){
        kendi tarafında takip belgesini oluşturur. */
     _fbDb.collection('followRequests').doc(_istekId(isteyenUid, _fbUser.uid))
       .set({durum:'onayli', onayTarihi: firebase.firestore.FieldValue.serverTimestamp()}, {merge:true})
-      .then(cozumle)
+      .then(function(){
+        if(typeof bildirimGonder === 'function') bildirimGonder(isteyenUid, 'istekKabul');
+        cozumle();
+      })
       .catch(function(){ reddet(new Error('İstek kabul edilemedi.')); });
   });
 }

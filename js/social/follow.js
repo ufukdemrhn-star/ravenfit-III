@@ -67,6 +67,10 @@ function takipDegistir(hedefUid){
         })
           .then(function(){
             _takipOnbellek[hedefUid] = true;
+            /* Bildirim — takip edilen kişi haberdar olsun */
+            if(typeof bildirimGonder === 'function'){
+              bildirimGonder(hedefUid, 'takip');
+            }
             cozumle(true);
           })
           .catch(function(e){ reddet(new Error('Takip edilemedi.')); });
@@ -178,4 +182,5 @@ function sosyalOnbellegiTemizle(){
   if(typeof _kesfetSorgu !== 'undefined') _kesfetSorgu = '';
   if(typeof etkilesimOnbellegiTemizle === 'function') etkilesimOnbellegiTemizle();
   if(typeof gizlilikOnbellegiTemizle === 'function') gizlilikOnbellegiTemizle();
+  if(typeof bildirimOnbellegiTemizle === 'function') bildirimOnbellegiTemizle();
 }

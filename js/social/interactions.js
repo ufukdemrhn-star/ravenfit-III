@@ -55,7 +55,17 @@ function begeniDegistir(postId){
           uid: _fbUser.uid,
           tarih: firebase.firestore.FieldValue.serverTimestamp()
         })
-          .then(function(){ _begeniOnbellek[postId] = true; cozumle(true); })
+          .then(function(){
+            _begeniOnbellek[postId] = true;
+            /* Gönderi sahibine bildirim */
+            if(typeof bildirimGonder === 'function' && _fbDb){
+              _fbDb.collection('posts').doc(postId).get().then(function(d){
+                if(d.exists) bildirimGonder(d.data().uid, 'begeni', postId,
+                                            (d.data().metin || '').slice(0,60));
+              }).catch(function(){});
+            }
+            cozumle(true);
+          })
           .catch(function(){ reddet(new Error('Beğenilemedi.')); });
       }
     });
@@ -115,7 +125,22 @@ function yorumEkle(postId, metin, ustYorum){
       ustYorum: ustYorum || null,
       tarih: firebase.firestore.FieldValue.serverTimestamp()
     })
-      .then(function(ref){ cozumle(ref.id); })
+      .then(function(ref){
+        /* Bildirim: yanıtsa yorum sahibine, değilse gönderi sahibine */
+        if(typeof bildirimGonder === 'function' && _fbDb){
+          if(ustYorum){
+            _fbDb.collection('posts').doc(postId).collection('comments')
+              .doc(ustYorum).get().then(function(d){
+                if(d.exists) bildirimGonder(d.data().uid, 'yanit', postId, metin);
+              }).catch(function(){});
+          } else {
+            _fbDb.collection('posts').doc(postId).get().then(function(d){
+              if(d.exists) bildirimGonder(d.data().uid, 'yorum', postId, metin);
+            }).catch(function(){});
+          }
+        }
+        cozumle(ref.id);
+      })
       .catch(function(e){ reddet(new Error('Yorum eklenemedi.')); });
   });
 }
@@ -235,7 +260,17 @@ function yorumBegeniDegistir(yorumId, postId){
           yorumId: yorumId, postId: postId, uid: _fbUser.uid,
           tarih: firebase.firestore.FieldValue.serverTimestamp()
         })
-          .then(function(){ _yorumBegeniOnbellek[yorumId] = true; cozumle(true); })
+          .then(function(){
+            _yorumBegeniOnbellek[yorumId] = true;
+            if(typeof bildirimGonder === 'function' && _fbDb){
+              _fbDb.collection('posts').doc(postId).collection('comments')
+                .doc(yorumId).get().then(function(d){
+                  if(d.exists) bildirimGonder(d.data().uid, 'yorumBegeni', postId,
+                                              (d.data().metin||'').slice(0,60));
+                }).catch(function(){});
+            }
+            cozumle(true);
+          })
           .catch(function(){ reddet(new Error('Beğenilemedi.')); });
       }
     });
