@@ -476,6 +476,17 @@ function openPost(postId){
   if(!_fbDb) return;
   var ov = document.getElementById('post-detail-overlay');
   if(!ov) return;
+
+  /* Altımızdaki ekranı yığına al — geri dönünce oraya dönelim */
+  if(typeof _ekranAcikMi === 'function'){
+    if(_ekranAcikMi('discover-overlay'))       navGizle('discover', closeDiscover, openDiscover);
+    else if(_ekranAcikMi('feed-screen'))       navGizle('feed', closeFeed, openFeed);
+    else if(_ekranAcikMi('user-profile-screen')){
+      var uid = _upUid;
+      navGizle('userProfile', closeUserProfile, function(){ openUserProfile(uid); });
+    }
+  }
+
   ov.classList.add('active');
   document.body.style.overflow = 'hidden';
 
@@ -500,8 +511,10 @@ function openPost(postId){
 function closePost(){
   var ov = document.getElementById('post-detail-overlay');
   if(ov) ov.classList.remove('active');
-  document.body.style.overflow = '';
   _acikGonderi = null;
+  if(typeof navGeri !== 'function' || !navGeri()){
+    document.body.style.overflow = '';
+  }
 }
 
 function _pdCiz(post, profil, medya){

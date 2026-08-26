@@ -90,6 +90,9 @@ function switchTab(id,btn){
    /* Aktif antrenman oturumu */
 
 function switchMain(id){
+  /* Sekme değişimi bağlamı kırar — ekran dönüş yığını temizlenir,
+     yoksa eski bir ekran beklenmedik anda geri açılır. */
+  if(typeof navSifirla === 'function') navSifirla();
   document.querySelectorAll('.main-section').forEach(function(s){s.classList.remove('active');});
   document.querySelectorAll('.bnav-btn').forEach(function(b){b.classList.remove('active');});
   document.getElementById('ms-'+id).classList.add('active');

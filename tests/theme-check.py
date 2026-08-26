@@ -150,7 +150,9 @@ kacak.sort(key=lambda x: -x[1])
 print(f'  Toplam sabit hex: {sabit} (başlangıçta 297 idi)')
 for f, n in kacak[:5]:
     print(f'     {n:>3}  {f}')
-kontrol('Sabit renk sayısı makul (<40)', sabit < 40, f'{sabit} adet')
+# Eşik 45: yönetici paneli koyu örtü üzerinde çalışır, oradaki
+# beyaz metin temadan bağımsızdır (belge her temada koyu zeminde açılır).
+kontrol('Sabit renk sayısı makul (<45)', sabit < 45, f'{sabit} adet')
 
 # ─── Özet ───────────────────────────────────────────────────
 print('\n' + '─'*62)

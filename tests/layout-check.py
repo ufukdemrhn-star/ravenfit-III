@@ -81,6 +81,7 @@ BEKLENEN = {
     '.pd-screen':               'fixed',   # gönderi detayı
     '.cr-overlay':              'fixed',   # fotoğraf kırpıcı
     '.fd-screen':               'fixed',   # ana akış
+    '.ad-screen':               'fixed',   # yönetici paneli
 }
 
 for sec, beklenen in BEKLENEN.items():
@@ -136,6 +137,7 @@ SIRA = [
     ('.up-screen',             820),   # kullanıcı profili
     ('.pd-screen',             840),   # gönderi detayı — profilin üstünde
     ('.sp-overlay',            850),   # paylaşımlı pencereler
+    ('.ad-screen',             880),   # yönetici paneli
     ('.cr-overlay',            900),   # kırpıcı en üstte
 ]
 onceki = -1

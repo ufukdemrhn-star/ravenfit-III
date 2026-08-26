@@ -181,7 +181,7 @@ function _akisKartHTML(g){
   /* Yazar */
   html += '<div class="fd-yazar">';
   html +=   '<button class="dsc-av" style="border:none;padding:0" ' +
-            'onclick="closeFeed();openUserProfile(\'' + g.uid + '\')">' + av + '</button>';
+            'onclick="openUserProfile(\'' + g.uid + '\')">' + av + '</button>';
   html +=   '<div class="dsc-bilgi">';
   html +=     '<div class="dsc-nick">@' + (p.nickname||'') + onayli + '</div>';
   html +=     '<div class="dsc-isim">' + _pdTarih(g.tarih) +
@@ -193,7 +193,7 @@ function _akisKartHTML(g){
   /* Kapak — tıklayınca gönderiye gider */
   var kapak = (g.onizlemeler && g.onizlemeler[0]) ? g.onizlemeler[0] : null;
   if(kapak){
-    html += '<div class="fd-medya" onclick="closeFeed();openPost(\'' + g.id + '\')">';
+    html += '<div class="fd-medya" onclick="openPost(\'' + g.id + '\')">';
     html +=   '<img src="' + kapak + '" alt="" loading="lazy">';
     if((g.fotoSayisi||0) > 1){
       html += '<span class="fd-coklu">⧉ ' + g.fotoSayisi + '</span>';
@@ -203,7 +203,7 @@ function _akisKartHTML(g){
 
   /* Metin — 3 satırda kırpılır */
   if(g.metin){
-    html += '<div class="fd-metin" onclick="closeFeed();openPost(\'' + g.id + '\')">' +
+    html += '<div class="fd-metin" onclick="openPost(\'' + g.id + '\')">' +
               _npKacir(g.metin) + '</div>';
   }
 
@@ -211,7 +211,7 @@ function _akisKartHTML(g){
   html += '<div class="fd-eylemler">';
   html +=   '<button class="fd-eylem" id="fb-' + g.id + '" onclick="akisBegen(\'' + g.id + '\')">' +
             '♡<span id="fbs-' + g.id + '"></span></button>';
-  html +=   '<button class="fd-eylem" onclick="closeFeed();openPost(\'' + g.id + '\')">' +
+  html +=   '<button class="fd-eylem" onclick="openPost(\'' + g.id + '\')">' +
             '💬<span id="fys-' + g.id + '"></span></button>';
   html += '</div>';
 

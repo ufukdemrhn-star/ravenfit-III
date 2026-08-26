@@ -1,25 +1,26 @@
-RavenFit — Güncelleme 1.1.0.0
+RavenFit — Güncelleme 1.2.0.0
 ==============================================
 
-14 dosya değişti (toplam 115 dosya).
+15 dosya değişti (toplam 120 dosya).
 Bu paketi açıp KLASÖR YAPISINI KORUYARAK depona yükle.
 Aynı yoldaki dosyaların üzerine yaz.
 
 DEĞİŞENLER:
 
-  GÜNCEL css/misc.css
-  GÜNCEL css/social.css
-  GÜNCEL data/badges.json
+  YENİ  css/admin.css
   GÜNCEL index.html
-  GÜNCEL js/badges/badges.js
-  GÜNCEL js/social/discover.js
+  YENİ  js/admin/panel.js
+  YENİ  js/admin/reports.js
+  GÜNCEL js/auth/firebase.js
   GÜNCEL js/social/feed.js
+  YENİ  js/social/nav-stack.js
   GÜNCEL js/social/posts.js
-  YENİ  js/social/pro-application.js
-  GÜNCEL js/social/profile-view.js
+  GÜNCEL js/social/profile-sync.js
   GÜNCEL js/social/user-profile.js
-  YENİ  js/social/verified.js
+  GÜNCEL js/ui/screens.js
+  YENİ  tests/admin-panel.js
   GÜNCEL tests/audit.sh
-  YENİ  tests/pro-application.js
+  GÜNCEL tests/layout-check.py
+  GÜNCEL tests/theme-check.py
 
 Yükledikten sonra: Ctrl + Shift + R

@@ -31,7 +31,13 @@ function openUserProfile(uid){
 
   _upUid = uid;
   _upSekme = 'posts';
-  closeDiscover();
+
+  /* Altımızda açık ekran varsa yığına kaydet — geri dönünce
+     kaldığı yerden devam etsin (bkz. js/social/nav-stack.js) */
+  var kesfetAcik = _ekranAcikMi('discover-overlay');
+  var akisAcik   = _ekranAcikMi('feed-screen');
+  if(kesfetAcik)      navGizle('discover', closeDiscover, openDiscover);
+  else if(akisAcik)   navGizle('feed', closeFeed, openFeed);
   closeFollowList();
 
   var ov = document.getElementById('user-profile-screen');
@@ -54,9 +60,16 @@ function openUserProfile(uid){
 function closeUserProfile(){
   var ov = document.getElementById('user-profile-screen');
   if(ov) ov.classList.remove('active');
-  document.body.style.overflow = '';
   _upProfil = null;
   _upUid = null;
+  /* Altta bekleyen ekran varsa geri aç, yoksa kaydırmayı serbest bırak */
+  if(!navGeri()) document.body.style.overflow = '';
+}
+
+/* Bir ekran şu an açık mı? */
+function _ekranAcikMi(id){
+  var el = document.getElementById(id);
+  return !!(el && el.classList.contains('active'));
 }
 
 function _upYukleniyor(){

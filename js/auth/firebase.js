@@ -413,7 +413,15 @@ function onUserLoggedIn(user){
         /* Açık profili yayınla — arama ve profil görüntüleme için */
         /* Eski büyük avatarları küçült — sessiz, tek seferlik */
         if(typeof avatarOnar === 'function') setTimeout(avatarOnar, 800);
-        if(typeof yayinlaProfil === 'function') setTimeout(yayinlaProfil, 1500);
+        /* ── ONAY DURUMUNU BULUTTAN AL ────────────────────────
+           Onay/rol kararını YÖNETİCİ verir, kullanıcı değil.
+           Tek doğru kaynak profiles/{uid}; yerel kopya ondan
+           güncellenir. Aksi hâlde yönetici onayladığında
+           kullanıcı hiçbir değişiklik görmez. */
+        if(typeof _onayDurumunuEsitle === 'function') setTimeout(_onayDurumunuEsitle, 900);
+        /* Yöneticilik kontrolü — panel girişi buna göre görünür */
+        if(typeof yoneticiKontrolEt === 'function') setTimeout(yoneticiKontrolEt, 600);
+        if(typeof yayinlaProfil === 'function') setTimeout(yayinlaProfil, 1800);
           console.warn('Eski kullanıcı adıyla giriş denendi:', _yanlisAd, '→ güncel:', nick);
           _fbAuth.signOut().then(function(){
             showAuthScreen();

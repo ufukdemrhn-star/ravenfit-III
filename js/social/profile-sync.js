@@ -187,3 +187,44 @@ function sonKatilanlar(limit){
       });
   });
 }
+
+/* ══════════════════════════════════════════════════════════
+   ONAY DURUMU EŞİTLEMESİ
+
+   Onay ve rol kararını YÖNETİCİ verir; kullanıcı kendi
+   profilinde bu alanları değiştiremez. Bu yüzden tek doğru
+   kaynak Firestore'daki profiles/{uid} belgesidir.
+
+   Yerel kopya girişte oradan güncellenir. Bu olmadan yönetici
+   onay verdiğinde kullanıcı hiçbir değişiklik görmez —
+   rozet açılmaz, hizmet sekmesi kilitli kalır.
+   ══════════════════════════════════════════════════════════ */
+function _onayDurumunuEsitle(){
+  if(!_fbUser || !_fbDb) return;
+
+  _fbDb.collection('profiles').doc(_fbUser.uid).get()
+    .then(function(doc){
+      if(!doc.exists) return;
+      var uzak = doc.data() || {};
+      var yerel = getYerelProfil();
+
+      var degisti = false;
+      if(uzak.onay && uzak.onay !== yerel.onay){ yerel.onay = uzak.onay; degisti = true; }
+      if(uzak.rol  && uzak.rol  !== yerel.rol ){ yerel.rol  = uzak.rol;  degisti = true; }
+
+      if(!degisti) return;
+      saveYerelProfil(yerel);
+
+      /* Rozet kontrolü yeniden çalışsın — "Onaylı Koç" açılabilir */
+      if(typeof checkAndAwardBadges === 'function') checkAndAwardBadges();
+      if(typeof renderProfil === 'function') renderProfil();
+      if(typeof renderRozetVitrini === 'function') renderRozetVitrini();
+
+      if(uzak.onay === 'onayli'){
+        showToast('🎖️ Profesyonel hesabın onaylandı!');
+      } else if(uzak.onay === 'red'){
+        showToast('Başvurun onaylanmadı. Ayrıntılar için başvuru ekranına bak.','warn');
+      }
+    })
+    .catch(function(e){ console.warn('Onay durumu okunamadı:', e && e.message); });
+}
