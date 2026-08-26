@@ -148,7 +148,7 @@
    "id": "verified_coach",
    "name_tr": "Onaylı Koç",
    "desc_tr": "Antrenörlük veya diyetisyenlik belgen onaylandı.",
-   "icon": "🎖️",
+   "icon": "🥇",
    "condition_type": "verified_pro",
    "condition_value": 1,
    "branch": "all"

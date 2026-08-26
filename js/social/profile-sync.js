@@ -216,6 +216,8 @@ function _onayDurumunuEsitle(){
       saveYerelProfil(yerel);
 
       /* Rozet kontrolü yeniden çalışsın — "Onaylı Koç" açılabilir */
+      /* Rozet kontrolü — onay düştüyse 'Onaylı Koç' geri alınır,
+         yükseldiyse verilir. checkAndAwardBadges ikisini de yapar. */
       if(typeof checkAndAwardBadges === 'function') checkAndAwardBadges();
       if(typeof renderProfil === 'function') renderProfil();
       if(typeof renderRozetVitrini === 'function') renderRozetVitrini();

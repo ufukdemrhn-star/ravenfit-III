@@ -26,7 +26,7 @@ var BADGES_FALLBACK=[
   {id:'multi_branch',name_tr:'Çok Yönlü',desc_tr:'2+ branşta aktif antrenman yapıyorsun!',icon:'🌟',condition_type:'branch_active',condition_value:2,branch:'all'},
   {id:'supp_master',name_tr:'Supplement Ustası',desc_tr:'5+ supplement kullanıyorsun!',icon:'💊',condition_type:'supplement_count',condition_value:5,branch:'all'},
   {id:'water_champ',name_tr:'Su Şampiyonu',desc_tr:'Günlük su hedefini tamamladın!',icon:'💧',condition_type:'water_complete',condition_value:1,branch:'all'},
-  {id:'verified_coach',name_tr:'Onaylı Koç',desc_tr:'Antrenörlük veya diyetisyenlik belgen onaylandı.',icon:'🎖️',condition_type:'verified_pro',condition_value:1,branch:'all'}
+  {id:'verified_coach',name_tr:'Onaylı Koç',desc_tr:'Antrenörlük veya diyetisyenlik belgen onaylandı.',icon:'🥇',condition_type:'verified_pro',condition_value:1,branch:'all'}
 ];
 
 function _getBadgeDefs(){
@@ -48,8 +48,70 @@ var _badgeQueue=[];
 
 var _badgeShowing=false;
 
+/* ══════════════════════════════════════════════════════════
+   GERİ ALINABİLİR ROZETLER
+
+   Çoğu rozet bir kez kazanılınca kalıcıdır — 50 antrenman
+   yapmışsan bu geri alınamaz, geçmiş bir başarıdır.
+
+   Ama bazı rozetler SÜREKLİ BİR DURUMU temsil eder. "Onaylı Koç"
+   bunlardan biri: yönetici onayı kaldırırsa kullanıcı artık
+   onaylı koç DEĞİLDİR ve rozet de kalkmalıdır. Aksi hâlde
+   profilinde geçersiz bir yetkinlik iddiası görünmeye devam eder.
+   ══════════════════════════════════════════════════════════ */
+var GERI_ALINABILIR_ROZETLER = ['verified_coach'];
+
+/* Koşulu artık sağlanmayan durum rozetlerini geri alır. */
+function _rozetleriGeriAl(){
+  var earned = getEarnedBadges();
+  if(!earned.length) return false;
+
+  var kaldirilacak = earned.filter(function(e){
+    if(GERI_ALINABILIR_ROZETLER.indexOf(e.id) < 0) return false;
+    return !_rozetKosuluSagli(e.id);
+  });
+
+  if(!kaldirilacak.length) return false;
+
+  var kalan = earned.filter(function(e){
+    return !kaldirilacak.some(function(k){ return k.id === e.id; });
+  });
+  saveEarnedBadges(kalan);
+
+  /* Vitrinden de çıkar — yoksa profilde boşluk kalır */
+  try {
+    var vitrin = JSON.parse(_lsGet('rf_badge_showcase') || '[]');
+    var yeniVitrin = vitrin.filter(function(id){
+      return !kaldirilacak.some(function(k){ return k.id === id; });
+    });
+    if(yeniVitrin.length !== vitrin.length){
+      _lsSet('rf_badge_showcase', JSON.stringify(yeniVitrin));
+    }
+  } catch(e){}
+
+  kaldirilacak.forEach(function(k){
+    console.warn('Rozet geri alındı:', k.id);
+  });
+  return true;
+}
+
+/* Durum rozetlerinin koşulunu tek yerden değerlendirir —
+   hem verme hem geri alma aynı mantığı kullanır. */
+function _rozetKosuluSagli(rozetId){
+  if(rozetId === 'verified_coach'){
+    try {
+      var p = JSON.parse(_lsGet('rf_profile') || '{}');
+      return p.onay === 'onayli' &&
+             (p.rol === 'antrenor' || p.rol === 'diyetisyen');
+    } catch(e){ return false; }
+  }
+  return true;
+}
+
 function checkAndAwardBadges(){
   var defs=_getBadgeDefs();
+  /* Önce geri almalar — koşulu düşen durum rozetleri kalksın */
+  _rozetleriGeriAl();
   var earned=getEarnedBadges();
   var logs=getWorkoutLogs();
   var entries=getEntries();
@@ -69,13 +131,7 @@ function checkAndAwardBadges(){
          Diğer rozetlerden farklı olarak antrenmanla değil,
          yönetici onayıyla açılır. */
       case 'verified_pro':
-        met = (function(){
-          try {
-            var p = JSON.parse(_lsGet('rf_profile') || '{}');
-            return p.onay === 'onayli' &&
-                   (p.rol === 'antrenor' || p.rol === 'diyetisyen');
-          } catch(e){ return false; }
-        })();
+        met = _rozetKosuluSagli(badge.id);
         break;
       case 'workout_count_branch':
         var branchLogs=logs.filter(function(l){
