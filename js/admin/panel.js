@@ -263,3 +263,39 @@ function adminProfilAc(uid){
 function _adKacir(s){
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
+
+/* ══════════════════════════════════════════════════════════
+   HESAP KİMLİĞİ (UID)
+
+   Yönetici tanımlarken Firebase konsolunda admins/{uid}
+   belgesi oluşturmak gerekir. UID'i konsolda aramak zahmetli
+   olduğu için uygulamadan kopyalanabilir hâle getirildi.
+   ══════════════════════════════════════════════════════════ */
+function uidKopyala(){
+  if(!_fbUser){
+    showToast('Giriş yapmadan hesap kimliği olmaz.','warn');
+    return;
+  }
+  var uid = _fbUser.uid;
+
+  function basarili(){
+    showToast('✅ Kopyalandı: ' + uid.slice(0,10) + '…');
+  }
+
+  /* Modern pano API'si yalnızca güvenli bağlamda çalışır */
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(uid).then(basarili).catch(function(){
+      _uidGoster(uid);
+    });
+  } else {
+    _uidGoster(uid);
+  }
+}
+
+/* Kopyalama başarısızsa elle seçilebilsin diye göster */
+function _uidGoster(uid){
+  showConfirm('Hesap Kimliğin',
+    uid + '\n\nBu değeri Firebase konsolunda admins koleksiyonuna ' +
+    'belge kimliği olarak gir.',
+    function(){}, 'Tamam');
+}

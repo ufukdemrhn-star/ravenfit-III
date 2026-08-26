@@ -1,4 +1,4 @@
-RavenFit — Güncelleme 1.2.0.0
+RavenFit — Güncelleme 1.2.0.1
 ==============================================
 
 15 dosya değişti (toplam 120 dosya).
