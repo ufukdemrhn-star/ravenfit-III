@@ -216,10 +216,12 @@ function _renderProfilSekmesi(){
     var p = getYerelProfil();
     var onay = p.onay || 'yok';
     if(onay === 'onayli'){
-      el.innerHTML = '<div class="pr-tab-bos"><span class="ikon">📣</span>' +
-        '<strong>Hizmet Paketlerin</strong><br>' +
-        'Verdiğin hizmetleri ve fiyatlarını burada listeleyeceksin.<br>' +
-        '<span style="opacity:.7">Yakında</span></div>';
+      el.innerHTML = '<div class="dsc-durum">Yükleniyor...</div>';
+      if(_fbUser && typeof paketleriGetir === 'function'){
+        paketleriGetir(_fbUser.uid).then(function(liste){
+          el.innerHTML = paketListesiHTML(liste, true);
+        });
+      }
     } else if(onay === 'beklemede'){
       el.innerHTML = '<div class="pr-tab-bos"><span class="ikon">⏳</span>' +
         '<strong>Başvurun İnceleniyor</strong><br>' +

@@ -232,9 +232,12 @@ function _upSekmeCiz(){
                    '<strong>Antrenman Programları</strong><br>' +
                    '<span style="opacity:.7">Yakında</span></div>';
   } else {
-    el.innerHTML = '<div class="pr-tab-bos"><span class="ikon">📣</span>' +
-                   '<strong>Hizmetler</strong><br>' +
-                   '<span style="opacity:.7">Yakında</span></div>';
+    el.innerHTML = '<div class="dsc-durum">Yükleniyor...</div>';
+    if(typeof paketleriGetir === 'function'){
+      paketleriGetir(_upUid).then(function(liste){
+        el.innerHTML = paketListesiHTML(liste, false);
+      });
+    }
   }
 }
 
