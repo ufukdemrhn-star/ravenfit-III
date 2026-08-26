@@ -69,6 +69,13 @@ function npFotoEklendi(olay){
   var inp = (olay && olay.target) ? olay.target : olay;
   if(!inp || !inp.files || !inp.files.length) return;
 
+  /* İkinci katman koruma: buton gizli olsa da çağrı engellensin */
+  if(_yeniGonderi.duzenlenenId){
+    showToast('Düzenlemede yeni fotoğraf eklenemez.','warn');
+    try { inp.value=''; } catch(e){}
+    return;
+  }
+
   var dosyalar = Array.prototype.slice.call(inp.files);
   var bosYer = GONDERI_MAX_FOTO - _yeniGonderi.fotograflar.length;
   if(bosYer <= 0){
@@ -140,13 +147,24 @@ function _npCiz(){
               '<span class="np-foto-boyut">' + baytMetni(foto.tam.bayt) + '</span>' +
             '</div>';
   });
-  if(f.length < GONDERI_MAX_FOTO){
+  /* ── DÜZENLEMEDE YENİ FOTOĞRAF EKLENEMEZ ──────────────
+     Sebep: bir gönderi masum içerikle paylaşılıp beğeni
+     topladıktan sonra fotoğrafı değiştirilebilir. Silmeye
+     izin var (hatalı yükleme düzeltilebilsin), eklemeye yok. */
+  var duzenlemeModu = !!_yeniGonderi.duzenlenenId;
+  if(!duzenlemeModu && f.length < GONDERI_MAX_FOTO){
     html += '<button class="np-foto-ekle" onclick="npFotoSec()">' +
               '<span>+</span>' +
               '<small>' + f.length + '/' + GONDERI_MAX_FOTO + '</small>' +
             '</button>';
   }
   html += '</div>';
+  if(duzenlemeModu){
+    html += '<div class="np-duzenleme-not">' +
+            'ℹ️ Düzenlemede fotoğraf <strong>silebilirsin</strong> ama ' +
+            '<strong>yeni ekleyemezsin</strong>. Farklı fotoğraf için yeni gönderi paylaş.' +
+            '</div>';
+  }
   html += '<div class="np-durum" id="np-durum"></div>';
 
   el.innerHTML = html;

@@ -123,7 +123,7 @@ function _upCiz(){
   html +=   '<button class="pr-act primary" id="up-takip-btn" disabled>...</button>';
   html +=   '<button class="pr-act" onclick="showToast(\'Mesajlaşma yakında eklenecek.\',\'warn\')">Mesaj At</button>';
   if(p.onay === 'onayli'){
-    html += '<button class="pr-act" onclick="showToast(\'Hizmet satın alma yakında eklenecek.\',\'warn\')">Abone Ol</button>';
+    html += '<button class="pr-act" onclick="openPackageViewer(\'' + _upUid + '\')">Abone Ol</button>';
   }
   html += '</div>';
 

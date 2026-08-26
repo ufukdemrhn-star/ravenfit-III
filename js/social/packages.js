@@ -35,7 +35,9 @@ var PAKET_KAPSAM = [
   {id:'supplement',ad:'Supplement önerisi',             ikon:'💊'}
 ];
 
-var PAKET_MAX = 6;   /* profil başına en fazla paket */
+var PAKET_MAX = 6;              /* profil başına en fazla paket */
+var PAKET_ACIKLAMA_MAX = 600;   /* açıklama karakter sınırı */
+var PAKET_ACIKLAMA_SATIR = 10;  /* açıklama satır sınırı */
 
 var _paket = {
   id:null, ad:'', aciklama:'', sure:'1ay', fiyat:'',
@@ -166,11 +168,15 @@ function _pkCiz(){
   html += '</div>';
 
   html += '<div class="fg" style="margin-top:16px"><label class="fl">Açıklama</label>' +
-          '<textarea class="fi" id="pk-aciklama" rows="3" maxlength="300" ' +
+          '<textarea class="fi" id="pk-aciklama" rows="5" maxlength="' + PAKET_ACIKLAMA_MAX + '" ' +
+          'oninput="pkAciklamaSay()" ' +
           'placeholder="Bu pakette neler yapıyorsun, kimler için uygun...">' +
-          _pkKacir(_paket.aciklama) + '</textarea></div>';
+          _pkKacir(_paket.aciklama) + '</textarea>' +
+          '<div class="pe-sayac" id="pk-aciklama-sayac"></div></div>';
 
   el.innerHTML = html;
+  _pkSonGecerli = _paket.aciklama || '';
+  pkAciklamaSay();
   pkFiyatDegisti();
 }
 
@@ -351,4 +357,172 @@ function paketSil(id){
 function _pkKacir(s){
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
     .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   AÇIKLAMA SINIRI
+   600 karakter · 10 satır. Biyografideki gibi metin yeniden
+   yazılmaz, sınırı aşan girdi engellenir.
+   ══════════════════════════════════════════════════════════ */
+var _pkSonGecerli = '';
+
+function _pkAciklamaGecerli(metin){
+  var m = String(metin || '');
+  if(m.length > PAKET_ACIKLAMA_MAX) return false;
+  if(m.split('\n').length > PAKET_ACIKLAMA_SATIR) return false;
+  return true;
+}
+
+function pkAciklamaSay(){
+  var t = document.getElementById('pk-aciklama');
+  var s = document.getElementById('pk-aciklama-sayac');
+  if(!t) return;
+
+  if(!_pkAciklamaGecerli(t.value)){
+    var imlec = t.selectionStart;
+    t.value = _pkSonGecerli;
+    var k = Math.min(imlec, _pkSonGecerli.length);
+    try { t.setSelectionRange(k, k); } catch(e){}
+    if(s){ s.classList.add('uyari'); setTimeout(function(){ s.classList.remove('uyari'); }, 450); }
+  } else {
+    _pkSonGecerli = t.value;
+  }
+  _paket.aciklama = t.value;
+
+  if(s){
+    var satir = t.value ? t.value.split('\n').length : 0;
+    s.innerHTML = t.value.length + '/' + PAKET_ACIKLAMA_MAX + ' karakter' +
+                  ' &nbsp;·&nbsp; ' + satir + '/' + PAKET_ACIKLAMA_SATIR + ' satır';
+    s.className = (t.value.length >= PAKET_ACIKLAMA_MAX || satir >= PAKET_ACIKLAMA_SATIR)
+                  ? 'pe-sayac dolu' : 'pe-sayac';
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   PAKET VİTRİNİ — tam ekran
+
+   "Abone Ol" butonundan açılır. Paketler önce KAPALI gelir:
+   yalnızca ad, fiyat, süre ve kapsam ikonları görünür.
+   Böylece birkaç paket aynı anda ekrana sığar ve kullanıcı
+   karşılaştırabilir. Tıklayınca açılır.
+   ══════════════════════════════════════════════════════════ */
+var _vitrinUid = null;
+var _vitrinPaketler = [];
+var _vitrinAcik = {};   /* paketId → true */
+
+function openPackageViewer(uid){
+  if(!uid) return;
+  _vitrinUid = uid;
+  _vitrinAcik = {};
+
+  var ov = document.getElementById('package-viewer-screen');
+  if(!ov) return;
+
+  /* Altımızdaki ekranı yığına al */
+  if(typeof _ekranAcikMi === 'function' && _ekranAcikMi('user-profile-screen')){
+    var u = _upUid;
+    navGizle('userProfile', closeUserProfile, function(){ openUserProfile(u); });
+  }
+
+  ov.classList.add('active');
+  document.body.style.overflow = 'hidden';
+
+  var g = document.getElementById('pv-body');
+  if(g) g.innerHTML = '<div class="dsc-durum">Yükleniyor...</div>';
+
+  Promise.all([profilGetir(uid), paketleriGetir(uid)]).then(function(r){
+    var profil = r[0], paketler = r[1].filter(function(p){ return p.aktif !== false; });
+    _vitrinPaketler = paketler;
+
+    var nickEl = document.getElementById('pv-nick');
+    if(nickEl){
+      nickEl.innerHTML = '@' + (profil.nickname||'') +
+        ((typeof onayRozeti === 'function') ? onayRozeti(profil, 13) : '');
+    }
+    _pvCiz();
+  }).catch(function(){
+    if(g) g.innerHTML = '<div class="dsc-durum">Paketler yüklenemedi.</div>';
+  });
+}
+
+function closePackageViewer(){
+  var ov = document.getElementById('package-viewer-screen');
+  if(ov) ov.classList.remove('active');
+  _vitrinUid = null;
+  if(typeof navGeri !== 'function' || !navGeri()){
+    document.body.style.overflow = '';
+  }
+}
+
+function pvToggle(paketId){
+  _vitrinAcik[paketId] = !_vitrinAcik[paketId];
+  _pvCiz();
+}
+
+function _pvCiz(){
+  var el = document.getElementById('pv-body');
+  if(!el) return;
+
+  if(!_vitrinPaketler.length){
+    el.innerHTML = '<div class="pr-tab-bos"><span class="ikon">📣</span>' +
+                   'Bu kullanıcının aktif hizmet paketi yok.</div>';
+    return;
+  }
+
+  el.innerHTML = _vitrinPaketler.map(function(p){
+    var sure = PAKET_SURELERI.find(function(s){ return s.id === p.sure; });
+    var acik = !!_vitrinAcik[p.id];
+
+    var html = '<div class="pv-kart' + (acik?' acik':'') + '">';
+
+    /* ── Kapalı hâl: ad, fiyat, süre, kapsam ikonları ── */
+    html += '<button class="pv-ust" onclick="pvToggle(\'' + p.id + '\')">';
+    html +=   '<div class="pv-ust-sol">';
+    html +=     '<div class="pv-ad">' + _pkKacir(p.ad) + '</div>';
+    /* Yalnızca verdiği hizmetlerin ikonları */
+    if(p.kapsam && p.kapsam.length){
+      html +=   '<div class="pv-ikonlar">';
+      p.kapsam.forEach(function(kid){
+        var k = PAKET_KAPSAM.find(function(x){ return x.id === kid; });
+        if(k) html += '<span title="' + k.ad + '">' + k.ikon + '</span>';
+      });
+      html +=   '</div>';
+    }
+    html +=   '</div>';
+    html +=   '<div class="pv-ust-sag">';
+    html +=     '<div class="pv-fiyat">' + paraFormat(p.fiyat) + '</div>';
+    html +=     '<div class="pv-sure">/' + (sure ? sure.ad : p.sure) + '</div>';
+    html +=   '</div>';
+    html +=   '<span class="pv-ok">' + (acik ? '▲' : '▼') + '</span>';
+    html += '</button>';
+
+    /* ── Açık hâl: açıklama + kapsam detayı ── */
+    if(acik){
+      html += '<div class="pv-detay">';
+      if(p.aciklama){
+        html += '<div class="pv-aciklama">' + _pkKacir(p.aciklama) + '</div>';
+      }
+      if(p.kapsam && p.kapsam.length){
+        html += '<div class="pv-kapsam">';
+        p.kapsam.forEach(function(kid){
+          var k = PAKET_KAPSAM.find(function(x){ return x.id === kid; });
+          if(!k) return;
+          var adet = p.kapsamAdet && p.kapsamAdet[kid];
+          html += '<div class="pkl-madde">' +
+                    '<span class="pkl-madde-ikon">' + k.ikon + '</span>' +
+                    '<span>' + k.ad + (adet ? ' <b>· ' + _pkKacir(adet) + '</b>' : '') + '</span>' +
+                  '</div>';
+        });
+        html += '</div>';
+      }
+      html += '<button class="pkl-btn birincil" style="width:100%" ' +
+              'onclick="showToast(\'Mesajlaşma yakında eklenecek.\',\'warn\')">' +
+              'İletişime Geç</button>';
+      html += '</div>';
+    }
+
+    html += '</div>';
+    return html;
+  }).join('');
 }

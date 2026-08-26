@@ -1,7 +1,7 @@
-RavenFit — Güncelleme 1.3.0.0
+RavenFit — Güncelleme 1.3.1.0
 ==============================================
 
-8 dosya değişti (toplam 125 dosya).
+5 dosya değişti (toplam 125 dosya).
 Bu paketi açıp KLASÖR YAPISINI KORUYARAK depona yükle.
 Aynı yoldaki dosyaların üzerine yaz.
 
@@ -9,11 +9,8 @@ DEĞİŞENLER:
 
   GÜNCEL css/social.css
   GÜNCEL index.html
-  YENİ  js/social/packages.js
-  YENİ  js/social/pricing.js
-  GÜNCEL js/social/profile-view.js
+  GÜNCEL js/social/packages.js
+  GÜNCEL js/social/posts.js
   GÜNCEL js/social/user-profile.js
-  GÜNCEL tests/audit.sh
-  YENİ  tests/pricing.js
 
 Yükledikten sonra: Ctrl + Shift + R
