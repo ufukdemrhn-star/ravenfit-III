@@ -523,7 +523,8 @@ function _pdCiz(post, profil, medya){
   html += '<div class="pd-yazar">';
   html +=   '<button class="dsc-av" style="border:none;padding:0" onclick="closePost();openUserProfile(\'' + post.uid + '\')">' + av + '</button>';
   html +=   '<div class="dsc-bilgi">';
-  html +=     '<div class="dsc-nick">@' + (profil.nickname||'') + '</div>';
+  html +=     '<div class="dsc-nick">@' + (profil.nickname||'') +
+              ((typeof onayRozeti === 'function') ? onayRozeti(profil, 13) : '') + '</div>';
   html +=     '<div class="dsc-isim">' + _pdTarih(post.tarih) +
               (post.duzenlendi ? ' · düzenlendi' : '') + '</div>';
   html +=   '</div>';
@@ -875,7 +876,8 @@ function _pdYorumHTML(y, altYorumlar, yanitMi){
   html +=   '<button class="pd-yorum-av" onclick="closePost();openUserProfile(\'' + y.uid + '\')">' + av + '</button>';
   html +=   '<div class="pd-yorum-govde">';
   html +=     '<div class="pd-yorum-ust">';
-  html +=       '<span class="pd-yorum-nick">@' + (p.nickname||'kullanıcı') + '</span>';
+  html +=       '<span class="pd-yorum-nick">@' + (p.nickname||'kullanıcı') +
+                ((typeof onayRozeti === 'function') ? onayRozeti(p, 11) : '') + '</span>';
   html +=       '<span class="pd-yorum-tarih">' + _pdTarih(y.tarih) + '</span>';
   html +=     '</div>';
   html +=     '<div class="pd-yorum-metin">' + _npKacir(y.metin) + '</div>';

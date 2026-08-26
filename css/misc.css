@@ -210,7 +210,9 @@
   flex:1;position:relative;
   -webkit-tap-highlight-color:transparent}
 .bnav-search-ring{
-  position:relative;top:-16px;
+  /* Önceki hâli top:-16px ile yukarı taşıyordu; diğer sekmelerle
+     hizasız duruyordu. Artık menünün dikey ortasında. */
+  position:relative;top:0;
   width:58px;height:58px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
   background:var(--card);
@@ -225,4 +227,4 @@
   box-shadow:0 6px 22px var(--ag)}
 
 /* Alt menü yüksekliği — yükseltilmiş buton taşmasın */
-.bottom-nav{overflow:visible}
+.bottom-nav{overflow:hidden}

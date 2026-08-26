@@ -25,7 +25,8 @@ var BADGES_FALLBACK=[
   {id:'entries_12',name_tr:'Veri Gurusu',desc_tr:'12 haftalık ölçüm takibi!',icon:'📈',condition_type:'entries_count',condition_value:12,branch:'all'},
   {id:'multi_branch',name_tr:'Çok Yönlü',desc_tr:'2+ branşta aktif antrenman yapıyorsun!',icon:'🌟',condition_type:'branch_active',condition_value:2,branch:'all'},
   {id:'supp_master',name_tr:'Supplement Ustası',desc_tr:'5+ supplement kullanıyorsun!',icon:'💊',condition_type:'supplement_count',condition_value:5,branch:'all'},
-  {id:'water_champ',name_tr:'Su Şampiyonu',desc_tr:'Günlük su hedefini tamamladın!',icon:'💧',condition_type:'water_complete',condition_value:1,branch:'all'}
+  {id:'water_champ',name_tr:'Su Şampiyonu',desc_tr:'Günlük su hedefini tamamladın!',icon:'💧',condition_type:'water_complete',condition_value:1,branch:'all'},
+  {id:'verified_coach',name_tr:'Onaylı Koç',desc_tr:'Antrenörlük veya diyetisyenlik belgen onaylandı.',icon:'🎖️',condition_type:'verified_pro',condition_value:1,branch:'all'}
 ];
 
 function _getBadgeDefs(){
@@ -63,6 +64,18 @@ function checkAndAwardBadges(){
     switch(badge.condition_type){
       case 'workout_count':
         met=logs.length>=badge.condition_value;
+        break;
+      /* Onaylı profesyonel — belge onaylandığında kazanılır.
+         Diğer rozetlerden farklı olarak antrenmanla değil,
+         yönetici onayıyla açılır. */
+      case 'verified_pro':
+        met = (function(){
+          try {
+            var p = JSON.parse(_lsGet('rf_profile') || '{}');
+            return p.onay === 'onayli' &&
+                   (p.rol === 'antrenor' || p.rol === 'diyetisyen');
+          } catch(e){ return false; }
+        })();
         break;
       case 'workout_count_branch':
         var branchLogs=logs.filter(function(l){

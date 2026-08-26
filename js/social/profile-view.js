@@ -44,9 +44,8 @@ function _renderKendiProfil(){
   var adEl = document.getElementById('pr-name');
   if(adEl){
     var isim = p.isim || (typeof U !== 'undefined' ? (U.name || '') : '');
-    var onayli = p.onay === 'onayli';
     adEl.innerHTML = (isim || nick || 'İsimsiz') +
-      (onayli ? ' <span class="pr-verified" title="Onaylı hesap">✔</span>' : '');
+      ((typeof onayRozeti === 'function') ? onayRozeti(p, 15) : '');
   }
 
   /* Biyografi */
@@ -213,10 +212,26 @@ function _renderProfilSekmesi(){
       'Paylaştığın programlar burada görünecek.<br>' +
       '<span style="opacity:.7">Yakında</span></div>';
   } else {
-    el.innerHTML = '<div class="pr-tab-bos"><span class="ikon">📣</span>' +
-      '<strong>Hizmetler</strong><br>' +
-      'Antrenörlük ve diyetisyenlik hizmetleri burada listelenecek.<br>' +
-      '<span style="opacity:.7">Yakında</span></div>';
+    /* Hizmetler — onay durumuna göre farklı içerik */
+    var p = getYerelProfil();
+    var onay = p.onay || 'yok';
+    if(onay === 'onayli'){
+      el.innerHTML = '<div class="pr-tab-bos"><span class="ikon">📣</span>' +
+        '<strong>Hizmet Paketlerin</strong><br>' +
+        'Verdiğin hizmetleri ve fiyatlarını burada listeleyeceksin.<br>' +
+        '<span style="opacity:.7">Yakında</span></div>';
+    } else if(onay === 'beklemede'){
+      el.innerHTML = '<div class="pr-tab-bos"><span class="ikon">⏳</span>' +
+        '<strong>Başvurun İnceleniyor</strong><br>' +
+        'Onaylandığında hizmet paketlerini paylaşabileceksin.' +
+        '<br><br><button class="btn btn-s" onclick="openProApplication()">Başvuruyu Gör</button></div>';
+    } else {
+      el.innerHTML = '<div class="pr-tab-bos"><span class="ikon">🎖️</span>' +
+        '<strong>Antrenör veya Diyetisyen misin?</strong><br>' +
+        'Belgeni doğrulat, profilinde onaylı rozet kazan ve<br>' +
+        'hizmet paketlerini paylaş.' +
+        '<br><br><button class="btn btn-p" onclick="openProApplication()">Başvuru Yap</button></div>';
+    }
   }
 }
 

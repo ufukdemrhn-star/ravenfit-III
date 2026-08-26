@@ -162,6 +162,13 @@ node tests/feed.js > /tmp/rf_feed.log 2>&1
 sonuc $? "$(grep -o '[0-9]*/[0-9]* geçti' /tmp/rf_feed.log | head -1)"
 grep "❌" /tmp/rf_feed.log | head -5
 
+# ── 4m. Profesyonel başvurusu ──────────────────────────────
+baslik "4m. Profesyonel başvurusu"
+node tests/pro-application.js > /tmp/rf_pro.log 2>&1
+! grep -q "❌" /tmp/rf_pro.log
+sonuc $? "$(grep -o '[0-9]*/[0-9]* geçti' /tmp/rf_pro.log | head -1)"
+grep "❌" /tmp/rf_pro.log | head -5
+
 # ── 5. DOM ID denetimi ─────────────────────────────────────
 baslik "5. DOM ID denetimi"
 python3 tests/dom-check.py > /tmp/rf_dom.log 2>&1

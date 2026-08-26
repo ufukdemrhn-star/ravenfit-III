@@ -78,8 +78,7 @@ function _upCiz(){
   var avatar = p.avatar
     ? '<img src="' + p.avatar + '" alt="">'
     : '<span>' + bas + '</span>';
-  var onayli = p.onay === 'onayli'
-    ? ' <span class="pr-verified" title="Onaylı hesap">✔</span>' : '';
+  var onayli = (typeof onayRozeti === 'function') ? onayRozeti(p, 15) : '';
 
   var html = '';
 
@@ -100,6 +99,10 @@ function _upCiz(){
 
   /* İsim + biyografi */
   html += '<div class="up-name">' + (p.isim || p.nickname || 'İsimsiz') + onayli + '</div>';
+  if(typeof onayEtiketi === 'function'){
+    var etiket = onayEtiketi(p);
+    if(etiket) html += '<div style="margin-bottom:8px">' + etiket + '</div>';
+  }
   if(p.bio) html += '<div class="up-bio">' + _upKacir(p.bio) + '</div>';
 
   /* Eylemler */

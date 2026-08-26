@@ -5,6 +5,8 @@
 
 var _kesfetSorgu = '';
 var _kesfetTimer = null;
+var _kesfetKaydirma = 0;      /* son kaydırma konumu */
+var _kesfetSonListe = null;   /* son gösterilen sonuçlar */
 
 function openDiscover(){
   var ov = document.getElementById('discover-overlay');
@@ -13,16 +15,43 @@ function openDiscover(){
   document.body.style.overflow = 'hidden';
 
   var inp = document.getElementById('dsc-input');
-  if(inp){ inp.value = _kesfetSorgu; setTimeout(function(){ inp.focus(); }, 180); }
+  if(inp) inp.value = _kesfetSorgu;
 
+  /* Önceki listeyi ve kaydırma konumunu geri yükle.
+     Bir profile girip geri dönünce baştan yüklemek, uzun
+     listede kullanıcının yerini kaybetmesine yol açıyordu. */
+  if(_kesfetSonListe){
+    _dscListele(_kesfetSonListe, null);
+    setTimeout(function(){
+      var g = document.getElementById('dsc-body');
+      if(g) g.scrollTop = _kesfetKaydirma;
+    }, 30);
+    return;
+  }
+
+  /* İlk açılış — odaklan ve yükle */
+  if(inp) setTimeout(function(){ inp.focus(); }, 180);
   if(_kesfetSorgu) dscAra();
   else _dscSonKatilanlar();
 }
 
 function closeDiscover(){
+  /* Kaydırma konumunu sakla — geri dönünce aynı yerden devam */
+  var g = document.getElementById('dsc-body');
+  if(g) _kesfetKaydirma = g.scrollTop;
   var ov = document.getElementById('discover-overlay');
   if(ov) ov.classList.remove('active');
   document.body.style.overflow = '';
+}
+
+/* Aramayı sıfırla — kullanıcı bilerek yeniden başlatmak isterse */
+function dscSifirla(){
+  _kesfetSonListe = null;
+  _kesfetKaydirma = 0;
+  _kesfetSorgu = '';
+  var inp = document.getElementById('dsc-input');
+  if(inp) inp.value = '';
+  _dscSonKatilanlar();
 }
 
 /* Yazarken arama — her tuşta sorgu atmamak için 300ms beklenir */
@@ -39,6 +68,7 @@ function dscAra(){
   if(!_kesfetSorgu){ return _dscSonKatilanlar(); }
   if(_kesfetSorgu.length < 1) return;
 
+  _kesfetKaydirma = 0;   /* yeni arama en baştan */
   _dscYukleniyor();
   profilAra(_kesfetSorgu, 20).then(function(sonuclar){
     _dscListele(sonuclar,
@@ -64,6 +94,7 @@ function _dscYukleniyor(){
 function _dscListele(liste, bosMesaj){
   var el = document.getElementById('dsc-body');
   if(!el) return;
+  _kesfetSonListe = liste;   /* geri dönüşte kullanılacak */
 
   var baslik = document.getElementById('dsc-baslik');
   if(baslik) baslik.textContent = _kesfetSorgu ? 'Arama Sonuçları' : 'Son Katılanlar';
@@ -78,8 +109,7 @@ function _dscListele(liste, bosMesaj){
     var avatar = p.avatar
       ? '<img src="' + p.avatar + '" alt="">'
       : '<span>' + bas + '</span>';
-    var onayli = p.onay === 'onayli'
-      ? ' <span class="dsc-onay" title="Onaylı hesap">✔</span>' : '';
+    var onayli = (typeof onayRozeti === 'function') ? onayRozeti(p, 13) : '';
     /* BRANCH_DEFS bir DİZİdir, nesne değil — id ile aranmalı.
        Önceki sürüm BRANCH_DEFS[b] yazıyordu ve hep undefined
        dönüyordu; bu yüzden herkeste '•' görünüyordu. */

@@ -174,8 +174,7 @@ function _akisKartHTML(g){
   var av = p.avatar ? '<img src="' + p.avatar + '" alt="">' : '<span>' + bas + '</span>';
   var tur = (typeof GONDERI_TURLERI !== 'undefined')
     ? GONDERI_TURLERI.find(function(t){ return t.id === g.tur; }) : null;
-  var onayli = p.onay === 'onayli'
-    ? ' <span class="dsc-onay" title="Onaylı hesap">✔</span>' : '';
+  var onayli = (typeof onayRozeti === 'function') ? onayRozeti(p, 13) : '';
 
   var html = '<article class="fd-kart">';
 
