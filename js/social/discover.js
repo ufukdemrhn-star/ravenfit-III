@@ -71,6 +71,7 @@ function dscAra(){
   _kesfetKaydirma = 0;   /* yeni arama en baştan */
   _dscYukleniyor();
   profilAra(_kesfetSorgu, 20).then(function(sonuclar){
+    sonuclar = _dscEngelAyikla(sonuclar);
     _dscListele(sonuclar,
       sonuclar.length ? null :
       '"' + _kesfetSorgu + '" için kullanıcı bulunamadı.');
@@ -80,6 +81,7 @@ function dscAra(){
 function _dscSonKatilanlar(){
   _dscYukleniyor();
   sonKatilanlar(12).then(function(liste){
+    liste = _dscEngelAyikla(liste);
     var el = document.getElementById('dsc-baslik');
     if(el) el.textContent = 'Son Katılanlar';
     _dscListele(liste, liste.length ? null : 'Henüz başka kullanıcı yok.');
@@ -130,4 +132,12 @@ function _dscListele(liste, bosMesaj){
              '<div class="dsc-sag">' + branslar + '</div>' +
            '</button>';
   }).join('');
+}
+
+
+/* Engellenen ve engelleyen kullanıcıları listeden çıkarır.
+   Arama sonucunda görünmeleri engellemenin anlamını bozar. */
+function _dscEngelAyikla(liste){
+  if(typeof engelliMi !== 'function') return liste;
+  return (liste || []).filter(function(p){ return !engelliMi(p.uid); });
 }

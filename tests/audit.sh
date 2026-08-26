@@ -197,6 +197,13 @@ node tests/pricing.js > /tmp/rf_fiyat.log 2>&1
 sonuc $? "$(grep -o '[0-9]*/[0-9]* geçti' /tmp/rf_fiyat.log | head -1)"
 grep "❌" /tmp/rf_fiyat.log | head -5
 
+# ── 4r. Engelleme ve gizlilik ──────────────────────────────
+baslik "4r. Engelleme ve gizlilik"
+node tests/privacy.js > /tmp/rf_gizlilik.log 2>&1
+! grep -q "❌" /tmp/rf_gizlilik.log
+sonuc $? "$(grep -o '[0-9]*/[0-9]* geçti' /tmp/rf_gizlilik.log | head -1)"
+grep "❌" /tmp/rf_gizlilik.log | head -5
+
 # ── 5. DOM ID denetimi ─────────────────────────────────────
 baslik "5. DOM ID denetimi"
 python3 tests/dom-check.py > /tmp/rf_dom.log 2>&1

@@ -148,18 +148,85 @@ function _adminSikayetCiz(){
     if(r.aciklama){
       html += '<div class="ad-aciklama">' + _adKacir(r.aciklama) + '</div>';
     }
+    /* Şikâyet edilen içeriğin ÖNİZLEMESİ — panelden çıkmadan
+       karar verilebilsin diye. Yönetici gönderiyi görmek için
+       başka ekrana gitmek zorunda kalmamalı. */
+    html +=   '<div class="ad-onizleme" id="ao-' + r.id + '">' +
+                '<div class="ad-onizleme-yukleniyor">İçerik yükleniyor...</div>' +
+              '</div>';
+
     html +=   '<div class="ad-eylemler">';
     if(r.tur === 'post'){
-      html +=   '<button class="ad-btn" onclick="adminIcerikGor(\'post\',\'' + r.hedefId + '\')">Gönderiyi Gör</button>';
+      html +=   '<button class="ad-btn" onclick="adminIcerikGor(\'post\',\'' + r.hedefId + '\')">Tam Ekranda Aç</button>';
       html +=   '<button class="ad-btn red" onclick="adminGonderiSil(\'' + r.hedefId + '\',\'' + r.id + '\')">Gönderiyi Sil</button>';
     } else if(r.tur === 'profil'){
-      html +=   '<button class="ad-btn" onclick="adminIcerikGor(\'profil\',\'' + r.hedefId + '\')">Profili Gör</button>';
+      html +=   '<button class="ad-btn" onclick="adminIcerikGor(\'profil\',\'' + r.hedefId + '\')">Profili Aç</button>';
     }
     html +=     '<button class="ad-btn" onclick="adminSikayetKapat(\'' + r.id + '\')">Kapat</button>';
     html +=   '</div>';
     html += '</div>';
     return html;
   }).join('');
+
+  /* Önizlemeleri asenkron doldur — liste beklemeden çizilsin */
+  _adminListe.forEach(function(r){ _adminOnizlemeDoldur(r); });
+}
+
+/* Şikâyet edilen içeriği panel içinde gösterir */
+function _adminOnizlemeDoldur(r){
+  var el = document.getElementById('ao-' + r.id);
+  if(!el || !_fbDb) return;
+
+  if(r.tur === 'post'){
+    _fbDb.collection('posts').doc(r.hedefId).get()
+      .then(function(doc){
+        if(!doc.exists){
+          el.innerHTML = '<div class="ad-onizleme-yok">⚠️ Gönderi silinmiş</div>';
+          return;
+        }
+        var g = doc.data();
+        return profilGetir(g.uid).catch(function(){ return {nickname:'?'}; })
+          .then(function(p){
+            var html = '<div class="ad-onizleme-ust">@' + (p.nickname||'') + '</div>';
+            if(g.onizlemeler && g.onizlemeler.length){
+              html += '<div class="ad-onizleme-fotolar">';
+              g.onizlemeler.slice(0,5).forEach(function(f){
+                html += '<img src="' + f + '" alt="">';
+              });
+              html += '</div>';
+            }
+            if(g.metin){
+              html += '<div class="ad-onizleme-metin">' + _adKacir(g.metin) + '</div>';
+            }
+            el.innerHTML = html;
+          });
+      })
+      .catch(function(){
+        el.innerHTML = '<div class="ad-onizleme-yok">İçerik okunamadı</div>';
+      });
+
+  } else if(r.tur === 'profil'){
+    profilGetir(r.hedefId)
+      .then(function(p){
+        var bas = (p.isim || p.nickname || '?').charAt(0).toUpperCase();
+        var av = p.avatar ? '<img src="' + p.avatar + '" alt="">' : '<span>' + bas + '</span>';
+        var html = '<div class="ad-onizleme-profil">' +
+                     '<div class="dsc-av">' + av + '</div>' +
+                     '<div class="dsc-bilgi">' +
+                       '<div class="dsc-nick">@' + (p.nickname||'') + '</div>' +
+                       '<div class="dsc-isim">' + _adKacir(p.isim||'') + '</div>' +
+                     '</div>' +
+                   '</div>';
+        if(p.bio) html += '<div class="ad-onizleme-metin">' + _adKacir(p.bio) + '</div>';
+        el.innerHTML = html;
+      })
+      .catch(function(){
+        el.innerHTML = '<div class="ad-onizleme-yok">⚠️ Profil bulunamadı</div>';
+      });
+
+  } else {
+    el.innerHTML = '<div class="ad-onizleme-yok">Önizleme yok</div>';
+  }
 }
 
 function adminIcerikGor(tur, id){

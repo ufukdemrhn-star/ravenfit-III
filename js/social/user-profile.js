@@ -47,8 +47,14 @@ function openUserProfile(uid){
 
   _upYukleniyor();
 
-  profilGetir(uid, true).then(function(p){
+  Promise.all([profilGetir(uid, true), engelleriYukle()]).then(function(r){
+    var p = r[0];
     _upProfil = p;
+
+    /* Engel varsa profil içeriği gösterilmez */
+    if(typeof engelliMi === 'function' && engelliMi(uid)){
+      return _upEngelliCiz(uid);
+    }
     _upCiz();
   }).catch(function(e){
     var g = document.getElementById('up-body');
@@ -77,6 +83,35 @@ function _upYukleniyor(){
   if(g) g.innerHTML = '<div class="dsc-durum">Yükleniyor...</div>';
   var b = document.getElementById('up-nick');
   if(b) b.textContent = '';
+}
+
+/* Engel varsa — iki yönlü, kim engelledi belirtilmez */
+function _upEngelliCiz(uid){
+  var g = document.getElementById('up-body');
+  if(!g) return;
+  var benEngelledim = (typeof benEngelledimMi === 'function') && benEngelledimMi(uid);
+
+  var nickEl = document.getElementById('up-nick');
+  if(nickEl) nickEl.textContent = '';
+
+  g.innerHTML =
+    '<div class="up-engel">' +
+      '<span class="ikon">🚫</span>' +
+      '<strong>' + (benEngelledim ? 'Bu kullanıcıyı engelledin' : 'Bu profili görüntüleyemezsin') + '</strong>' +
+      (benEngelledim
+        ? 'Engeli kaldırırsan profilini yeniden görebilirsin.' +
+          '<br><br><button class="btn btn-s" onclick="upEngeliKaldir(\'' + uid + '\')">Engeli Kaldır</button>'
+        : 'Bu kullanıcının gizlilik ayarları profilini görmene izin vermiyor.') +
+    '</div>';
+}
+
+function upEngeliKaldir(uid){
+  showConfirm('Engeli Kaldır','Bu kullanıcıyı yeniden görebileceksin.', function(){
+    engeliKaldir(uid).then(function(){
+      showToast('Engel kaldırıldı.');
+      openUserProfile(uid);
+    }).catch(function(e){ showToast('❌ ' + e.message,'error'); });
+  }, 'Kaldır');
 }
 
 function _upCiz(){
@@ -128,8 +163,11 @@ function _upCiz(){
   html += '</div>';
 
   /* İstatistikler — SADECE paylaştıkları */
-  var ist = p.istatistik || {};
-  var vitrin = (p.vitrin || []).filter(function(id){ return ist[id] !== undefined; });
+  var icerikAcik = _upIcerikAcik();
+  var ist = icerikAcik ? (p.istatistik || {}) : {};
+  var vitrin = icerikAcik
+    ? (p.vitrin || []).filter(function(id){ return ist[id] !== undefined; })
+    : [];
   html += '<div class="rc">';
   html +=   '<div class="pr-stats-head">';
   html +=     '<div class="rct" style="margin:0">📊 İSTATİSTİKLER</div>';
@@ -138,7 +176,9 @@ function _upCiz(){
   }
   html +=   '</div>';
   if(!vitrin.length){
-    html += '<div class="pr-vitrin-bos">Bu kullanıcı istatistiklerini paylaşmıyor.</div>';
+    html += '<div class="pr-vitrin-bos">' +
+            (icerikAcik ? 'Bu kullanıcı istatistiklerini paylaşmıyor.'
+                        : '🔒 Gizli hesap — takip edince görünür') + '</div>';
   } else {
     html += '<div class="pr-vitrin">' + vitrin.map(function(id){
       var a = alanBul(id);
@@ -183,6 +223,12 @@ function _upCiz(){
   _upTakipDurumu();
 }
 
+/* Gizli profilde içerik görünür mü? */
+function _upIcerikAcik(){
+  if(typeof icerikGorulebilirMi !== 'function') return true;
+  return icerikGorulebilirMi(_upProfil);
+}
+
 /* Rozet şeridi — profilden gelen rozet listesi */
 function _upRozetler(p){
   var idler = p.rozetler || [];
@@ -214,6 +260,17 @@ function _upSekmeCiz(){
   var el = document.getElementById('up-tab-body');
   if(!el) return;
   var ad = _upProfil ? ('@' + (_upProfil.nickname||'')) : 'Bu kullanıcı';
+
+  /* Gizli profil ve takip etmiyorsam içerik kilitli */
+  if(!_upIcerikAcik()){
+    el.innerHTML = '<div class="up-kilit">' +
+      '<span class="ikon">🔒</span>' +
+      '<strong>Bu hesap gizli</strong>' +
+      'Gönderilerini ve istatistiklerini görmek için ' +
+      'takip isteği gönder ve onaylanmasını bekle.' +
+      '</div>';
+    return;
+  }
   if(_upSekme === 'posts'){
     el.innerHTML = '<div class="dsc-durum">Yükleniyor...</div>';
     if(typeof gonderileriGetir === 'function'){
@@ -259,25 +316,68 @@ function _upSayaclar(){
 }
 
 function _upTakipDurumu(){
-  takipEdiyorMuyum(_upUid).then(_upTakipButon);
+  takipEdiyorMuyum(_upUid).then(function(ediyor){
+    if(ediyor) return _upTakipButon('takipte');
+    /* Takip etmiyorum — gizli profilse istek durumuna bak */
+    if(gizliProfilMi(_upProfil)){
+      takipIstegiDurumu(_upUid).then(function(durum){
+        _upTakipButon(durum === 'beklemede' ? 'istekBekliyor' : 'istekGonder');
+      });
+    } else {
+      _upTakipButon('takipEt');
+    }
+  });
 }
 
-function _upTakipButon(ediyor){
+/* Buton dört durumdan birinde olur:
+   takipte · takipEt · istekGonder · istekBekliyor */
+function _upTakipButon(durum){
   var b = document.getElementById('up-takip-btn');
   if(!b) return;
   b.disabled = false;
-  b.textContent = ediyor ? 'Takiptesin' : 'Takip Et';
-  b.className = 'pr-act ' + (ediyor ? 'following' : 'primary');
+
+  var metinler = {
+    takipte:       {yazi:'Takiptesin',      sinif:'following'},
+    takipEt:       {yazi:'Takip Et',        sinif:'primary'},
+    istekGonder:   {yazi:'Takip İsteği Gönder', sinif:'primary'},
+    istekBekliyor: {yazi:'İstek Gönderildi', sinif:'following'}
+  };
+  var d = metinler[durum] || metinler.takipEt;
+  b.textContent = d.yazi;
+  b.className = 'pr-act ' + d.sinif;
+  b.dataset.durum = durum;
   b.onclick = upTakipDegistir;
 }
 
 function upTakipDegistir(){
   var b = document.getElementById('up-takip-btn');
-  if(b){ b.disabled = true; b.textContent = '...'; }
-  takipDegistir(_upUid).then(function(ediyor){
-    _upTakipButon(ediyor);
+  if(!b) return;
+  var durum = b.dataset.durum || 'takipEt';
+  b.disabled = true; b.textContent = '...';
+
+  var islem;
+  if(durum === 'istekGonder'){
+    islem = takipIstegiGonder(_upUid).then(function(){ return 'istekBekliyor'; });
+  } else if(durum === 'istekBekliyor'){
+    islem = takipIstegiGeriCek(_upUid).then(function(){ return 'istekGonder'; });
+  } else {
+    islem = takipDegistir(_upUid).then(function(ediyor){
+      return ediyor ? 'takipte' : (gizliProfilMi(_upProfil) ? 'istekGonder' : 'takipEt');
+    });
+  }
+
+  islem.then(function(yeniDurum){
+    _upTakipButon(yeniDurum);
     _upSayaclar();
-    showToast(ediyor ? '✅ Takip ediliyor.' : 'Takip bırakıldı.');
+    var mesajlar = {
+      takipte:       '✅ Takip ediliyor.',
+      istekBekliyor: '✅ Takip isteği gönderildi.',
+      istekGonder:   'İstek geri çekildi.',
+      takipEt:       'Takip bırakıldı.'
+    };
+    showToast(mesajlar[yeniDurum] || '');
+    /* Gizli profilde takip başlayınca içerik açılır */
+    if(yeniDurum === 'takipte' && gizliProfilMi(_upProfil)) _upCiz();
   }).catch(function(e){
     _upTakipDurumu();
     showToast('❌ ' + e.message, 'error');
@@ -328,4 +428,70 @@ function _upDeger(id, deger){
 
 function _upKacir(s){
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ══════════════════════════════════════════════════════════
+   KULLANICI SEÇENEKLERİ MENÜSÜ
+   Şikâyet ve engelleme tek yerde toplandı.
+   ══════════════════════════════════════════════════════════ */
+function upMenuAc(){
+  if(!_upUid) return;
+  var nick = _upProfil ? ('@' + (_upProfil.nickname||'')) : 'Kullanıcı';
+
+  var baslik = document.getElementById('um-baslik');
+  if(baslik) baslik.textContent = nick;
+
+  var engelli = (typeof benEngelledimMi === 'function') && benEngelledimMi(_upUid);
+  var el = document.getElementById('um-body');
+  if(el){
+    el.innerHTML =
+      '<button class="um-secenek" onclick="upMenuKapat();openReport(\'profil\',\'' + _upUid + '\',\'' + _upUid + '\')">' +
+        '<span class="um-ikon">🚩</span>' +
+        '<span><strong>Şikâyet Et</strong><small>Kurallara aykırı davranış bildir</small></span>' +
+      '</button>' +
+      '<button class="um-secenek tehlike" onclick="upEngelToggle()">' +
+        '<span class="um-ikon">' + (engelli ? '✅' : '🚫') + '</span>' +
+        '<span><strong>' + (engelli ? 'Engeli Kaldır' : 'Engelle') + '</strong>' +
+        '<small>' + (engelli
+          ? 'Profilini yeniden görebilirsin'
+          : 'Birbirinizi göremez, mesajlaşamazsınız') + '</small></span>' +
+      '</button>';
+  }
+
+  var ov = document.getElementById('user-menu-overlay');
+  if(ov) ov.classList.add('active');
+}
+
+function upMenuKapat(){
+  var ov = document.getElementById('user-menu-overlay');
+  if(ov) ov.classList.remove('active');
+}
+
+function upEngelToggle(){
+  var uid = _upUid;
+  var engelli = (typeof benEngelledimMi === 'function') && benEngelledimMi(uid);
+  var nick = _upProfil ? ('@' + (_upProfil.nickname||'')) : 'Bu kullanıcı';
+  upMenuKapat();
+
+  if(engelli){
+    showConfirm('Engeli Kaldır', nick + ' kullanıcısını yeniden görebileceksin.', function(){
+      engeliKaldir(uid).then(function(){
+        showToast('Engel kaldırıldı.');
+        openUserProfile(uid);
+      }).catch(function(e){ showToast('❌ ' + e.message,'error'); });
+    }, 'Kaldır');
+  } else {
+    showConfirm('Engelle',
+      nick + ' kullanıcısını engellemek üzeresin.\n\n' +
+      '• Birbirinizin profilini göremezsiniz\n' +
+      '• Mevcut takipler kaldırılır\n' +
+      '• Mesajlaşamazsınız\n\n' +
+      'Bu işlemi daha sonra geri alabilirsin.',
+      function(){
+        engelle(uid).then(function(){
+          showToast('Kullanıcı engellendi.');
+          closeUserProfile();
+        }).catch(function(e){ showToast('❌ ' + e.message,'error'); });
+      }, 'Engelle');
+  }
 }

@@ -71,6 +71,7 @@ function _profilYayinla(){
       istatistik: p.istatistik || {},        /* SADECE paylaşılanlar */
       vitrin:     p.vitrin || [],
       rol:        p.rol || 'uye',
+      gizli:      p.gizli === true,
       onay:       p.onay || 'yok',
       takipci:    p.takipciSayisi || 0,
       takip:      p.takipSayisi || 0,

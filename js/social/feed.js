@@ -55,7 +55,10 @@ function _akisYukle(){
   var el = document.getElementById('fd-body');
   if(el) el.innerHTML = '<div class="dsc-durum">Yükleniyor...</div>';
 
-  var vaat = (_akisSekme === 'takip') ? _akisTakipGonderileri() : _akisTumGonderiler();
+  /* Engel listesi olmadan filtre yapılamaz — önce o yüklenir */
+  var vaat = engelleriYukle().then(function(){
+    return (_akisSekme === 'takip') ? _akisTakipGonderileri() : _akisTumGonderiler();
+  });
 
   vaat.then(function(gonderiler){
     _akisGonderiler = gonderiler;
@@ -109,21 +112,62 @@ function _akisTakipGonderileri(){
     })).then(function(gruplar){
       var hepsi = [];
       gruplar.forEach(function(g){ hepsi = hepsi.concat(g); });
+      /* Engellenenlerin gönderileri takip akışında da görünmemeli */
+      if(typeof engelliMi === 'function'){
+        hepsi = hepsi.filter(function(g){ return !engelliMi(g.uid); });
+      }
       return _akisSirala(hepsi);
     });
   });
 }
 
-/* Tüm gönderiler — keşfet */
+/* Tüm gönderiler — keşfet.
+
+   İki filtre uygulanır:
+     • Engellenen/engelleyen kullanıcıların gönderileri çıkarılır
+     • GİZLİ hesapların gönderileri keşfette görünmez
+       (takip akışında görünür — orada zaten takip ilişkisi var)
+
+   Filtre istemcide yapılır çünkü Firestore'da "gizli olmayan
+   kullanıcıların gönderileri" tek sorguyla alınamaz; posts
+   belgesinde gizlilik bilgisi yok, profiles'ta. */
 function _akisTumGonderiler(){
   if(!_fbDb) return Promise.resolve([]);
-  return _fbDb.collection('posts').limit(60).get()
+  return _fbDb.collection('posts').limit(80).get()
     .then(function(snap){
       var liste = [];
       snap.forEach(function(d){ var g = d.data(); g.id = d.id; liste.push(g); });
-      return _akisSirala(liste);
+      return _akisGizlilikFiltresi(_akisSirala(liste));
     })
     .catch(function(){ return []; });
+}
+
+/* Gizli hesapların ve engellilerin gönderilerini ayıklar */
+function _akisGizlilikFiltresi(liste){
+  if(!liste.length) return Promise.resolve([]);
+
+  /* Engelli olanları hemen çıkar */
+  if(typeof engelliMi === 'function'){
+    liste = liste.filter(function(g){ return !engelliMi(g.uid); });
+  }
+
+  /* Gizlilik için yazar profillerine bakılmalı */
+  var uidler = [];
+  liste.forEach(function(g){ if(uidler.indexOf(g.uid) < 0) uidler.push(g.uid); });
+
+  return Promise.all(uidler.map(function(u){
+    return profilGetir(u).catch(function(){ return null; });
+  })).then(function(profiller){
+    var gizliler = {};
+    profiller.forEach(function(p){
+      if(p && p.gizli === true && (!_fbUser || p.uid !== _fbUser.uid)){
+        /* Takip ediyorsam görebilirim */
+        var takipte = typeof _takipOnbellek !== 'undefined' && _takipOnbellek[p.uid] === true;
+        if(!takipte) gizliler[p.uid] = true;
+      }
+    });
+    return liste.filter(function(g){ return !gizliler[g.uid]; }).slice(0, 60);
+  });
 }
 
 /* Yeniden eskiye. Sunucu zaman damgası istemcide sıralanır —

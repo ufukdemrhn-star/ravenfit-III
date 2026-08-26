@@ -434,6 +434,10 @@ function onUserLoggedIn(user){
            profiles/{uid} belgesidir, yerel kopya ondan güncellenir. */
         if(typeof _onayDurumunuEsitle === 'function') setTimeout(_onayDurumunuEsitle, 900);
         /* Açık profili yayınla — arama ve profil görüntüleme için */
+        /* Engel listesi — akış ve keşfet filtreleri buna dayanır */
+        if(typeof engelleriYukle === 'function') setTimeout(engelleriYukle, 1100);
+        /* Onaylanmış takip isteklerimi takip ilişkisine çevir */
+        if(typeof onaylananIstekleriIsle === 'function') setTimeout(onaylananIstekleriIsle, 1400);
         if(typeof yayinlaProfil === 'function') setTimeout(yayinlaProfil, 1800);
 
         /* Eşleme yoksa oluştur — kullanıcı adı değiştirme bu belgeye
