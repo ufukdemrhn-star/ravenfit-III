@@ -159,7 +159,13 @@ function profilleriGetir(uidler){
   return Promise.all(uidler.map(function(uid){
     return profilGetir(uid).catch(function(){ return null; });
   })).then(function(liste){
-    return liste.filter(Boolean);
+    return liste.filter(function(p){
+      if(!p) return false;
+      /* Engelli ve silinmeyi bekleyen hesaplar listelerde görünmez */
+      if(typeof engelliMi === 'function' && engelliMi(p.uid)) return false;
+      if(typeof silinmeyiBekliyorMu === 'function' && silinmeyiBekliyorMu(p)) return false;
+      return true;
+    });
   });
 }
 

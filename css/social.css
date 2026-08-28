@@ -1335,3 +1335,58 @@ button.pd-sayac:active{color:var(--accent)}
 .pv-kapsam{
   display:flex;flex-direction:column;gap:7px;
   padding:12px;border-radius:10px;background:var(--card2);margin:12px 0}
+
+
+/* ══════════════════════════════════════════════════════════
+   HESAP SILME
+   ══════════════════════════════════════════════════════════ */
+.sl-bilgi{
+  padding:12px 14px;border-radius:11px;
+  background:var(--card2);border-left:2.5px solid var(--info);
+  font-size:12.5px;color:var(--text2);line-height:1.6}
+.sl-uyari{
+  margin-top:14px;padding:12px 14px;border-radius:11px;
+  background:color-mix(in srgb,var(--warn) 13%,transparent);
+  color:var(--warn);font-size:12px;line-height:1.6;font-weight:600}
+
+.sl-ne-olur{
+  margin-top:18px;padding:14px;border-radius:12px;
+  background:var(--card2)}
+.sl-ne-olur-baslik{
+  font-size:12px;font-weight:700;color:var(--text);
+  text-transform:uppercase;letter-spacing:.5px;margin-bottom:11px}
+.sl-adim{
+  display:flex;align-items:flex-start;gap:10px;
+  font-size:12.5px;color:var(--text2);line-height:1.55;margin-bottom:9px}
+.sl-adim:last-child{margin-bottom:0}
+.sl-adim span{
+  width:20px;height:20px;border-radius:50%;flex-shrink:0;
+  background:var(--accent-btn);color:var(--on-accent);
+  font-size:11px;font-weight:700;
+  display:flex;align-items:center;justify-content:center}
+.sl-adim strong{color:var(--text)}
+
+.btn.sl-tehlike{background:var(--danger);color:#FFFFFF}
+
+/* Geri sayim ekrani */
+.sl-durum{text-align:center;padding:14px 8px}
+.sl-sayac{
+  font-size:56px;font-weight:800;color:var(--danger);
+  line-height:1;font-family:'Bebas Neue',cursive}
+.sl-sayac-lbl{font-size:13px;color:var(--text2);margin-top:4px}
+.sl-cizgi{
+  height:5px;border-radius:3px;background:var(--card2);
+  overflow:hidden;margin:16px 0}
+.sl-cizgi div{
+  height:100%;background:var(--danger);border-radius:3px;
+  transition:width .6s ease}
+.sl-durum-metin{
+  font-size:13px;color:var(--text2);line-height:1.65;margin-top:6px}
+.sl-durum-metin strong{color:var(--text)}
+
+/* Son onay */
+.sl-son-onay{text-align:center;padding:20px 8px}
+.sl-son-ikon{font-size:44px;line-height:1;margin-bottom:12px}
+.sl-son-baslik{font-size:18px;font-weight:700;color:var(--danger);margin-bottom:10px}
+.sl-son-metin{font-size:13px;color:var(--text2);line-height:1.7}
+.sl-son-metin strong{color:var(--text);font-size:15px}

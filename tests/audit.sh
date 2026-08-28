@@ -211,6 +211,13 @@ node tests/notifications.js > /tmp/rf_bildirim.log 2>&1
 sonuc $? "$(grep -o '[0-9]*/[0-9]* geçti' /tmp/rf_bildirim.log | head -1)"
 grep "❌" /tmp/rf_bildirim.log | head -5
 
+# ── 4t. Hesap silme ────────────────────────────────────────
+baslik "4t. Hesap silme"
+node tests/account-deletion.js > /tmp/rf_silme.log 2>&1
+! grep -q "❌" /tmp/rf_silme.log
+sonuc $? "$(grep -o '[0-9]*/[0-9]* geçti' /tmp/rf_silme.log | head -1)"
+grep "❌" /tmp/rf_silme.log | head -5
+
 # ── 5. DOM ID denetimi ─────────────────────────────────────
 baslik "5. DOM ID denetimi"
 python3 tests/dom-check.py > /tmp/rf_dom.log 2>&1

@@ -136,16 +136,49 @@ function gizlilikDegistir(gizli){
   return new Promise(function(cozumle, reddet){
     if(!_fbUser || !_fbDb) return reddet(new Error('Giriş yapmalısın.'));
 
+    var oncekiGizli = getYerelProfil().gizli === true;
     var p = getYerelProfil();
     p.gizli = !!gizli;
     saveYerelProfil(p);
 
+    /* ⚠️ saveData() ŞART.
+       Yerel profil users/{uid}.rf_profile alanında saklanır ve
+       girişte oradan geri yüklenir. saveData çağrılmazsa bulutta
+       ESKİ profil kalır ve bir sonraki girişte gizlilik ayarı
+       sıfırlanır — kullanıcı ayarı kaybeder. */
+    if(typeof saveData === 'function') saveData();
+
     _fbDb.collection('profiles').doc(_fbUser.uid).set({gizli: !!gizli}, {merge:true})
       .then(function(){
         if(_profilOnbellek) delete _profilOnbellek[_fbUser.uid];
-        cozumle(!!gizli);
+        /* Gizliden AÇIĞA geçiş: bekleyen istekler anlamsız kalır,
+           hepsi otomatik kabul edilir. Açık hesapta zaten herkes
+           takip edebilir; istekleri bekletmek kullanıcıyı mağdur eder. */
+        if(oncekiGizli && !gizli){
+          return bekleyenIstekleriTopluKabul().then(function(n){
+            cozumle({gizli:false, kabulEdilen:n});
+          });
+        }
+        cozumle({gizli: !!gizli, kabulEdilen:0});
       })
       .catch(function(e){ reddet(new Error('Ayar kaydedilemedi.')); });
+  });
+}
+
+/* Bekleyen tüm takip isteklerini kabul eder.
+   Hesap herkese açık hâle gelince çağrılır. */
+function bekleyenIstekleriTopluKabul(){
+  return bekleyenIstekleriGetir().then(function(istekler){
+    if(!istekler.length) return 0;
+    return Promise.all(istekler.map(function(i){
+      return _fbDb.collection('followRequests').doc(_istekId(i.isteyen, _fbUser.uid))
+        .set({durum:'onayli', onayTarihi: firebase.firestore.FieldValue.serverTimestamp()},
+             {merge:true})
+        .then(function(){
+          if(typeof bildirimGonder === 'function') bildirimGonder(i.isteyen, 'istekKabul');
+        })
+        .catch(function(){});
+    })).then(function(){ return istekler.length; });
   });
 }
 
@@ -335,8 +368,15 @@ function gzGizlilikToggle(){
   var p = getYerelProfil();
   var yeni = !(p.gizli === true);
 
-  gizlilikDegistir(yeni).then(function(){
-    showToast(yeni ? '🔒 Hesabın artık gizli.' : 'Hesabın herkese açık.');
+  gizlilikDegistir(yeni).then(function(sonuc){
+    if(yeni){
+      showToast('🔒 Hesabın artık gizli.');
+    } else if(sonuc && sonuc.kabulEdilen > 0){
+      showToast('✅ Hesabın herkese açık. ' + sonuc.kabulEdilen +
+                ' bekleyen istek otomatik kabul edildi.');
+    } else {
+      showToast('Hesabın herkese açık.');
+    }
     _gzCiz();
     if(typeof renderProfil === 'function') renderProfil();
   }).catch(function(e){ showToast('❌ ' + e.message,'error'); });

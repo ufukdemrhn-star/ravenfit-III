@@ -126,7 +126,8 @@ function _akisTakipGonderileri(){
       if(typeof engelliMi === 'function'){
         hepsi = hepsi.filter(function(g){ return !engelliMi(g.uid); });
       }
-      return _akisSirala(hepsi);
+      /* Silinmeyi bekleyenler takip akışından da çıkarılır */
+      return _akisGizlilikFiltresi(_akisSirala(hepsi));
     });
   });
 }
@@ -170,6 +171,12 @@ function _akisGizlilikFiltresi(liste){
   })).then(function(profiller){
     var gizliler = {};
     profiller.forEach(function(p){
+      /* Silinmeyi bekleyen hesapların gönderileri hiç görünmez */
+      if(p && typeof silinmeyiBekliyorMu === 'function' && silinmeyiBekliyorMu(p)
+         && (!_fbUser || p.uid !== _fbUser.uid)){
+        gizliler[p.uid] = true;
+        return;
+      }
       if(p && p.gizli === true && (!_fbUser || p.uid !== _fbUser.uid)){
         /* Takip ediyorsam görebilirim */
         var takipte = typeof _takipOnbellek !== 'undefined' && _takipOnbellek[p.uid] === true;

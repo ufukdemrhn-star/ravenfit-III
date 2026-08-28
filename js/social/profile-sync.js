@@ -212,6 +212,11 @@ function _onayDurumunuEsitle(){
       var degisti = false;
       if(uzak.onay && uzak.onay !== yerel.onay){ yerel.onay = uzak.onay; degisti = true; }
       if(uzak.rol  && uzak.rol  !== yerel.rol ){ yerel.rol  = uzak.rol;  degisti = true; }
+      /* Gizlilik de buluttan doğrulanır — yerel kopya bozulursa
+         profiles belgesi tek doğru kaynaktır. */
+      if(uzak.gizli !== undefined && (uzak.gizli === true) !== (yerel.gizli === true)){
+        yerel.gizli = uzak.gizli === true; degisti = true;
+      }
 
       if(!degisti) return;
       saveYerelProfil(yerel);

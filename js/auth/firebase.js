@@ -440,6 +440,8 @@ function onUserLoggedIn(user){
         if(typeof onaylananIstekleriIsle === 'function') setTimeout(onaylananIstekleriIsle, 1400);
         /* Okunmamış bildirim rozeti */
         if(typeof bildirimRozetiGuncelle === 'function') setTimeout(bildirimRozetiGuncelle, 1600);
+        /* Silinme bekleyen hesap uyarısı */
+        if(typeof silmeDurumuKontrol === 'function') setTimeout(silmeDurumuKontrol, 2200);
         if(typeof yayinlaProfil === 'function') setTimeout(yayinlaProfil, 1800);
 
         /* Eşleme yoksa oluştur — kullanıcı adı değiştirme bu belgeye

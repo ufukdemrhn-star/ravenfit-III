@@ -55,6 +55,17 @@ function openUserProfile(uid){
     if(typeof engelliMi === 'function' && engelliMi(uid)){
       return _upEngelliCiz(uid);
     }
+    /* Silinmeyi bekleyen hesap görüntülenemez */
+    if(typeof silinmeyiBekliyorMu === 'function' && silinmeyiBekliyorMu(p)){
+      var g = document.getElementById('up-body');
+      var nickEl = document.getElementById('up-nick');
+      if(nickEl) nickEl.textContent = '';
+      if(g) g.innerHTML = '<div class="up-engel">' +
+        '<span class="ikon">👻</span>' +
+        '<strong>Hesap kullanılamıyor</strong>' +
+        'Bu hesap artık aktif değil.</div>';
+      return;
+    }
     _upCiz();
   }).catch(function(e){
     var g = document.getElementById('up-body');

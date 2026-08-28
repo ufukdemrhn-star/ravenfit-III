@@ -8,16 +8,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <!-- Stil dosyaları -->
-<link rel="stylesheet" href="css/themes.css?v=1.5.0.0">
-<link rel="stylesheet" href="css/base.css?v=1.5.0.0">
-<link rel="stylesheet" href="css/components.css?v=1.5.0.0">
-<link rel="stylesheet" href="css/profile.css?v=1.5.0.0">
-<link rel="stylesheet" href="css/workout.css?v=1.5.0.0">
-<link rel="stylesheet" href="css/misc.css?v=1.5.0.0">
-<link rel="stylesheet" href="css/supplements.css?v=1.5.0.0">
-<link rel="stylesheet" href="css/calculators.css?v=1.5.0.0">
-<link rel="stylesheet" href="css/social.css?v=1.5.0.0">
-<link rel="stylesheet" href="css/admin.css?v=1.5.0.0">
+<link rel="stylesheet" href="css/themes.css?v=1.6.0.0">
+<link rel="stylesheet" href="css/base.css?v=1.6.0.0">
+<link rel="stylesheet" href="css/components.css?v=1.6.0.0">
+<link rel="stylesheet" href="css/profile.css?v=1.6.0.0">
+<link rel="stylesheet" href="css/workout.css?v=1.6.0.0">
+<link rel="stylesheet" href="css/misc.css?v=1.6.0.0">
+<link rel="stylesheet" href="css/supplements.css?v=1.6.0.0">
+<link rel="stylesheet" href="css/calculators.css?v=1.6.0.0">
+<link rel="stylesheet" href="css/social.css?v=1.6.0.0">
+<link rel="stylesheet" href="css/admin.css?v=1.6.0.0">
 <link rel="icon" href="assets/icons/favicon.png" type="image/png">
 <link rel="icon" href="assets/icons/icon-192.png" type="image/png" sizes="192x192">
 <link rel="manifest" href="manifest.json">
@@ -111,7 +111,7 @@
   <img src="assets/icons/logo.png" width="148">
 </div>
   <h1 class="splash-title">RAVEN<span style="color:var(--accent)">FIT</span></h1>
-  <div class="splash-tag">Versiyon 1.5.0.0 (beta)</div>
+  <div class="splash-tag">Versiyon 1.6.0.0 (beta)</div>
   <div class="splash-sub">Sen sadece antrenmanına odaklan</div>
   <div class="pills">
     <div class="pill"><div class="pill-dot"></div>Çoklu Branş</div>
@@ -805,6 +805,13 @@
       <div style="font-size:10px;color:var(--text3);margin-top:5px" id="storage-usage-note"></div>
     </div>
     <div class="sdw-sep"></div>
+    <button class="sdw-item danger" onclick="openAccountDeletion();closeSettingsDrawer()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/><path d="M17 8l5 5M22 8l-5 5"/>
+      </svg>
+      Hesabımı Sil
+    </button>
     <button class="sdw-item danger" onclick="resetAll();closeSettingsDrawer()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
       Tüm Verileri Sıfırla
@@ -1198,6 +1205,18 @@
   <div class="up-body" id="up-body"></div>
 </div>
 
+<!-- ══ HESAP SİLME ═══════════════════════════════════════ -->
+<div class="sp-overlay" id="delete-overlay">
+  <div class="sp-sheet">
+    <div class="sp-head">
+      <div class="sp-baslik">Hesabı Sil</div>
+      <button class="sp-kapat" onclick="closeAccountDeletion()" aria-label="Kapat">&times;</button>
+    </div>
+    <div class="sp-body" id="sl-body" style="padding:4px 16px 12px"></div>
+    <div class="sp-foot" id="sl-foot"></div>
+  </div>
+</div>
+
 <!-- ══ GİZLİLİK AYARLARI ═════════════════════════════════ -->
 <div class="sp-overlay" id="privacy-overlay">
   <div class="sp-sheet">
@@ -1290,6 +1309,7 @@
     <button class="ad-sekme act" data-as="basvurular" onclick="adminSekme('basvurular')">Başvurular</button>
     <button class="ad-sekme" data-as="onayli" onclick="adminSekme('onayli')">Onaylılar</button>
     <button class="ad-sekme" data-as="sikayet" onclick="adminSekme('sikayet')">Şikâyetler</button>
+    <button class="ad-sekme" data-as="silme" onclick="adminSekme('silme')">Silme</button>
     <button class="ad-sekme" data-as="icerik" onclick="adminSekme('icerik')">Ara</button>
   </div>
   <div class="ad-body" id="ad-body"></div>
@@ -1502,97 +1522,98 @@
 
 <!-- ══ Uygulama modülleri ══ -->
 <!-- js/core -->
-<script src="js/core/storage.js?v=1.5.0.0"></script>
-<script src="js/core/state.js?v=1.5.0.0"></script>
-<script src="js/core/utils.js?v=1.5.0.0"></script>
-<script src="js/core/data-loader.js?v=1.5.0.0"></script>
-<script src="js/core/theme.js?v=1.5.0.0"></script>
+<script src="js/core/storage.js?v=1.6.0.0"></script>
+<script src="js/core/state.js?v=1.6.0.0"></script>
+<script src="js/core/utils.js?v=1.6.0.0"></script>
+<script src="js/core/data-loader.js?v=1.6.0.0"></script>
+<script src="js/core/theme.js?v=1.6.0.0"></script>
 
 <!-- js/ui -->
-<script src="js/ui/toast.js?v=1.5.0.0"></script>
-<script src="js/ui/screens.js?v=1.5.0.0"></script>
-<script src="js/ui/wizard.js?v=1.5.0.0"></script>
-<script src="js/ui/charts.js?v=1.5.0.0"></script>
+<script src="js/ui/toast.js?v=1.6.0.0"></script>
+<script src="js/ui/screens.js?v=1.6.0.0"></script>
+<script src="js/ui/wizard.js?v=1.6.0.0"></script>
+<script src="js/ui/charts.js?v=1.6.0.0"></script>
 
 <!-- js/health -->
-<script src="js/health/calculations.js?v=1.5.0.0"></script>
-<script src="js/health/goals.js?v=1.5.0.0"></script>
-<script src="js/health/body-profile.js?v=1.5.0.0"></script>
-<script src="js/health/reds-warning.js?v=1.5.0.0"></script>
-<script src="js/health/ffmi-detail.js?v=1.5.0.0"></script>
-<script src="js/health/conditions.js?v=1.5.0.0"></script>
+<script src="js/health/calculations.js?v=1.6.0.0"></script>
+<script src="js/health/goals.js?v=1.6.0.0"></script>
+<script src="js/health/body-profile.js?v=1.6.0.0"></script>
+<script src="js/health/reds-warning.js?v=1.6.0.0"></script>
+<script src="js/health/ffmi-detail.js?v=1.6.0.0"></script>
+<script src="js/health/conditions.js?v=1.6.0.0"></script>
 
 <!-- js/tabs -->
-<script src="js/tabs/render-all.js?v=1.5.0.0"></script>
-<script src="js/tabs/body.js?v=1.5.0.0"></script>
-<script src="js/tabs/nutrition.js?v=1.5.0.0"></script>
-<script src="js/tabs/measurements.js?v=1.5.0.0"></script>
-<script src="js/tabs/progress.js?v=1.5.0.0"></script>
+<script src="js/tabs/render-all.js?v=1.6.0.0"></script>
+<script src="js/tabs/body.js?v=1.6.0.0"></script>
+<script src="js/tabs/nutrition.js?v=1.6.0.0"></script>
+<script src="js/tabs/measurements.js?v=1.6.0.0"></script>
+<script src="js/tabs/progress.js?v=1.6.0.0"></script>
 
 <!-- js/profile -->
-<script src="js/profile/avatar.js?v=1.5.0.0"></script>
-<script src="js/profile/settings.js?v=1.5.0.0"></script>
-<script src="js/profile/profile.js?v=1.5.0.0"></script>
+<script src="js/profile/avatar.js?v=1.6.0.0"></script>
+<script src="js/profile/settings.js?v=1.6.0.0"></script>
+<script src="js/profile/profile.js?v=1.6.0.0"></script>
 
 <!-- js/nutrition -->
-<script src="js/nutrition/supplements.js?v=1.5.0.0"></script>
-<script src="js/nutrition/panels.js?v=1.5.0.0"></script>
-<script src="js/nutrition/water.js?v=1.5.0.0"></script>
+<script src="js/nutrition/supplements.js?v=1.6.0.0"></script>
+<script src="js/nutrition/panels.js?v=1.6.0.0"></script>
+<script src="js/nutrition/water.js?v=1.6.0.0"></script>
 
 <!-- js/workout -->
-<script src="js/workout/labels.js?v=1.5.0.0"></script>
-<script src="js/workout/data.js?v=1.5.0.0"></script>
-<script src="js/workout/branches.js?v=1.5.0.0"></script>
-<script src="js/workout/menu.js?v=1.5.0.0"></script>
-<script src="js/workout/library.js?v=1.5.0.0"></script>
-<script src="js/workout/programs.js?v=1.5.0.0"></script>
-<script src="js/workout/history.js?v=1.5.0.0"></script>
-<script src="js/workout/engine.js?v=1.5.0.0"></script>
-<script src="js/workout/tools.js?v=1.5.0.0"></script>
+<script src="js/workout/labels.js?v=1.6.0.0"></script>
+<script src="js/workout/data.js?v=1.6.0.0"></script>
+<script src="js/workout/branches.js?v=1.6.0.0"></script>
+<script src="js/workout/menu.js?v=1.6.0.0"></script>
+<script src="js/workout/library.js?v=1.6.0.0"></script>
+<script src="js/workout/programs.js?v=1.6.0.0"></script>
+<script src="js/workout/history.js?v=1.6.0.0"></script>
+<script src="js/workout/engine.js?v=1.6.0.0"></script>
+<script src="js/workout/tools.js?v=1.6.0.0"></script>
 
 <!-- js/calculators -->
-<script src="js/calculators/index.js?v=1.5.0.0"></script>
-<script src="js/calculators/one-rm.js?v=1.5.0.0"></script>
-<script src="js/calculators/working-set.js?v=1.5.0.0"></script>
-<script src="js/calculators/sleep.js?v=1.5.0.0"></script>
-<script src="js/calculators/pr-test.js?v=1.5.0.0"></script>
+<script src="js/calculators/index.js?v=1.6.0.0"></script>
+<script src="js/calculators/one-rm.js?v=1.6.0.0"></script>
+<script src="js/calculators/working-set.js?v=1.6.0.0"></script>
+<script src="js/calculators/sleep.js?v=1.6.0.0"></script>
+<script src="js/calculators/pr-test.js?v=1.6.0.0"></script>
 
 <!-- js/badges -->
-<script src="js/badges/badges.js?v=1.5.0.0"></script>
+<script src="js/badges/badges.js?v=1.6.0.0"></script>
 
 <!-- js/auth -->
-<script src="js/auth/firebase.js?v=1.5.0.0"></script>
+<script src="js/auth/firebase.js?v=1.6.0.0"></script>
 
 <!-- js/admin -->
-<script src="js/admin/self-test.js?v=1.5.0.0"></script>
+<script src="js/admin/self-test.js?v=1.6.0.0"></script>
 
 <!-- js/social -->
-<script src="js/social/media.js?v=1.5.0.0"></script>
-<script src="js/social/profiles.js?v=1.5.0.0"></script>
-<script src="js/social/nav-stack.js?v=1.5.0.0"></script>
-<script src="js/social/verified.js?v=1.5.0.0"></script>
-<script src="js/social/stats-panel.js?v=1.5.0.0"></script>
-<script src="js/social/profile-view.js?v=1.5.0.0"></script>
-<script src="js/social/profile-edit.js?v=1.5.0.0"></script>
-<script src="js/social/badge-showcase.js?v=1.5.0.0"></script>
-<script src="js/social/profile-sync.js?v=1.5.0.0"></script>
-<script src="js/social/follow.js?v=1.5.0.0"></script>
-<script src="js/social/privacy.js?v=1.5.0.0"></script>
-<script src="js/social/notifications.js?v=1.5.0.0"></script>
-<script src="js/social/discover.js?v=1.5.0.0"></script>
-<script src="js/social/user-profile.js?v=1.5.0.0"></script>
-<script src="js/social/cropper.js?v=1.5.0.0"></script>
-<script src="js/social/interactions.js?v=1.5.0.0"></script>
-<script src="js/social/posts.js?v=1.5.0.0"></script>
-<script src="js/social/feed.js?v=1.5.0.0"></script>
-<script src="js/social/pro-application.js?v=1.5.0.0"></script>
-<script src="js/social/pricing.js?v=1.5.0.0"></script>
-<script src="js/social/packages.js?v=1.5.0.0"></script>
-<script src="js/admin/panel.js?v=1.5.0.0"></script>
-<script src="js/admin/reports.js?v=1.5.0.0"></script>
+<script src="js/social/media.js?v=1.6.0.0"></script>
+<script src="js/social/profiles.js?v=1.6.0.0"></script>
+<script src="js/social/nav-stack.js?v=1.6.0.0"></script>
+<script src="js/social/verified.js?v=1.6.0.0"></script>
+<script src="js/social/stats-panel.js?v=1.6.0.0"></script>
+<script src="js/social/profile-view.js?v=1.6.0.0"></script>
+<script src="js/social/profile-edit.js?v=1.6.0.0"></script>
+<script src="js/social/badge-showcase.js?v=1.6.0.0"></script>
+<script src="js/social/profile-sync.js?v=1.6.0.0"></script>
+<script src="js/social/follow.js?v=1.6.0.0"></script>
+<script src="js/social/privacy.js?v=1.6.0.0"></script>
+<script src="js/social/notifications.js?v=1.6.0.0"></script>
+<script src="js/social/account-deletion.js?v=1.6.0.0"></script>
+<script src="js/social/discover.js?v=1.6.0.0"></script>
+<script src="js/social/user-profile.js?v=1.6.0.0"></script>
+<script src="js/social/cropper.js?v=1.6.0.0"></script>
+<script src="js/social/interactions.js?v=1.6.0.0"></script>
+<script src="js/social/posts.js?v=1.6.0.0"></script>
+<script src="js/social/feed.js?v=1.6.0.0"></script>
+<script src="js/social/pro-application.js?v=1.6.0.0"></script>
+<script src="js/social/pricing.js?v=1.6.0.0"></script>
+<script src="js/social/packages.js?v=1.6.0.0"></script>
+<script src="js/admin/panel.js?v=1.6.0.0"></script>
+<script src="js/admin/reports.js?v=1.6.0.0"></script>
 
 <!-- Başlatıcı — en son yüklenir -->
-<script src="js/app.js?v=1.5.0.0"></script>
+<script src="js/app.js?v=1.6.0.0"></script>
 
 <!-- 🔥 Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>

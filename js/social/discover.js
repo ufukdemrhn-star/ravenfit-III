@@ -138,6 +138,10 @@ function _dscListele(liste, bosMesaj){
 /* Engellenen ve engelleyen kullanıcıları listeden çıkarır.
    Arama sonucunda görünmeleri engellemenin anlamını bozar. */
 function _dscEngelAyikla(liste){
-  if(typeof engelliMi !== 'function') return liste;
-  return (liste || []).filter(function(p){ return !engelliMi(p.uid); });
+  return (liste || []).filter(function(p){
+    /* Engelli veya silinmeyi bekleyen hesaplar listelenmez */
+    if(typeof engelliMi === 'function' && engelliMi(p.uid)) return false;
+    if(typeof silinmeyiBekliyorMu === 'function' && silinmeyiBekliyorMu(p)) return false;
+    return true;
+  });
 }
