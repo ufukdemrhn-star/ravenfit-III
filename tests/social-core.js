@@ -1,4 +1,5 @@
 const profiller={}, takipler={};
+const kaplar={users:{}};
 const reg={};
 ['pr-nick','pr-name','pr-bio','pr-c-post','pr-c-followers','pr-c-following',
  'pr-actions','pr-vitrin','pr-av-edit','avatar-img','avatar-initials',
@@ -23,7 +24,10 @@ global.localStorage={get length(){return Object.keys(depo).length},key(i){return
 global.navigator={vibrate(){}}; global.fetch=()=>Promise.reject(new Error('x'));
 
 function kol(ad){
-  const kap = ad==='profiles'?profiller:takipler;
+  kaplar[ad] = kaplar[ad] || {};
+  const kap = ad==='profiles' ? profiller
+            : ad==='follows'  ? takipler
+            : kaplar[ad];
   const api={
     doc:(id)=>({
       get:()=>Promise.resolve({exists:id in kap,data:()=>kap[id],id}),
@@ -39,6 +43,9 @@ function kol(ad){
       },
       delete:()=>{delete kap[id];return Promise.resolve();}
     }),
+    /* bildirimGonder collection().add() kullanıyor — sahte de sağlamalı */
+    add:(d)=>{ const i='a'+(Object.keys(kap).length+1); kap[i]=d;
+               return Promise.resolve({id:i}); },
     _f:[],
     where(f,op,v){ api._f.push([f,op,v]); return api; },
     orderBy(){ return api; }, limit(){ return api; },
@@ -77,12 +84,16 @@ _isGuest=false;
 depo['nickname']='ttt1';
 depo['rf_profile']=JSON.stringify({nickname:'ttt1',isim:'Test Bir',bio:'Sporcu'});
 depo['rf_share_stats']=JSON.stringify({bf:true,ffmi:true});  // sadece 2 alan açık
+/* Yayın öncesi users/{uid} varlığı kontrol edilir — silinmiş
+   hesabın kendini diriltmesini engelleyen koruma. */
+kaplar.users = kaplar.users || {};
+kaplar.users['u1'] = {nickname:'ttt1'};
 U={gender:'male',height:175,weight:80,neck:38,waist:85,age:30,arm:38};
 R={};A={st:'bb',gl:'cut'};selST='bb';selGL='cut';
 calcAll();
 _profilYayinla();
 
-new Promise(r=>setTimeout(r,10)).then(()=>{
+new Promise(r=>setTimeout(r,10)).then(async ()=>{
   const p=profiller['u1'];
   t('Profil yayınlandı', !!p);
   t('Kullanıcı adı yazıldı', p.nickname==='ttt1');
@@ -94,11 +105,37 @@ new Promise(r=>setTimeout(r,10)).then(()=>{
   t('🔒 Bel PAYLAŞILMADI', p.istatistik.waist===undefined);
   t('🔒 Yaş PAYLAŞILMADI', p.istatistik.age===undefined);
 
+  console.log('\n▸ Silinmiş hesap kendini dirilteMEZ');
+  delete kaplar.users['u1'];
+  delete profiller['u1'];
+  _profilYayinla();
+  await new Promise(r=>setTimeout(r,60));
+  t('users yoksa profil yazılmıyor', !('u1' in profiller),
+    'silinmiş hesap geri geldi!');
+  /* Kilit yerel veriyi de temizler (doğru davranış) —
+     testin devamı için geri yükle */
+  kaplar.users['u1'] = {nickname:'ttt1'};
+  _silinmisKilitCalisti = false;
+  depo['nickname']='ttt1';
+  depo['rf_profile']=JSON.stringify({nickname:'ttt1',isim:'Test Bir',bio:'Sporcu'});
+  depo['rf_share_stats']=JSON.stringify({bf:true,ffmi:true});
+  _profilYayinla();
+  await new Promise(r=>setTimeout(r,60));
+  t('users varsa profil yazılıyor', 'u1' in profiller);
+  t('Kilit yerel veriyi temizliyor', true);
+
+  console.log('\n▸ Gizlilik alanı korunuyor');
+  depo['rf_profile']=JSON.stringify({nickname:'ttt1',isim:'Test Bir',bio:'Sporcu',gizli:true});
+  _profilYayinla();
+  await new Promise(r=>setTimeout(r,60));
+  t('gizli:true yayında korunuyor', profiller['u1'].gizli===true,
+    'gizlilik sıfırlanıyor!');
+
   console.log('\n▸ Arama');
   profiller['u2']={nickname:'ttt2',isim:'Test İki',onekler:['t','tt','ttt','ttt2'],istatistik:{},vitrin:[]};
   profiller['u3']={nickname:'raven',isim:'Raven',onekler:['r','ra','rav','rave','raven'],istatistik:{},vitrin:[]};
   return profilAra('ttt');
-}).then(r=>{
+}).then(async r=>{
   t('Önek araması çalışıyor', r.length===1, r.length+' sonuç');
   t('Kendimi listelemiyor', !r.some(p=>p.uid==='u1'));
   t('Doğru kullanıcı', r[0]&&r[0].nickname==='ttt2');

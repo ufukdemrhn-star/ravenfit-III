@@ -172,6 +172,12 @@ function profilNesnesiUret(){
     vitrin:    getVitrinAlanlari().filter(function(id){ return !!ayarlar[id]; }),
     rol:       p.rol   || 'uye',
     onay:      p.onay  || 'yok',
+    /* ⚠️ Bu alanların EKSİK kalması ciddi hata üretir:
+       yayinlaProfil() bu nesneyi profiles/{uid} belgesine yazar.
+       Alan yoksa undefined → false olarak yazılır ve kullanıcının
+       gizlilik ayarı ile silme durumu her yayında SIFIRLANIR. */
+    gizli:     p.gizli === true,
+    silinecek: p.silinecek === true,
     guncelleme: Date.now()
   };
 }

@@ -429,7 +429,21 @@ function adminHesabiSil(uid){
 function _adminSilmeYurut(uid){
   showToast('Siliniyor, lütfen bekle...');
 
-  /* Alt koleksiyonlu gönderiler önce temizlenir */
+  var hatalar = [];
+  var silinen = {};
+
+  /* Hata YUTULMAZ — hangi koleksiyonun silinemediği raporlanır.
+     Önceki sürümde .catch(function(){}) kullanılıyordu ve izin
+     hataları sessizce geçiyordu; veriler duruyordu ama "silindi"
+     mesajı çıkıyordu. */
+  function say(ad, n){ silinen[ad] = (silinen[ad]||0) + n; }
+  function hata(ad, e){
+    var mesaj = (e && (e.code || e.message)) || 'bilinmeyen';
+    hatalar.push(ad + ': ' + mesaj);
+    console.warn('Silinemedi —', ad, e);
+  }
+
+  /* ── 1. Kullanıcının gönderileri (alt koleksiyonlarıyla) ── */
   var gonderiSil = _fbDb.collection('posts').where('uid','==',uid).limit(300).get()
     .then(function(snap){
       return Promise.all(snap.docs.map(function(d){
@@ -439,55 +453,116 @@ function _adminSilmeYurut(uid){
           .then(function(){ return ref.collection('comments').get(); })
           .then(function(c){ return Promise.all(c.docs.map(function(x){ return x.ref.delete(); })); })
           .then(function(){ return ref.delete(); })
-          .catch(function(){});
+          .then(function(){ say('gönderi', 1); })
+          .catch(function(e){ hata('gönderi', e); });
       }));
-    }).catch(function(){});
+    }).catch(function(e){ hata('gönderiler', e); });
 
-  /* Düz koleksiyonlar — alan adı her birinde farklı */
+  /* ── 2. BAŞKASININ gönderilerindeki yorumları ──
+     Alt koleksiyonlar arası arama için collectionGroup gerekir.
+     Bu olmadan kullanıcının başka profillerde bıraktığı yorumlar
+     kalıyor ve "@kullanıcı — profil bulunamadı" olarak görünüyordu. */
+  var yorumSil = Promise.resolve();
+  if(typeof _fbDb.collectionGroup === 'function'){
+    yorumSil = _fbDb.collectionGroup('comments').where('uid','==',uid).limit(300).get()
+      .then(function(snap){
+        return Promise.all(snap.docs.map(function(d){
+          return d.ref.delete()
+            .then(function(){ say('yorum', 1); })
+            .catch(function(e){ hata('yorum', e); });
+        }));
+      })
+      .catch(function(e){
+        /* Dizin eksikse Firestore bunu bildirir — kullanıcıya göster */
+        hata('yorumlar (collectionGroup dizini gerekebilir)', e);
+      });
+  } else {
+    hatalar.push('yorumlar: collectionGroup desteklenmiyor');
+  }
+
+  /* ── 3. Düz koleksiyonlar ── */
   var toplu = [
-    ['likes',          'uid'],
-    ['commentLikes',   'uid'],
-    ['packages',       'uid'],
-    ['follows',        'takipEden'],
-    ['follows',        'takipEdilen'],
-    ['blocks',         'engelleyen'],
-    ['blocks',         'engellenen'],
-    ['notifications',  'hedef'],
-    ['notifications',  'kimden'],
-    ['followRequests', 'isteyen'],
-    ['followRequests', 'hedef'],
-    ['reports',        'sikayetEden']
+    ['likes',          'uid',          'beğeni'],
+    ['commentLikes',   'uid',          'yorum beğenisi'],
+    ['packages',       'uid',          'paket'],
+    ['follows',        'takipEden',    'takip (giden)'],
+    ['follows',        'takipEdilen',  'takip (gelen)'],
+    ['blocks',         'engelleyen',   'engel (giden)'],
+    ['blocks',         'engellenen',   'engel (gelen)'],
+    ['notifications',  'hedef',        'bildirim (gelen)'],
+    ['notifications',  'kimden',       'bildirim (giden)'],
+    ['followRequests', 'isteyen',      'istek (giden)'],
+    ['followRequests', 'hedef',        'istek (gelen)'],
+    ['reports',        'sikayetEden',  'şikâyet']
   ].map(function(p){
     return _fbDb.collection(p[0]).where(p[1],'==',uid).limit(300).get()
       .then(function(snap){
-        return Promise.all(snap.docs.map(function(d){ return d.ref.delete(); }));
-      }).catch(function(){});
+        return Promise.all(snap.docs.map(function(d){
+          return d.ref.delete()
+            .then(function(){ say(p[2], 1); })
+            .catch(function(e){ hata(p[2], e); });
+        }));
+      }).catch(function(e){ hata(p[2], e); });
   });
 
-  /* Tekil belgeler */
+  /* ── 4. Tekil belgeler ── */
   var nick = null;
   var tekil = _fbDb.collection('users').doc(uid).get()
     .then(function(d){ if(d.exists) nick = (d.data().nickname||'').toLowerCase(); })
     .catch(function(){})
     .then(function(){
       var isler = [
-        _fbDb.collection('profiles').doc(uid).delete().catch(function(){}),
-        _fbDb.collection('users').doc(uid).delete().catch(function(){}),
-        _fbDb.collection('applications').doc(uid).delete().catch(function(){}),
-        _fbDb.collection('deletionRequests').doc(uid).delete().catch(function(){})
-      ];
-      if(nick) isler.push(_fbDb.collection('nicknames').doc(nick).delete().catch(function(){}));
+        ['profiles', uid], ['users', uid],
+        ['applications', uid], ['deletionRequests', uid]
+      ].map(function(p){
+        return _fbDb.collection(p[0]).doc(p[1]).delete()
+          .then(function(){ say(p[0], 1); })
+          .catch(function(e){ hata(p[0], e); });
+      });
+      if(nick){
+        isler.push(_fbDb.collection('nicknames').doc(nick).delete()
+          .then(function(){ say('kullanıcı adı', 1); })
+          .catch(function(e){ hata('kullanıcı adı', e); }));
+      }
       return Promise.all(isler);
     });
 
-  Promise.all([gonderiSil].concat(toplu).concat([tekil]))
+  Promise.all([gonderiSil, yorumSil].concat(toplu).concat([tekil]))
     .then(function(){
       if(_profilOnbellek) delete _profilOnbellek[uid];
-      showToast('✅ Hesap ve tüm verileri silindi.');
-      _adminYukle();
-    })
-    .catch(function(e){
-      showToast('⚠️ Silme kısmen tamamlandı: ' + (e && e.message || ''),'warn');
+
+      var ozet = Object.keys(silinen).map(function(k){
+        return k + ': ' + silinen[k];
+      }).join(', ');
+
+      if(hatalar.length){
+        console.warn('Silme hataları:', hatalar);
+        showToast('⚠️ Kısmen silindi. ' + hatalar.length +
+                  ' işlem başarısız — konsolu kontrol et.','warn');
+        _adminSilmeRaporu(uid, silinen, hatalar);
+      } else {
+        showToast('✅ Hesap silindi. ' + (ozet || 'veri yoktu'));
+      }
       _adminYukle();
     });
+}
+
+/* Kısmi başarısızlıkta ayrıntılı rapor — hangi kural eksik,
+   yönetici görsün diye. */
+function _adminSilmeRaporu(uid, silinen, hatalar){
+  var el = document.getElementById('ad-body');
+  if(!el) return;
+  var html = '<div class="ad-kart" style="border-color:var(--warn)">';
+  html +=   '<div class="ad-ad">⚠️ Silme kısmen tamamlandı</div>';
+  html +=   '<div class="ad-aciklama">Bazı veriler silinemedi. ' +
+            'Çoğunlukla Firestore kurallarında yönetici izni eksiktir.</div>';
+  html +=   '<div class="ad-onizleme"><div class="ad-onizleme-ust">Başarısız</div>' +
+            '<div class="ad-onizleme-metin">' +
+            hatalar.slice(0,10).map(function(h){ return '• ' + _adKacir(h); }).join('<br>') +
+            '</div></div>';
+  html +=   '<div class="ad-eylemler">' +
+            '<button class="ad-btn red" onclick="_adminSilmeYurut(\'' + uid + '\')">Tekrar Dene</button>' +
+            '<button class="ad-btn" onclick="_adminYukle()">Kapat</button></div>';
+  html += '</div>';
+  el.innerHTML = html + el.innerHTML;
 }

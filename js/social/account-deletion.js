@@ -304,3 +304,58 @@ function silmeDurumuKontrol(){
               'Ayarlardan vazgeçebilirsin.','warn');
   });
 }
+
+/* ══════════════════════════════════════════════════════════
+   SİLİNMİŞ HESAP KİLİDİ
+
+   Silinen kullanıcının CİHAZINDA localStorage hâlâ dolu:
+   profil, ölçümler, gönderi geçmişi, kullanıcı adı. Giriş
+   yaptığında saveData ve yayinlaProfil çalışıp bu verileri
+   buluta geri yazıyor — hesap kendini diriltiyordu.
+
+   Çözüm: girişte bulutta users/{uid} var mı diye bakılır.
+   Yoksa hesap silinmiştir; yerel veri temizlenir ve oturum
+   kapatılır. Kullanıcı silinmiş hesabına dönemez.
+   ══════════════════════════════════════════════════════════ */
+
+var _silinmisKilitCalisti = false;
+
+function _silinmisHesapKilitle(){
+  if(_silinmisKilitCalisti) return;
+  _silinmisKilitCalisti = true;
+
+  showToast('Bu hesap silinmiş.','error');
+
+  /* Yerel veriyi temizle — yoksa bir sonraki girişte yine yazılır */
+  try {
+    if(typeof _clearUserLocalData === 'function') _clearUserLocalData();
+  } catch(e){}
+
+  setTimeout(function(){
+    if(_fbAuth) _fbAuth.signOut().then(function(){
+      if(typeof showAuthScreen === 'function') showAuthScreen();
+      var e = document.getElementById('auth-err');
+      if(e){
+        e.style.color = 'var(--danger)';
+        e.textContent = 'Bu hesap silinmiş. Yeni hesap oluşturabilirsin.';
+      }
+    });
+  }, 1200);
+}
+
+/* Girişte hesabın hâlâ var olup olmadığını doğrular.
+   Diğer tüm kancalardan ÖNCE çalışmalı. */
+function silinmisHesapKontrol(){
+  if(!_fbUser || !_fbDb) return Promise.resolve(true);
+  _silinmisKilitCalisti = false;
+
+  return _fbDb.collection('users').doc(_fbUser.uid).get()
+    .then(function(d){
+      if(!d.exists){
+        _silinmisHesapKilitle();
+        return false;
+      }
+      return true;
+    })
+    .catch(function(){ return true; });   /* okunamadıysa engelleme */
+}

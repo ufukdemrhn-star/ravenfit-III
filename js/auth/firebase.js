@@ -426,6 +426,10 @@ function onUserLoggedIn(user){
         _denenenNick = null;
         /* ── GİRİŞ SONRASI ARKA PLAN İŞLERİ ───────────────────
            Sırayla ve gecikmeli çalışır; ilk açılışı yavaşlatmasın. */
+        /* ⚠️ İLK KONTROL: hesap silinmiş mi?
+           Diğer kancalar veri YAZAR; silinmiş hesap onlarla
+           kendini diriltir. Bu yüzden en başta doğrulanır. */
+        if(typeof silinmisHesapKontrol === 'function') setTimeout(silinmisHesapKontrol, 300);
         /* Eski büyük avatarları küçült — sessiz, tek seferlik */
         if(typeof avatarOnar === 'function') setTimeout(avatarOnar, 800);
         /* Yöneticilik kontrolü — panel girişi buna göre görünür */

@@ -24,6 +24,28 @@ function _profilYayinla(){
   if(!_fbUser || !_fbDb) return;
   if(typeof _isGuest !== 'undefined' && _isGuest) return;   /* misafir yayınlamaz */
 
+  /* ⚠️ SİLİNMİŞ HESAP KENDİNİ DİRİLTEMEZ
+
+     Silinen kullanıcının cihazında localStorage hâlâ dolu.
+     Giriş yapınca yayinlaProfil çalışıp profiles/{uid} belgesini
+     yeniden oluşturuyordu — hesap "geri geliyordu".
+
+     Bu yüzden yayın öncesi bulutta kayıt var mı diye bakılır.
+     users/{uid} yoksa hesap silinmiştir; hiçbir şey yazılmaz. */
+  _fbDb.collection('users').doc(_fbUser.uid).get()
+    .then(function(d){
+      if(!d.exists){
+        console.warn('Hesap silinmiş — profil yayınlanmadı.');
+        if(typeof _silinmisHesapKilitle === 'function') _silinmisHesapKilitle();
+        return;
+      }
+      _profilYayinlaGercek();
+    })
+    .catch(function(){ /* okunamadıysa yazmayı deneme */ });
+}
+
+function _profilYayinlaGercek(){
+
   try {
     var p = profilNesnesiUret();
     var nick = (p.nickname || _lsGet('nickname') || '').toLowerCase();
@@ -72,6 +94,7 @@ function _profilYayinla(){
       vitrin:     p.vitrin || [],
       rol:        p.rol || 'uye',
       gizli:      p.gizli === true,
+      silinecek:  p.silinecek === true,
       onay:       p.onay || 'yok',
       takipci:    p.takipciSayisi || 0,
       takip:      p.takipSayisi || 0,
