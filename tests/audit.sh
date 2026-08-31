@@ -57,6 +57,13 @@ python3 tests/login-hooks.py > /tmp/rf_hook.log 2>&1
 sonuc $? "$(grep -o '[0-9]*/[0-9]* geçti' /tmp/rf_hook.log | head -1)"
 grep "❌" /tmp/rf_hook.log | head -5
 
+# ── 0e. Kas verisi bütünlüğü ───────────────────────────────
+baslik "0e. Kas verisi bütünlüğü"
+python3 tests/muscle-data.py > /tmp/rf_kas.log 2>&1
+! grep -q "❌" /tmp/rf_kas.log
+sonuc $? "$(grep -o '[0-9]*/[0-9]* geçti' /tmp/rf_kas.log | head -1)"
+grep "❌" /tmp/rf_kas.log | head -5
+
 # ── 1. JS sözdizimi ────────────────────────────────────────
 baslik "1. JavaScript sözdizimi"
 GECERLI=0; TOPLAM=0

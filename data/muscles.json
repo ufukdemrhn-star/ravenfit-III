@@ -1,0 +1,247 @@
+{
+ "surum": "2.0",
+ "guncelleme": "2026-09",
+ "olcek": {
+  "aciklama": "10'luk aktivasyon ölçeği. Bantlar %MVIC literatürüne ve ExRx işlevsel sınıflandırmasına oturur.",
+  "bantlar": [
+   {
+    "puan": 10,
+    "ad": "Kusursuz",
+    "aciklama": "Hareketin amacı bu kas. Nadir kullanılır."
+   },
+   {
+    "puan": 9,
+    "ad": "Çok Yüksek",
+    "aciklama": "Birincil hareket ettirici."
+   },
+   {
+    "puan": [
+     7,
+     8
+    ],
+    "ad": "Yüksek",
+    "aciklama": "Belirgin yük alır, hareketi belirler."
+   },
+   {
+    "puan": [
+     5,
+     6
+    ],
+    "ad": "Sinerjist",
+    "aciklama": "Yardımcı. Anlamlı katkı ama birincil değil."
+   },
+   {
+    "puan": [
+     3,
+     4
+    ],
+    "ad": "Kısmi",
+    "aciklama": "Stabilizatör. Çoğunlukla izometrik."
+   },
+   {
+    "puan": [
+     1,
+     2
+    ],
+    "ad": "Düşük",
+    "aciklama": "Ölçülebilir ama antrenman etkisi önemsiz."
+   }
+  ],
+  "kural": "Her bileşik harekette EN AZ BİR kas 9 veya 10 olmalı. Yoksa hareketin amacı belirsizdir."
+ },
+ "gruplar": [
+  {
+   "id": "gogus",
+   "ad": "Göğüs",
+   "ikon": "🫀",
+   "kaslar": [
+    {
+     "id": "pectoralis-clavicular",
+     "ad": "Üst Göğüs",
+     "lat": "Pectoralis Major (Clavicular)"
+    },
+    {
+     "id": "pectoralis-sternal",
+     "ad": "Orta Göğüs",
+     "lat": "Pectoralis Major (Sternal)"
+    }
+   ]
+  },
+  {
+   "id": "omuz",
+   "ad": "Omuz",
+   "ikon": "🎯",
+   "kaslar": [
+    {
+     "id": "anterior-deltoid",
+     "ad": "Ön Omuz",
+     "lat": "Deltoideus Anterior"
+    },
+    {
+     "id": "middle-deltoid",
+     "ad": "Yan Omuz",
+     "lat": "Deltoideus Medialis"
+    },
+    {
+     "id": "posterior-deltoid",
+     "ad": "Arka Omuz",
+     "lat": "Deltoideus Posterior"
+    }
+   ]
+  },
+  {
+   "id": "kol",
+   "ad": "Kol",
+   "ikon": "💪",
+   "kaslar": [
+    {
+     "id": "biceps",
+     "ad": "Biceps",
+     "lat": "Biceps Brachii + Brachialis"
+    },
+    {
+     "id": "triceps-long",
+     "ad": "Triceps Uzun",
+     "lat": "Triceps Brachii (Long Head)"
+    },
+    {
+     "id": "triceps-lateral",
+     "ad": "Triceps Dış",
+     "lat": "Triceps Brachii (Lateral + Medial Head)"
+    },
+    {
+     "id": "forearms",
+     "ad": "Ön Kol",
+     "lat": "Forearm Flexors/Extensors"
+    }
+   ]
+  },
+  {
+   "id": "sirt",
+   "ad": "Sırt",
+   "ikon": "🔺",
+   "kaslar": [
+    {
+     "id": "upper-traps",
+     "ad": "Üst Trapez",
+     "lat": "Trapezius (Upper)"
+    },
+    {
+     "id": "middle-traps",
+     "ad": "Orta Trapez",
+     "lat": "Trapezius (Middle)"
+    },
+    {
+     "id": "lower-traps",
+     "ad": "Alt Trapez",
+     "lat": "Trapezius (Lower)"
+    },
+    {
+     "id": "rhomboids",
+     "ad": "Rhomboid",
+     "lat": "Rhomboideus Major/Minor"
+    },
+    {
+     "id": "lats",
+     "ad": "Kanat",
+     "lat": "Latissimus Dorsi + Teres Major"
+    },
+    {
+     "id": "rotator-cuff",
+     "ad": "Rotator Manşet",
+     "lat": "Supraspinatus, Infraspinatus, Teres Minor, Subscapularis"
+    },
+    {
+     "id": "spinal-erectors",
+     "ad": "Bel Dikleştirici",
+     "lat": "Erector Spinae"
+    }
+   ]
+  },
+  {
+   "id": "karin",
+   "ad": "Karın",
+   "ikon": "🎽",
+   "kaslar": [
+    {
+     "id": "abs",
+     "ad": "Karın",
+     "lat": "Rectus Abdominis"
+    },
+    {
+     "id": "obliques",
+     "ad": "Yan Karın",
+     "lat": "Obliquus Externus/Internus"
+    }
+   ]
+  },
+  {
+   "id": "kalca",
+   "ad": "Kalça",
+   "ikon": "🍑",
+   "kaslar": [
+    {
+     "id": "glute-max",
+     "ad": "Büyük Kalça",
+     "lat": "Gluteus Maximus"
+    },
+    {
+     "id": "glute-med",
+     "ad": "Orta Kalça",
+     "lat": "Gluteus Medius/Minimus"
+    },
+    {
+     "id": "hip-flexors",
+     "ad": "Kalça Fleksör",
+     "lat": "Iliopsoas, Rectus Femoris"
+    },
+    {
+     "id": "adductors",
+     "ad": "İç Bacak",
+     "lat": "Adductor Magnus/Longus/Brevis"
+    }
+   ]
+  },
+  {
+   "id": "bacak",
+   "ad": "Bacak",
+   "ikon": "🦵",
+   "kaslar": [
+    {
+     "id": "quads",
+     "ad": "Ön Bacak",
+     "lat": "Quadriceps Femoris"
+    },
+    {
+     "id": "hamstrings",
+     "ad": "Arka Bacak",
+     "lat": "Biceps Femoris, Semitendinosus, Semimembranosus"
+    },
+    {
+     "id": "calves",
+     "ad": "Baldır",
+     "lat": "Gastrocnemius, Soleus"
+    }
+   ]
+  },
+  {
+   "id": "diger",
+   "ad": "Diğer",
+   "ikon": "⚙️",
+   "kaslar": [
+    {
+     "id": "neck-flexors",
+     "ad": "Boyun",
+     "lat": "Sternocleidomastoid, Scalenes"
+    }
+   ]
+  }
+ ],
+ "notlar": [
+  "triceps-medial kaldırıldı: yüzey EMG ile ölçülemez (derin kas), triceps-lateral'e birleştirildi.",
+  "middle-traps ve rhomboids işlevsel olarak birlikte çalışır; EMG ile ayırt edilmeleri güçtür. Çoğu harekette benzer puan alırlar.",
+  "gluteus minimus yerine medius kullanıldı: medius asıl kalça abduktörüdür, minimus derin ve küçüktür.",
+  "Gluteal kaslar anatomik olarak kalça grubunda; sırt grubunda DEĞİL.",
+  "Aktivasyon puanları ölçülmüş EMG verisi değil, literatür-bilgili kinesiyolojik yargıdır. Tek bir kapsamlı EMG veri tabanı mevcut değildir."
+ ]
+}

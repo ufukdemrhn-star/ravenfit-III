@@ -1,18 +1,29 @@
-RavenFit — Güncelleme 1.6.1.0
+RavenFit — Güncelleme 1.7.0.0
 ==============================================
 
-7 dosya değişti (toplam 131 dosya).
+18 dosya değişti (toplam 137 dosya).
 Bu paketi açıp KLASÖR YAPISINI KORUYARAK depona yükle.
 Aynı yoldaki dosyaların üzerine yaz.
 
 DEĞİŞENLER:
 
+  GÜNCEL data/exercises-fitness.json
+  GÜNCEL data/exercises-posture.json
+  GÜNCEL data/exercises-swimming.json
+  YENİ  data/muscles.json
   GÜNCEL index.html
   GÜNCEL js/admin/panel.js
   GÜNCEL js/auth/firebase.js
   GÜNCEL js/social/account-deletion.js
   GÜNCEL js/social/profile-sync.js
   GÜNCEL js/social/profiles.js
+  GÜNCEL js/workout/labels.js
+  GÜNCEL tests/audit.sh
+  YENİ  tests/muscle-data.py
   GÜNCEL tests/social-core.js
+  YENİ  tools/arketipler.py
+  YENİ  tools/eslestir.py
+  YENİ  tools/kalibre-parti1.py
+  YENİ  tools/kalibre-tum.py
 
 Yükledikten sonra: Ctrl + Shift + R

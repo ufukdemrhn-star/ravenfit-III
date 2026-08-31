@@ -10,55 +10,72 @@
 /* ── Kas grubu etiketleri ────────────────────────────────── */
 
 var MUSCLE_TR={
-  /* Yeni anatomik isimler (İngilizce) */
-  'neck-flexors':           'Neck Flexors',
-  'anterior-deltoid':       'Anterior Deltoid',
-  'middle-deltoid':         'Middle Deltoid',
-  'posterior-deltoid':      'Posterior Deltoid',
-  'traps':                  'Trapezius',
-  'lower-traps':            'Lower Trapezius',
-  'rotator-cuff':           'Rotator Cuff',
-  'lats':                   'Latissimus Dorsi',
-  'spinal-erectors':        'Spinal Erectors',
-  'biceps':                 'Biceps',
-  'triceps-long':           'Triceps Long Head',
-  'triceps-lateral':        'Triceps Lateral Head',
-  'triceps-medial':         'Triceps Medial Head',
-  'forearms':               'Forearms',
-  'pectoralis-sternal':     'Pectoralis Sternal',
-  'pectoralis-clavicular':  'Pectoralis Clavicular',
-  'abs':                    'Abs',
-  'obliques':               'Obliques',
-  'glute-max':              'Gluteus Maximus',
-  'glute-med':              'Gluteus Medius',
-  'quads':                  'Quadriceps',
-  'hamstrings':             'Hamstrings',
-  'adductors':              'Adductors',
-  'hip-flexors':            'Hip Flexors',
-  'calves':                 'Calves',
-  'full-body':              'Full Body',
-  /* Eski anahtar fallback (eski JSON kalıntıları için) */
-  'chest':'Pectoralis','upper-chest':'Pectoralis Clavicular','lower-chest':'Pectoralis Sternal',
-  'front-shoulder':'Anterior Deltoid','mid-shoulder':'Middle Deltoid','rear-shoulder':'Posterior Deltoid',
-  'rear-delt':'Posterior Deltoid',
-  'forearm-flexors':'Forearms','forearm-extensors':'Forearms','brachioradialis':'Forearms',
-  'mid-traps':'Trapezius','upper-traps':'Trapezius','rhomboids':'Trapezius',
-  'erector-spinae':'Spinal Erectors','teres-major':'Latissimus Dorsi',
-  'abs-upper':'Abs','abs-lower':'Abs','transverse-abs':'Abs',
-  'glutes':'Gluteus Maximus','abductors':'Gluteus Medius',
-  'gastrocnemius':'Calves','soleus':'Calves','grip':'Forearms'
+  /* Göğüs */
+  'pectoralis-clavicular':   'Pectoralis Major (Clavicular)',
+  'pectoralis-sternal':      'Pectoralis Major (Sternal)',
+  /* Omuz */
+  'anterior-deltoid':        'Deltoideus Anterior',
+  'middle-deltoid':          'Deltoideus Medialis',
+  'posterior-deltoid':       'Deltoideus Posterior',
+  /* Kol */
+  'biceps':                  'Biceps Brachii + Brachialis',
+  'triceps-long':            'Triceps Brachii (Long Head)',
+  'triceps-lateral':         'Triceps Brachii (Lateral + Medial Head)',
+  'forearms':                'Forearm Flexors/Extensors',
+  /* Sırt */
+  'upper-traps':             'Trapezius (Upper)',
+  'middle-traps':            'Trapezius (Middle)',
+  'lower-traps':             'Trapezius (Lower)',
+  'rhomboids':               'Rhomboideus Major/Minor',
+  'lats':                    'Latissimus Dorsi + Teres Major',
+  'rotator-cuff':            'Supraspinatus, Infraspinatus, Teres Minor, Subscapularis',
+  'spinal-erectors':         'Erector Spinae',
+  /* Karın */
+  'abs':                     'Rectus Abdominis',
+  'obliques':                'Obliquus Externus/Internus',
+  /* Kalça */
+  'glute-max':               'Gluteus Maximus',
+  'glute-med':               'Gluteus Medius/Minimus',
+  'hip-flexors':             'Iliopsoas, Rectus Femoris',
+  'adductors':               'Adductor Magnus/Longus/Brevis',
+  /* Bacak */
+  'quads':                   'Quadriceps Femoris',
+  'hamstrings':              'Biceps Femoris, Semitendinosus, Semimembranosus',
+  'calves':                  'Gastrocnemius, Soleus',
+  /* Diğer */
+  'neck-flexors':            'Sternocleidomastoid, Scalenes',
+
+  /* ── ESKİ ANAHTAR YEDEĞİ ──────────────────────────────
+     Eski JSON kalıntıları ve kullanıcının kaydettiği özel
+     programlar bu anahtarları içerebilir. Kaldırılırsa
+     etiketler boş görünür. */
+  'traps':'Trapezius (Upper)', 'triceps-medial':'Triceps Brachii (Lateral + Medial Head)',
+  'full-body':'Tüm Vücut',
+  'chest':'Pectoralis','upper-chest':'Pectoralis Major (Clavicular)','lower-chest':'Pectoralis Major (Sternal)',
+  'front-shoulder':'Deltoideus Anterior','mid-shoulder':'Deltoideus Medialis',
+  'rear-shoulder':'Deltoideus Posterior','rear-delt':'Deltoideus Posterior',
+  'forearm-flexors':'Forearm Flexors/Extensors','forearm-extensors':'Forearm Flexors/Extensors',
+  'brachioradialis':'Forearm Flexors/Extensors','grip':'Forearm Flexors/Extensors',
+  'mid-traps':'Trapezius (Middle)','erector-spinae':'Erector Spinae',
+  'teres-major':'Latissimus Dorsi + Teres Major',
+  'abs-upper':'Rectus Abdominis','abs-lower':'Rectus Abdominis','transverse-abs':'Rectus Abdominis',
+  'glutes':'Gluteus Maximus','abductors':'Gluteus Medius/Minimus',
+  'gastrocnemius':'Gastrocnemius, Soleus','soleus':'Gastrocnemius, Soleus'
 };
 
 /* Filtre kategori → kas anahtarları mapping */
 
 var MUSCLE_CATEGORY_MAP={
   'chest':     ['pectoralis-sternal','pectoralis-clavicular','chest','upper-chest','lower-chest'],
-  'back':      ['lats','traps','lower-traps','spinal-erectors','rotator-cuff','mid-traps','upper-traps','rhomboids','erector-spinae','teres-major'],
-  'shoulders': ['anterior-deltoid','middle-deltoid','posterior-deltoid','front-shoulder','mid-shoulder','rear-shoulder','rear-delt'],
-  'arms':      ['biceps','triceps-long','triceps-lateral','forearms','triceps-medial','forearm-flexors','forearm-extensors','brachioradialis','grip'],
+  'back':      ['lats','upper-traps','middle-traps','lower-traps','rhomboids','rotator-cuff',
+                'spinal-erectors','traps','mid-traps','erector-spinae','teres-major'],
+  'shoulders': ['anterior-deltoid','middle-deltoid','posterior-deltoid',
+                'front-shoulder','mid-shoulder','rear-shoulder','rear-delt'],
+  'arms':      ['biceps','triceps-long','triceps-lateral','forearms',
+                'triceps-medial','forearm-flexors','forearm-extensors','brachioradialis','grip'],
   'core':      ['abs','obliques','abs-upper','abs-lower','transverse-abs'],
-  'glutes':    ['glute-max','glute-med','glutes','abductors'],
-  'legs':      ['quads','hamstrings','adductors','hip-flexors','calves','gastrocnemius','soleus'],
+  'glutes':    ['glute-max','glute-med','hip-flexors','adductors','glutes','abductors'],
+  'legs':      ['quads','hamstrings','calves','gastrocnemius','soleus'],
   'neck':      ['neck-flexors'],
   'full-body': ['full-body']
 };
